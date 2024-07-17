@@ -1,1 +1,1 @@
-# gallery-validation-action
+# template-validation-action
