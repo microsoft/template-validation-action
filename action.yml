@@ -1,0 +1,86 @@
+name: 'Gallery Standard Validation'
+description: 'Validate the standard of the gallery'
+inputs:
+  repositoryURL:  # id of input
+    description: 'The URL of the repository to validate'
+    required: true
+    default: ''
+outputs:
+  resultFile:
+    description: "A file path to a results file."
+    value: ${{ steps.run_validation.outputs.resultFile}}
+runs:
+  using: "composite"
+  steps:
+    - name: Extract topics
+      id: extract_repo_info
+      run: |
+        extracted_link=${{ inputs.repositoryURL }} 
+        repo_info=$(echo $extracted_link | sed 's|https://github.com/||')
+        topics_list=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/$repo_info/topics | jq -r '.names | join(",")')
+        echo "topics=\"$topics_list\"" >> $GITHUB_ENV
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+
+    - name: Git Clone Repository
+      run: |
+        cd ..
+        git clone ${{ inputs.repositoryURL }} candidate-repo
+        if [ -d "./candidate-repo/hooks" ] && [ "$(ls -A ./candidate-repo/hooks/*.sh 2>/dev/null)" ]; then
+          chmod +x ./candidate-repo/hooks/*.sh
+        else
+          echo "No hooks directory or no .sh files found in hooks directory"
+        fi
+      shell: bash
+
+    - name: Run Microsoft Security DevOps Analysis
+      uses: microsoft/security-devops-action@v1
+      id: msdo
+      with:
+        tools: templateanalyzer
+      env:
+        GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ./../candidate-repo/
+
+    - name: Set environment name with timestamp
+      id: set_env_name
+      run: |
+        current_time=$(date +%m%d%H%M)
+        azure_env_name="${{ env.AZURE_ENV_NAME }}-$current_time"
+        echo "AZURE_ENV_NAME=$azure_env_name" >> $GITHUB_ENV
+        echo "azure_env_name is $azure_env_name"
+      shell: bash
+      env:
+        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
+
+    - name: Install AZD
+      uses: Azure/setup-azd@v1.0.0
+
+    - name: Log in with Azure (Federated Credentials)
+      if: ${{ env.AZURE_CLIENT_ID != '' }}
+      run: |
+        azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
+      shell: bash
+      env:
+        AZURE_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ env.AZURE_TENANT_ID }}
+
+    - name: Run validation
+      id: run_validation
+      run: |
+        sudo apt-get install python3
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        cd ../candidate-repo
+        python3 ../template-validation-action/src/gallery_validate.py . --debug --azdup --azddown --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ../output.log
+        output_link=$(realpath ../output.log)
+        echo "resultFile=\"$output_link\"" >> $GITHUB_OUTPUT
+      shell: bash
+      env:
+        TOPICS: ${{ env.topics }}
+        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
+        AZURE_LOCATION: ${{ env.AZURE_LOCATION }}
+        AZURE_SUBSCRIPTION_ID: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        CREATE_ROLE_FOR_USER: false
+        GITHUB_ACTIONS: true
+        AZURE_PRINCIPAL_TYPE: "ServicePrincipal"
