@@ -1,9 +1,6 @@
 name: Template Validation Sample Workflow
 on: 
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
@@ -27,6 +24,7 @@ jobs:
         uses: microsoft/template-validation-action@main
         with:
           repositoryURL: https://github.com/Azure-Samples/azd-ai-starter
+          branch: main
 
       - name: print result
         run: cat ${{ steps.validation.outputs.resultFile }}

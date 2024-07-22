@@ -5,6 +5,10 @@ inputs:
     description: 'The URL of the repository to validate'
     required: true
     default: ''
+  branch:
+    description: 'The branch of the repository to validate'
+    required: false
+    default: 'main'
 outputs:
   resultFile:
     description: "A file path to a results file."
@@ -26,7 +30,13 @@ runs:
     - name: Git Clone Repository
       run: |
         cd ..
-        git clone ${{ inputs.repositoryURL }} candidate-repo
+        if [ "${{ inputs.branch }}" == "main" ]; then
+          echo "Cloning the main branch"
+          git clone ${{ inputs.repositoryURL }} candidate-repo
+        else
+          echo "Cloning the ${{ inputs.branch }} branch"
+          git clone --branch ${{ inputs.branch }} ${{ inputs.repositoryURL }} candidate-repo
+        fi
         if [ -d "./candidate-repo/hooks" ] && [ "$(ls -A ./candidate-repo/hooks/*.sh 2>/dev/null)" ]; then
           chmod +x ./candidate-repo/hooks/*.sh
         else
