@@ -80,11 +80,12 @@ runs:
       run: |
         sudo apt-get install python3
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r ${{ github.action_path }}/requirements.txt
         cd ../candidate-repo
-        python3 ../template-validation-action/src/gallery_validate.py . --debug --azdup --azddown --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ../output.log
+        python3 ${{ github.action_path }}/src/gallery_validate.py . --debug --azdup --azddown --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ../output.log
         output_link=$(realpath ../output.log)
-        echo "resultFile=\"$output_link\"" >> $GITHUB_OUTPUT
+        echo "resultFile is $output_link"
+        echo "resultFile=$output_link" >> $GITHUB_OUTPUT
       shell: bash
       env:
         TOPICS: ${{ env.topics }}
