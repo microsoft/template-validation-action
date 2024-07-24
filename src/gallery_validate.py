@@ -102,6 +102,7 @@ def check_for_azd_down(folder_path):
         return True, ItemResultFormat.PASS.format(message="azd down")
     except subprocess.CalledProcessError as e:
         logging.debug(f"{e.stdout}")
+        logging.debug(f"{e.stderr}")
         return False, ItemResultFormat.FAIL.format(message="azd down", detail_messages=f"Error: {e.stdout}")
     finally:
         os.chdir(original_directory)
@@ -119,6 +120,7 @@ def check_for_azd_up(folder_path):
         return True, ItemResultFormat.PASS.format(message="azd up")
     except subprocess.CalledProcessError as e:
         logging.debug(f"{e.stdout}")
+        logging.debug(f"{e.stderr}")
         return False, ItemResultFormat.FAIL.format(message="azd up", detail_messages=f"Error: {e.stdout}")
     finally:
         os.chdir(original_directory)
