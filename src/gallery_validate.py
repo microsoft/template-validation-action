@@ -113,6 +113,7 @@ def check_for_azd_up(folder_path):
     original_directory = os.getcwd()
     try:
         os.chdir(folder_path)
+        use_local_tf_backend(folder_path)
         command = f"azd up --no-prompt"
         result = subprocess.run(
             command, capture_output=True, text=True, check=True, shell=True)
@@ -124,6 +125,19 @@ def check_for_azd_up(folder_path):
         return False, ItemResultFormat.FAIL.format(message="azd up", detail_messages=f"Error: {e.stdout}")
     finally:
         os.chdir(original_directory)
+
+
+def use_local_tf_backend(folder_path):
+    provider_file = os.path.join(folder_path, "infra", "provider.tf")
+    if not os.path.exists(provider_file):
+        return
+    with open(provider_file, 'r') as file:
+        content = file.read()
+    modified_content = content.replace('backend "azurerm" {}', 'backend "local" {}')
+    
+    with open(provider_file, 'w') as file:
+        file.write(modified_content)
+    logging.debug(f"Replace azurerm backend with local backend in {provider_file}.")
 
 
 def check_for_actions_in_workflow_file(repo_path, file_name, actions):
