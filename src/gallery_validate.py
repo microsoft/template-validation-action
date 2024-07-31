@@ -11,8 +11,7 @@ root_folder = "."
 github_folder = ".github"
 workflows_folder = "workflows"
 markdown_file_extension = "md"
-yaml_file_extension = "yaml"
-yaml_file_extension2 = "yml"
+yaml_file_extensions = ["yaml", "yml"]
 azure_dev_workflow_file = "azure-dev"
 code_of_conduct_file = "CODE_OF_CONDUCT"
 contributing_file = "CONTRIBUTING"
@@ -32,12 +31,6 @@ readme_h2_tags = [
     "## Getting Started",
     "## Guidance",
     "## Resources"
-]
-
-
-source_code_structure_folders = [
-    infra_folder_path,
-    devcontainer_folder_path
 ]
 
 severity_error = "error"
@@ -91,40 +84,34 @@ def check_msdo_result(msdo_result_file):
 
 
 def check_for_azd_down(folder_path):
-    logging.debug(f"Checking with azd down...")
-    original_directory = os.getcwd()
+    logging.debug(f"Checking with azd down in {folder_path}")
+    message = "azd down" if folder_path == "." else f"azd down in {folder_path}"
     try:
-        os.chdir(folder_path)
         command = f"azd down --force --purge"
         result = subprocess.run(
-            command, capture_output=True, text=True, check=True, shell=True)
+            command, cwd=folder_path, capture_output=True, text=True, check=True, shell=True)
         logging.debug(f"{result.stdout}")
-        return True, ItemResultFormat.PASS.format(message="azd down")
+        return True, ItemResultFormat.PASS.format(message=message)
     except subprocess.CalledProcessError as e:
         logging.debug(f"{e.stdout}")
         logging.debug(f"{e.stderr}")
-        return False, ItemResultFormat.FAIL.format(message="azd down", detail_messages=f"Error: {e.stdout}")
-    finally:
-        os.chdir(original_directory)
+        return False, ItemResultFormat.FAIL.format(message=message, detail_messages=f"Error: {e.stdout}")
 
 
 def check_for_azd_up(folder_path):
-    logging.debug(f"Checking with azd up...")
-    original_directory = os.getcwd()
+    logging.debug(f"Checking with azd up in {folder_path}")
+    message = "azd up" if folder_path == "." else f"azd up in {folder_path}"
     try:
-        os.chdir(folder_path)
         use_local_tf_backend(folder_path)
         command = f"azd up --no-prompt"
         result = subprocess.run(
-            command, capture_output=True, text=True, check=True, shell=True)
+            command, cwd=folder_path, capture_output=True, text=True, check=True, shell=True)
         logging.debug(f"{result.stdout}")
-        return True, ItemResultFormat.PASS.format(message="azd up")
+        return True, ItemResultFormat.PASS.format(message=message)
     except subprocess.CalledProcessError as e:
         logging.debug(f"{e.stdout}")
         logging.debug(f"{e.stderr}")
-        return False, ItemResultFormat.FAIL.format(message="azd up", detail_messages=f"Error: {e.stdout}")
-    finally:
-        os.chdir(original_directory)
+        return False, ItemResultFormat.FAIL.format(message=message, detail_messages=f"Error: {e.stdout}")
 
 
 def use_local_tf_backend(folder_path):
@@ -247,13 +234,18 @@ def check_repository_management(repo_path, topics):
     return final_result, line_delimiter.join(final_messages)
 
 
-def check_source_code_structure(repo_path):
+def check_source_code_structure(repo_path, infra_yaml_path):
     source_code_structure_validators = [
-        FileValidtor("source_code_structure", False, azure_dev_workflow_file, [yaml_file_extension, yaml_file_extension2], repo_path, [
+        FileValidtor("source_code_structure", False, azure_dev_workflow_file, yaml_file_extensions, repo_path, [
             os.path.join(github_folder, workflows_folder)], False, None),
-        FileValidtor("source_code_structure", False, infra_yaml_file, [
-            yaml_file_extension, yaml_file_extension2], repo_path, [""], False, None),
+        FileValidtor("source_code_structure", False, infra_yaml_file, yaml_file_extensions, infra_yaml_path, [""], False, None),
     ]
+
+    source_code_structure_folders = [
+        os.path.join(infra_yaml_path, infra_folder_path),
+        devcontainer_folder_path
+    ]
+
     final_result = True
     final_messages = [""]
     final_messages.append("## Source code structure and conventions:")
@@ -271,20 +263,21 @@ def check_source_code_structure(repo_path):
     return final_result, line_delimiter.join(final_messages)
 
 
-def check_functional_requirements(repo_path, check_azd_up, check_azd_down):
+def check_functional_requirements(infra_yaml_paths, check_azd_up, check_azd_down):
     final_result = True
     final_messages = [""]
     final_messages.append("## Functional Requirements:")
 
     # check for the existence of the files
     if check_azd_up:
-        result, message = check_for_azd_up(repo_path)
-        final_result = final_result and result
-        final_messages.append(message)
-        if check_azd_down:
-            result, message = check_for_azd_down(repo_path)
+        for infra_yaml_path in infra_yaml_paths:
+            result, message = check_for_azd_up(infra_yaml_path)
             final_result = final_result and result
             final_messages.append(message)
+            if check_azd_down:
+                result, message = check_for_azd_down(infra_yaml_path)
+                final_result = final_result and result
+                final_messages.append(message)
 
     return final_result, line_delimiter.join(final_messages)
 
@@ -321,6 +314,15 @@ def check_security_requirements(repo_path, msdo_result_file):
     return final_result, line_delimiter.join(final_messages)
 
 
+def find_infra_yaml_path(repo_path):
+    infra_yaml_paths = []
+    for root, dirs, files in os.walk(repo_path):
+        for extension in yaml_file_extensions:
+            if infra_yaml_file + "." + extension in files:
+                infra_yaml_paths.append(root)
+    return infra_yaml_paths if len(infra_yaml_paths) > 0 else [repo_path]
+
+
 def internal_validator(repo_path, check_azd_up, check_azd_down, topics, msdo_result_file):
     if not os.path.isdir(repo_path):
         raise Exception(f"Error: The path {repo_path} is not a valid directory.")
@@ -328,17 +330,18 @@ def internal_validator(repo_path, check_azd_up, check_azd_down, topics, msdo_res
 
     final_result = True
     final_message = []
+    infra_yaml_paths = find_infra_yaml_path(repo_path)
 
     result, message = check_repository_management(repo_path, topics)
     final_result = final_result and result
     final_message.append(message)
 
-    result, message = check_source_code_structure(repo_path)
+    result, message = check_source_code_structure(repo_path, infra_yaml_paths[0])
     final_result = final_result and result
     final_message.append(message)
 
     result, message = check_functional_requirements(
-        repo_path, check_azd_up, check_azd_down)
+        infra_yaml_paths, check_azd_up, check_azd_down)
     final_result = final_result and result
     final_message.append(message)
 
