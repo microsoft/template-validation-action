@@ -57,6 +57,7 @@ runs:
       id: run_validation
       working-directory: ${{ inputs.templatePath }}
       run: |
+        pip install -r ${{ github.action_path }}/requirements.txt
         python ${{ github.action_path }}/src/gallery_validate.py . --debug --azdup --azddown --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ runner.temp }}/output.log
         output_link=$(realpath ${{ runner.temp }}/output.log)
         echo "resultFile is $output_link"
