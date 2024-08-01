@@ -3,7 +3,7 @@ description: 'Validate the standard of the gallery'
 inputs:
   templatePath:
     description: 'The path of target template to validate'
-    required: true
+    required: false
     default: '.'
 outputs:
   resultFile:
