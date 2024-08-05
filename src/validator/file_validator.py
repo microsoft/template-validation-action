@@ -39,7 +39,7 @@ class FileValidtor(ValidatorBase):
                                         for tag in self.h2Tags:
                                             if tag not in content:
                                                 self.result = self.result and False
-                                                submessages.append(f"- Error: {tag} is missing in {file}.")
+                                                submessages.append(ItemResultFormat.SUBITEM.format(message=f"{tag} is missing in {file}."))
                                     fileContent.close()
                                 if self.result:
                                     messages.append(ItemResultFormat.PASS.format(message=f"{potential_name} File"))
@@ -50,7 +50,7 @@ class FileValidtor(ValidatorBase):
                                 return self.result, self.message
 
         messages.append(ItemResultFormat.FAIL.format(message=f"{potential_name} File",
-                                                     detail_messages=f"- Error: {potential_name} file is missing."))
+                                                     detail_messages=ItemResultFormat.SUBITEM.format(message=f"{potential_name} file is missing.")))
 
         self.message = line_delimiter.join(messages)
         return self.result, self.message
