@@ -4,9 +4,9 @@ details_help_link = "https://aka.ms/ai-template-standards"
 
 
 class Signs:
-    CHECK = ":heavy_check_mark:"
-    BLOCK = ":x:"
-    WARNING = ":warning:"
+    CHECK = "- [x]"
+    BLOCK = "- [ ] :x:"
+    WARNING = "- [ ] :warning:"
 
 
 how_to_fix = "## <i>How to fix?</i>\n<b>The full Definition of Done of the AI-Gallery template and fix approached can be found [HERE]({detail_link}).</b>".format(
@@ -17,9 +17,11 @@ final_result_format = "# AI Gallery Standard Validation: {{result}} \n{{message}
 
 
 class ItemResultFormat:
-    PASS = "<details><summary>{sign} <b>{{message}}</b>.</summary></details>".format(
+    PASS = "{sign} <b>{{message}}</b>.".format(
         sign=Signs.CHECK)
-    FAIL = "<details><summary>{sign} <b>{{message}}</b>. <a href={detail_link}>[How to fix?]</a></summary>\n\n{{detail_messages}}\n\n</details>".format(
+    FAIL = "{sign} <b>{{message}}</b>. <a href={detail_link}>[How to fix?]</a>\n\n{{detail_messages}}\n".format(
         sign=Signs.BLOCK, detail_link=details_help_link)
-    WARNING = "<details><summary>{sign} <b>{{message}}</b>. <a href={detail_link}>[How to fix?]</a></summary>\n\n{{detail_messages}}\n\n</details>".format(
+    WARNING = "{sign} <b>{{message}}</b>. <a href={detail_link}>[How to fix?]</a>\n\n{{detail_messages}}\n".format(
         sign=Signs.WARNING, detail_link=details_help_link)
+    DETAILS = "  <details>\n  <summary> Details </summary>\n\n  {message}\n\n</details>"
+    SUBITEM = "  {sign} {{message}}".format(sign=Signs.BLOCK)
