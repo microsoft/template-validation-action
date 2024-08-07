@@ -1,10 +1,16 @@
 name: 'Gallery Standard Validation'
 description: 'Validate the standard of the gallery'
 inputs:
-  templatePath:
+  repositoryURL:
+    description: 'The URL of the repository to validate'
+    required: true
+  branch:
+    description: 'The branch of the repository to validate'
+    required: false
+    default: 'main'
+  repositoryPath:
     description: 'The path of target template to validate'
     required: false
-    default: '.'
 outputs:
   resultFile:
     description: "A file path to a results file."
@@ -15,12 +21,44 @@ runs:
     - name: Extract topics
       id: extract_repo_info
       run: |
-        repository=${{ env.REPOSITORY || github.repository }}
-        topics_list=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/$repository/topics | jq -r '.names | join(",")')
+        extracted_link=${{ inputs.repositoryURL }}
+        repo_info=$(echo $extracted_link | sed 's|https://github.com/||')
+        topics_list=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/$repo_info/topics | jq -r '.names | join(",")')
         echo "topics=\"$topics_list\"" >> $GITHUB_ENV
       shell: bash
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+
+    - name: Git clone repository
+      if: "${{ github.event.inputs.repositoryPath == '' }}"
+      run: |
+        cd ..
+        if [ "${{ inputs.branch }}" == "main" ]; then
+          echo "Cloning the main branch"
+          git clone ${{ inputs.repositoryURL }} candidate-repo
+        else
+          echo "Cloning the ${{ inputs.branch }} branch"
+          git clone --branch ${{ inputs.branch }} ${{ inputs.repositoryURL }} candidate-repo
+        fi
+        if [ -d "./candidate-repo/hooks" ] && [ "$(ls -A ./candidate-repo/hooks/*.sh 2>/dev/null)" ]; then
+          chmod +x ./candidate-repo/hooks/*.sh
+        else
+          echo "No hooks directory or no .sh files found in hooks directory"
+        fi
+      shell: bash
+
+    - name: Set template path
+      run: |
+        if [ "${{ inputs.repositoryPath }}" != "" ]; then
+          echo "Using the provided repo path"
+          temp_path=${{ inputs.repositoryPath }}
+        else
+          echo "Using cloned repository path"
+          temp_path="./../candidate-repo/"
+        fi
+        echo "repoPath=$temp_path" >> $GITHUB_ENV
+        echo "repoPath is $temp_path"
+      shell: bash
 
     - name: Run Microsoft Security DevOps Analysis
       uses: microsoft/security-devops-action@v1
@@ -28,7 +66,7 @@ runs:
       with:
         tools: templateanalyzer
       env:
-        GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ${{ inputs.templatePath }}
+        GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ${{ env.repoPath }}
 
     - name: Set environment name with timestamp
       id: set_env_name
@@ -55,15 +93,16 @@ runs:
 
     - name: Run validation
       id: run_validation
-      working-directory: ${{ inputs.templatePath }}
+      working-directory: ${{ env.REPO_PATH }}
       run: |
         pip install -r ${{ github.action_path }}/requirements.txt
-        python ${{ github.action_path }}/src/gallery_validate.py . --debug --azdup --azddown --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ runner.temp }}/output.log
-        output_link=$(realpath ${{ runner.temp }}/output.log)
+        python ${{ github.action_path }}/src/gallery_validate.py . --debug --azdup --azddown --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log
+        output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
         echo "resultFile is $output_link"
         echo "resultFile=$output_link" >> $GITHUB_OUTPUT
       shell: bash
       env:
+        REPO_PATH: ${{ env.repoPath }}
         TOPICS: ${{ env.topics }}
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
         AZURE_LOCATION: ${{ env.AZURE_LOCATION }}

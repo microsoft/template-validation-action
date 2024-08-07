@@ -1,4 +1,4 @@
-name: Template Validation Sample Workflow
+name: Template Validation Sample Workflow with Path
 on: 
   workflow_dispatch:
 
@@ -39,9 +39,8 @@ jobs:
       - id: validation
         uses: microsoft/template-validation-action@main
         with:
-          templatePath: ${{ runner.temp }}/template
-        env:
-          REPOSITORY: "Azure-Samples/azd-ai-starter"
+          repositoryURL: https://github.com/Azure-Samples/azd-ai-starter
+          repositoryPath: ${{ runner.temp }}/template
 
       - name: print result
         run: cat ${{ steps.validation.outputs.resultFile }}
