@@ -39,8 +39,9 @@ jobs:
       - id: validation
         uses: microsoft/template-validation-action@main
         with:
-          repositoryURL: https://github.com/Azure-Samples/azd-ai-starter
-          repositoryPath: ${{ runner.temp }}/template
+          workingDirectory: ${{ runner.temp }}/template
+        env:
+          REPOSITORY_NAME: Azure-Samples/azd-ai-starter
 
       - name: print result
         run: cat ${{ steps.validation.outputs.resultFile }}
