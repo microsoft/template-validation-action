@@ -3,14 +3,15 @@ description: 'Validate the standard of the gallery'
 inputs:
   repositoryURL:
     description: 'The URL of the repository to validate'
-    required: true
+    required: false
   branch:
     description: 'The branch of the repository to validate'
     required: false
     default: 'main'
-  repositoryPath:
+  workingDirectory:
     description: 'The path of target template to validate'
     required: false
+    default: '.'
 outputs:
   resultFile:
     description: "A file path to a results file."
@@ -18,47 +19,40 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Extract topics
-      id: extract_repo_info
+    - name: Prepare repository
       run: |
-        extracted_link=${{ inputs.repositoryURL }}
-        repo_info=$(echo $extracted_link | sed 's|https://github.com/||')
-        topics_list=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/$repo_info/topics | jq -r '.names | join(",")')
-        echo "topics=\"$topics_list\"" >> $GITHUB_ENV
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-
-    - name: Git clone repository
-      if: "${{ github.event.inputs.repositoryPath == '' }}"
-      run: |
-        cd ..
-        if [ "${{ inputs.branch }}" == "main" ]; then
-          echo "Cloning the main branch"
-          git clone ${{ inputs.repositoryURL }} candidate-repo
-        else
+        if [ "${{ inputs.repositoryURL }}" != "" ]; then
           echo "Cloning the ${{ inputs.branch }} branch"
-          git clone --branch ${{ inputs.branch }} ${{ inputs.repositoryURL }} candidate-repo
+          git clone --branch ${{ inputs.branch }} ${{ inputs.repositoryURL }} ${{ runner.temp }}/candidate-repo
+          echo "REPOSITORY_PATH=${{ runner.temp }}/candidate-repo" >> $GITHUB_ENV
+          repo_info=$(echo "${{ inputs.repositoryUrl }}" | sed 's|https://github.com/||')
+          echo "REPOSITORY_NAME=$repo_info" >> $GITHUB_ENV
+        elif [ -d "${{ inputs.workingDirectory }}" ]; then
+          echo "Using the provided repo path: ${{ inputs.workingDirectory }}"
+          repository_path=$(realpath "${{ inputs.workingDirectory }}")
+          echo "REPOSITORY_PATH=$repository_path" >> $GITHUB_ENV
         fi
-        if [ -d "./candidate-repo/hooks" ] && [ "$(ls -A ./candidate-repo/hooks/*.sh 2>/dev/null)" ]; then
-          chmod +x ./candidate-repo/hooks/*.sh
+      shell: bash
+    
+    - name: Add execute permission to hooks script
+      working-directory: ${{ env.REPOSITORY_PATH }}
+      run: |
+        if [ -d "hooks" ] && [ "$(ls -A hooks/*.sh 2>/dev/null)" ]; then
+          chmod +x hooks/*.sh
         else
           echo "No hooks directory or no .sh files found in hooks directory"
         fi
       shell: bash
 
-    - name: Set template path
+    - name: Extract topics
+      id: extract_repo_info
       run: |
-        if [ "${{ inputs.repositoryPath }}" != "" ]; then
-          echo "Using the provided repo path"
-          temp_path=${{ inputs.repositoryPath }}
-        else
-          echo "Using cloned repository path"
-          temp_path="./../candidate-repo/"
-        fi
-        echo "repoPath=$temp_path" >> $GITHUB_ENV
-        echo "repoPath is $temp_path"
+        repository_name=${{ env.REPOSITORY_NAME || github.repository }}
+        topics_list=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/$repository_name/topics | jq -r '.names | join(",")')
+        echo "topics=\"$topics_list\"" >> $GITHUB_ENV
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
 
     - name: Run Microsoft Security DevOps Analysis
       uses: microsoft/security-devops-action@v1
@@ -66,7 +60,7 @@ runs:
       with:
         tools: templateanalyzer
       env:
-        GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ${{ env.repoPath }}
+        GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ${{ env.REPOSITORY_PATH }}
 
     - name: Set environment name with timestamp
       id: set_env_name
@@ -102,7 +96,7 @@ runs:
         echo "resultFile=$output_link" >> $GITHUB_OUTPUT
       shell: bash
       env:
-        REPO_PATH: ${{ env.repoPath }}
+        REPO_PATH: ${{ env.REPOSITORY_PATH }}
         TOPICS: ${{ env.topics }}
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
         AZURE_LOCATION: ${{ env.AZURE_LOCATION }}
