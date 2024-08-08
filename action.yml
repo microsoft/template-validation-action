@@ -30,7 +30,7 @@ runs:
         elif [ -d "${{ inputs.workingDirectory }}" ]; then
           echo "Using the provided repo path: ${{ inputs.workingDirectory }}"
           repository_path=$(realpath "${{ inputs.workingDirectory }}")
-          echo "REPOSITORY_PATH=$repository_path >> $GITHUB_ENV
+          echo "REPOSITORY_PATH=$repository_path" >> $GITHUB_ENV
         fi
       shell: bash
     
@@ -38,10 +38,11 @@ runs:
       working-directory: ${{ env.REPOSITORY_PATH }}
       run: |
         if [ -d "hooks" ] && [ "$(ls -A hooks/*.sh 2>/dev/null)" ]; then
-          chmod +x ./candidate-repo/hooks/*.sh
+          chmod +x hooks/*.sh
         else
           echo "No hooks directory or no .sh files found in hooks directory"
         fi
+      shell: bash
 
     - name: Extract topics
       id: extract_repo_info
