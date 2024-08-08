@@ -212,12 +212,12 @@ def check_folder_existence(repo_path, folder_name):
 def check_repository_management(repo_path, topics):
 
     repository_management_validators = [
-        FileValidator("repository_management", False, readme_file, [markdown_file_extension], repo_path, [""], False, readme_h2_tags),
-        FileValidator("repository_management", False, license_file, [markdown_file_extension, ""], repo_path, [""], False, None),
-        FileValidator("repository_management", False, security_file, [markdown_file_extension], repo_path, [""], False, None),
-        FileValidator("repository_management", False, code_of_conduct_file, [markdown_file_extension], repo_path, [github_folder, ""], False, None),
-        FileValidator("repository_management", False, contributing_file, [markdown_file_extension], repo_path, ["", github_folder], False, None),
-        FileValidator("repository_management", False, issue_template_file, [markdown_file_extension], repo_path, [github_folder], False, None)
+        FileValidator("repository_management", readme_file, [markdown_file_extension], repo_path, [""], readme_h2_tags),
+        FileValidator("repository_management", license_file, [markdown_file_extension, ""], repo_path),
+        FileValidator("repository_management", security_file, [markdown_file_extension], repo_path),
+        FileValidator("repository_management", code_of_conduct_file, [markdown_file_extension], repo_path, [github_folder, ""]),
+        FileValidator("repository_management", contributing_file, [markdown_file_extension], repo_path, ["", github_folder]),
+        FileValidator("repository_management", issue_template_file, [markdown_file_extension, ""], repo_path, [github_folder])
     ]
 
     final_result = True
@@ -239,9 +239,9 @@ def check_repository_management(repo_path, topics):
 
 def check_source_code_structure(repo_path, infra_yaml_path):
     source_code_structure_validators = [
-        FileValidator("source_code_structure", False, azure_dev_workflow_file, yaml_file_extensions, repo_path, [
-            os.path.join(github_folder, workflows_folder)], False, None),
-        FileValidator("source_code_structure", False, infra_yaml_file, yaml_file_extensions, infra_yaml_path, [""], False, None),
+        FileValidator("source_code_structure", azure_dev_workflow_file, yaml_file_extensions, repo_path, [
+            os.path.join(github_folder, workflows_folder)]),
+        FileValidator("source_code_structure", infra_yaml_file, yaml_file_extensions, infra_yaml_path),
     ]
 
     source_code_structure_folders = [
