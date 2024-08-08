@@ -4,7 +4,7 @@ import os
 import logging
 
 
-class FileValidtor(ValidatorBase):
+class FileValidator(ValidatorBase):
     def __init__(self, validatorCatalog, errorAsWarning, fileName, extensionList, rootFolder, folderList, caseSensitive, h2Tags):
         super().__init__(f"{fileName}FileValidator", validatorCatalog, errorAsWarning)
         self.fileName = fileName
