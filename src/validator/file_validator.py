@@ -5,7 +5,7 @@ import logging
 
 
 class FileValidator(ValidatorBase):
-    def __init__(self, validatorCatalog, fileName, extensionList, rootFolder, folderList = [""], h2Tags = None, caseSensitive = False, errorAsWarning = False):
+    def __init__(self, validatorCatalog, fileName, extensionList, rootFolder, folderList = [""], h2Tags = None, caseSensitive = False, errorAsWarning = False, isFolderAllowed = False):
         super().__init__(f"{fileName}FileValidator", validatorCatalog, errorAsWarning)
         self.fileName = fileName
         self.extensionList = extensionList
@@ -13,6 +13,7 @@ class FileValidator(ValidatorBase):
         self.folderList = folderList
         self.caseSensitive = caseSensitive
         self.h2Tags = h2Tags
+        self.isFolderAllowed = isFolderAllowed
 
     def validate(self):
         logging.debug(f"{self.name}: Checking for file {self.fileName} with {self.extensionList} "
@@ -48,9 +49,16 @@ class FileValidator(ValidatorBase):
                                                                                  detail_messages=line_delimiter.join(subMessages)))
                                 self.message = line_delimiter.join(messages)
                                 return self.result, self.message
+                    if (self.isFolderAllowed == True and self.fileName in dirs):
+                        self.result = True
+                        messages.append(ItemResultFormat.PASS.format(message=f"{self.fileName} Folder"))
+                        self.message = line_delimiter.join(messages)
+                        return self.result, self.message
 
-        messages.append(ItemResultFormat.FAIL.format(message=f"{potential_name} File",
-                                                     detail_messages=ItemResultFormat.SUBITEM.format(message=f"Error: {potential_name} file is missing.")))
+        errorMessage = f"{potential_name} File or {self.fileName} Folder" if self.isFolderAllowed else f"{potential_name} File"
+        detailMessage = f"Error: {potential_name} file or {self.fileName} folder is missing." if self.isFolderAllowed else f"Error: {potential_name} file is missing."
+        messages.append(ItemResultFormat.FAIL.format(message=errorMessage,
+                                                     detail_messages=ItemResultFormat.SUBITEM.format(message=detailMessage)))
 
         self.message = line_delimiter.join(messages)
         return self.result, self.message

@@ -77,3 +77,15 @@ def test_file_validator_H2Tag_not_found_case_sensitive():
     result, message = validator.validate()
     assert result == False
     assert message == ItemResultFormat.FAIL.format(message="README.md File", detail_messages=ItemResultFormat.SUBITEM.format(message="Error: ## Test H2 Not Found is missing in README.md."))
+
+def test_file_validator_folder_allowed_and_exists():
+    validator = FileValidator("TestCatalog", "ISSUE_TEMPLATE", ["md"], "test/data", [""], None, False, False, True)
+    result, message = validator.validate()
+    assert result == True
+    assert message == ItemResultFormat.PASS.format(message="ISSUE_TEMPLATE Folder")
+
+def test_file_validator_folder_allowed_but_not_exists():
+    validator = FileValidator("TestCatalog", "NON_EXISTENT_FOLDER", ["md"], "test/data", [""], None, False, False, True)
+    result, message = validator.validate()
+    assert result == False
+    assert message == ItemResultFormat.FAIL.format(message="NON_EXISTENT_FOLDER.md File or NON_EXISTENT_FOLDER Folder", detail_messages=ItemResultFormat.SUBITEM.format(message="Error: NON_EXISTENT_FOLDER.md file or NON_EXISTENT_FOLDER folder is missing."))
