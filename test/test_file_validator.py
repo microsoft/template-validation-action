@@ -54,13 +54,25 @@ def test_file_validator_file_not_found_in_subfolder():
     assert result == False
     assert message == ItemResultFormat.FAIL.format(message="license File", detail_messages=ItemResultFormat.SUBITEM.format(message="Error: license file is missing."))
 
-def test_file_validator_H2Tag_found():
+def test_file_validator_H2Tag_found_case_non_sensitive():
+    validator = FileValidator("TestCatalog", False, "README", ["md"], "test/data", [""], False, ["## Test h2"])
+    result, message = validator.validate()
+    assert result == True
+    assert message == ItemResultFormat.PASS.format(message="README.md File")
+
+def test_file_validator_H2Tag_found_case_sensitive():
     validator = FileValidator("TestCatalog", False, "README", ["md"], "test/data", [""], True, ["## Test H2"])
     result, message = validator.validate()
     assert result == True
     assert message == ItemResultFormat.PASS.format(message="README.md File")
 
-def test_file_validator_H2Tag_not_found():
+def test_file_validator_H2Tag_not_found_case_non_sensitive():
+    validator = FileValidator("TestCatalog", False, "README", ["md"], "test/data", [""], False, ["## Test h2 Not Found"])
+    result, message = validator.validate()
+    assert result == False
+    assert message == ItemResultFormat.FAIL.format(message="README.md File", detail_messages=ItemResultFormat.SUBITEM.format(message="Error: ## Test h2 Not Found is missing in README.md."))
+
+def test_file_validator_H2Tag_not_found_case_sensitive():
     validator = FileValidator("TestCatalog", False, "README", ["md"], "test/data", [""], True, ["## Test H2 Not Found"])
     result, message = validator.validate()
     assert result == False

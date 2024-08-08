@@ -32,20 +32,20 @@ class FileValidator(ValidatorBase):
                             if ((self.caseSensitive == False and file.lower() == candidateFile.lower()) or (self.caseSensitive == True and file == candidateFile)):
                                 self.result = True
                                 logging.debug(f"- {file} is found in {root}.")
-                                submessages = []
+                                subMessages = []
                                 if self.h2Tags is not None:
                                     with open(os.path.join(root, file), 'r') as fileContent:
                                         content = fileContent.read()
                                         for tag in self.h2Tags:
-                                            if tag not in content:
-                                                self.result = self.result and False
-                                                submessages.append(ItemResultFormat.SUBITEM.format(message=f"Error: {tag} is missing in {file}."))
+                                            if (self.caseSensitive == False and tag.lower() not in content.lower()) or (self.caseSensitive == True and tag not in content) :
+                                                self.result = False
+                                                subMessages.append(ItemResultFormat.SUBITEM.format(message=f"Error: {tag} is missing in {file}."))
                                     fileContent.close()
                                 if self.result:
                                     messages.append(ItemResultFormat.PASS.format(message=f"{potential_name} File"))
                                 else:
                                     messages.append(ItemResultFormat.FAIL.format(message=f"{potential_name} File",
-                                                                                 detail_messages=line_delimiter.join(submessages)))
+                                                                                 detail_messages=line_delimiter.join(subMessages)))
                                 self.message = line_delimiter.join(messages)
                                 return self.result, self.message
 
