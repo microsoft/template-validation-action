@@ -42,8 +42,8 @@ security_actions = ['microsoft/security-devops-action',
                     'github/codeql-action/upload-sarif']
 
 
-def indent(text):
-    return '  '.join(text.splitlines(True))
+def indent(text, count=2):
+    return (' ' * count).join(text.splitlines(True))
 
 def check_msdo_result(msdo_result_file):
     logging.debug(f"Checking for msdo result: {msdo_result_file}...")
@@ -60,13 +60,13 @@ def check_msdo_result(msdo_result_file):
                 if severity == severity_error and item['Code'] not in severity_error_exceptions:
                     result = result and False
                     subMessages.append(
-                        ItemResultFormat.SUBITEM.format(message=f"{severity}: {item['Code']} - {item['Description']}"))
+                        ItemResultFormat.SUBITEM.format(message=f"{severity}: {item['Code']} - {indent(item['Description'], 4)}"))
                 elif item['Code'] in severity_error_exceptions:
                     subMessages.append(
-                        ItemResultFormat.SUBITEM.format(message=f"warning: {item['Code']} - {item['Description']}"))
+                        ItemResultFormat.SUBITEM.format(message=f"warning: {item['Code']} - {indent(item['Description'], 4)}"))
                 else:
                     subMessages.append(
-                        ItemResultFormat.SUBITEM.format(message=f"{severity}: {item['Code']} - {item['Description']}"))
+                        ItemResultFormat.SUBITEM.format(message=f"{severity}: {item['Code']} - {indent(item['Description'], 4)}"))
 
         if result and len(subMessages) == 0:
             message = ItemResultFormat.PASS.format(
