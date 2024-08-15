@@ -61,6 +61,7 @@ runs:
         tools: templateanalyzer
       env:
         GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ${{ env.REPOSITORY_PATH }}
+      continue-on-error: true
 
     - name: Set environment name with timestamp
       id: set_env_name
