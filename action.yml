@@ -15,7 +15,7 @@ inputs:
 outputs:
   resultFile:
     description: "A file path to a results file."
-    value: ${{ steps.run_validation.outputs.resultFile}}
+    value: ${{ steps.set_output.outputs.resultFile}}
 runs:
   using: "composite"
   steps:
@@ -74,33 +74,85 @@ runs:
       env:
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
 
-    - name: Install AZD
-      uses: Azure/setup-azd@v1.0.0
-
-    - name: Log in with Azure (Federated Credentials)
-      if: ${{ env.AZURE_CLIENT_ID != '' }}
+    - name: Copy validator into devcontainer
       run: |
-        azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
+        mkdir -p ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}
+        cp -r ${{ github.action_path }}/src ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/src
+        cp ${{ github.action_path }}/requirements.txt ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/requirements.txt
+        cp ${{ steps.msdo.outputs.sarifFile }} ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/msdo.sarif
+        env > ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/env_variables.txt
       shell: bash
-      env:
-        AZURE_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
-        AZURE_TENANT_ID: ${{ env.AZURE_TENANT_ID }}
 
-    - name: Run validation
-      id: run_validation
-      working-directory: ${{ env.REPO_PATH }}
+    - uses: actions/github-script@v6
+      id: script
+      with:
+        debug: true
+        script: |
+          const token = process.env['ACTIONS_RUNTIME_TOKEN']
+          const runtimeUrl = process.env['ACTIONS_ID_TOKEN_REQUEST_URL']
+          core.setOutput('TOKEN', token.trim())
+          core.setOutput('ID_TOKEN_URL', runtimeUrl.trim())
+
+    - name: Login azd in devcontainer
+      id: azd-login
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
+        subFolder: ${{ env.REPOSITORY_PATH }}
+        env: |
+          ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN=${{ steps.script.outputs.TOKEN }}
+      
+    - name: Run validator in devcontainer
+      id: validation
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          if [ -f tva_${{ github.run_id }}/env_variables.txt ]; then
+            while IFS= read -r line; do
+              var_name=$(echo "$line" | cut -d'=' -f1)
+              if [ -z "${!var_name}" ]; then
+                export "$line"
+              fi
+            done < tva_${{ github.run_id }}/env_variables.txt
+          fi
+          if ! command -v python &> /dev/null; then
+            echo "python not found, installing python..."
+            sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv
+          fi
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python3 -m pip install -r tva_${{ github.run_id }}/requirements.txt;
+          python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --azdup --azddown --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif
+        subFolder: ${{ env.REPOSITORY_PATH }}
+        env: |
+          ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN=${{ steps.script.outputs.TOKEN }}
+          AZURE_CLIENT_ID=${{ env.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID=${{ env.AZURE_TENANT_ID }}
+          AZURE_ENV_NAME=${{ env.AZURE_ENV_NAME }}
+          AZURE_LOCATION=${{ env.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID=${{ env.AZURE_SUBSCRIPTION_ID }}
+          CREATE_ROLE_FOR_USER=false
+          AZURE_PRINCIPAL_TYPE=ServicePrincipal
+          TOPICS=${{ env.topics }}
+    
+    - name: Send output to main workflow
+      id: send_output
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          cat tva_${{ github.run_id }}/output.log
+        subFolder: ${{ env.REPOSITORY_PATH }}
+
+    - id: set_output
       run: |
-        pip install -r ${{ github.action_path }}/requirements.txt
-        python ${{ github.action_path }}/src/gallery_validate.py . --debug --azdup --azddown --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log
+        echo "${{ steps.send_output.outputs.runCmdOutput }}" >> ${{ env.AZURE_ENV_NAME }}-output.log
         output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
         echo "resultFile is $output_link"
         echo "resultFile=$output_link" >> $GITHUB_OUTPUT
-      shell: bash
+      working-directory: ${{ env.REPOSITORY_PATH }}
+      shell: bash 
       env:
-        REPO_PATH: ${{ env.REPOSITORY_PATH }}
-        TOPICS: ${{ env.topics }}
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
-        AZURE_LOCATION: ${{ env.AZURE_LOCATION }}
-        AZURE_SUBSCRIPTION_ID: ${{ env.AZURE_SUBSCRIPTION_ID }}
-        CREATE_ROLE_FOR_USER: false
-        AZURE_PRINCIPAL_TYPE: "ServicePrincipal"
