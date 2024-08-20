@@ -90,7 +90,7 @@ def check_for_azd_down(folder_path):
     logging.debug(f"Checking with azd down in {folder_path}")
     message = "azd down" if folder_path == "." else f"azd down in {folder_path}"
     try:
-        command = f"azd down --force --purge"
+        command = f"azd down --force --purge --no-prompt"
         result = subprocess.run(
             command, cwd=folder_path, capture_output=True, text=True, check=True, shell=True)
         logging.debug(f"{result.stdout}")
