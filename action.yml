@@ -142,6 +142,7 @@ runs:
           python3 -m venv .venv
           source .venv/bin/activate
           python3 -m pip install -r tva_${{ github.run_id }}/requirements.txt;
+        subFolder: ${{ env.REPOSITORY_PATH }}
     
     - name: Run validation
       id: validation
