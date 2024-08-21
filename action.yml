@@ -150,11 +150,11 @@ runs:
       with:
         runCmd: |
           source .venv/bin/activate
-          validate_cmd="python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif"
           if [ "${{ inputs.runAzdUp }}" = "true" ]; then
-            validate_cmd="$validate_cmd --azdup --azddown"
+            python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif --azdup --azddown
+          else
+            python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif
           fi
-          eval $validate_cmd
         subFolder: ${{ env.REPOSITORY_PATH }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
@@ -209,11 +209,11 @@ runs:
       working-directory: ${{ env.REPOSITORY_PATH }}
       run: |
         pip install -r ${{ github.action_path }}/requirements.txt
-        validate_cmd="python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log"
         if [ "${{ inputs.runAzdUp }}" = "true" ]; then
-          validate_cmd="$validate_cmd --azdup --azddown"
+          python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log --azdup --azddown
+        else
+          python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log
         fi
-        eval $validate_cmd
         output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
         echo "resultFile is $output_link"
         echo "resultFile=$output_link" >> $GITHUB_OUTPUT
