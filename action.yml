@@ -127,14 +127,6 @@ runs:
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
-          if [ -f tva_${{ github.run_id }}/env_variables.txt ]; then
-            while IFS= read -r line; do
-              var_name=$(echo "$line" | cut -d'=' -f1)
-              if [ -z "${!var_name}" ]; then
-                export "$line"
-              fi
-            done < tva_${{ github.run_id }}/env_variables.txt
-          fi
           if ! command -v python &> /dev/null; then
             echo "python not found, installing python..."
             sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv
@@ -151,6 +143,14 @@ runs:
       with:
         runCmd: |
           source .venv/bin/activate
+          if [ -f tva_${{ github.run_id }}/env_variables.txt ]; then
+            while IFS= read -r line; do
+              var_name=$(echo "$line" | cut -d'=' -f1)
+              if [ -z "${!var_name}" ]; then
+                export "$line"
+              fi
+            done < tva_${{ github.run_id }}/env_variables.txt
+          fi
           if [ "${{ inputs.runAzdUp }}" = "true" ]; then
             python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif --azdup --azddown
           else
