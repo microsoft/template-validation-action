@@ -110,6 +110,16 @@ runs:
           core.setOutput('TOKEN', token.trim())
           core.setOutput('AAD_TOKEN', aadToken.trim())
           core.setOutput('ID_TOKEN_URL', runtimeUrl.trim())
+    
+    - name: Start Docker
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          if [ -f Dockerfile ]; then
+            sudo service docker start
+          fi
+        subFolder: ${{ env.REPOSITORY_PATH }}
 
     - name: Login azd in devcontainer
       id: azd-login
