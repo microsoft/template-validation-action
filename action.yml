@@ -116,10 +116,12 @@ runs:
       with:
         runCmd: |
           azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
+          az login --service-principal -u "${{ env.AZURE_CLIENT_ID }}" --federated-token $ACTIONS_ID_TOKEN_REQUEST_TOKEN --tenant "${{ env.AZURE_TENANT_ID }}"
         subFolder: ${{ env.REPOSITORY_PATH }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
           ACTIONS_ID_TOKEN_REQUEST_TOKEN=${{ steps.script.outputs.TOKEN }}
+      continue-on-error: true
       
     - name: Setup Python in devcontainer
       id: setup-python
