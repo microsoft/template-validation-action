@@ -19,7 +19,7 @@ inputs:
 outputs:
   resultFile:
     description: "A file path to a results file."
-    value: ${{ steps.set_output.outputs.resultFile}}
+    value: ${{ steps.set_output.outputs.resultFile }}
 runs:
   using: "composite"
   steps:
@@ -194,18 +194,6 @@ runs:
           cat tva_${{ github.run_id }}/output.log
         subFolder: ${{ env.REPOSITORY_PATH }}
 
-    - id: set_output
-      if: ${{ env.USE_DEVCONTAINER == 'true' }}
-      run: |
-        echo "${{ steps.send_output.outputs.runCmdOutput }}" >> ${{ env.AZURE_ENV_NAME }}-output.log
-        output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
-        echo "resultFile is $output_link"
-        echo "resultFile=$output_link" >> $GITHUB_OUTPUT
-      working-directory: ${{ env.REPOSITORY_PATH }}
-      shell: bash 
-      env:
-        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
-
     - name: Install AZD
       if: ${{ env.USE_DEVCONTAINER == 'false' }}
       uses: Azure/setup-azd@v1.0.0
@@ -230,9 +218,6 @@ runs:
         else
           python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log
         fi
-        output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
-        echo "resultFile is $output_link"
-        echo "resultFile=$output_link" >> $GITHUB_OUTPUT
       shell: bash
       env:
         TOPICS: ${{ env.topics }}
@@ -241,3 +226,16 @@ runs:
         AZURE_SUBSCRIPTION_ID: ${{ env.AZURE_SUBSCRIPTION_ID }}
         CREATE_ROLE_FOR_USER: false
         AZURE_PRINCIPAL_TYPE: "ServicePrincipal"
+
+    - id: set_output
+      run: |
+        if [[ ${{ env.USE_DEVCONTAINER }} == 'true' ]]; then
+          echo "${{ steps.send_output.outputs.runCmdOutput }}" >> ${{ env.AZURE_ENV_NAME }}-output.log
+        fi
+        output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
+        echo "resultFile is $output_link"
+        echo "resultFile=$output_link" >> $GITHUB_OUTPUT
+      working-directory: ${{ env.REPOSITORY_PATH }}
+      shell: bash 
+      env:
+        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
