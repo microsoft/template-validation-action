@@ -180,7 +180,7 @@ def check_topic_existence(actual_topics, expected_topics):
         result = False
         subMessages.append(ItemResultFormat.SUBITEM.format(message=f"Error: topics string is NULL."))
     else:
-        actual_topics_list = actual_topics.split(",")
+        actual_topics_list = actual_topics.replace('"', '').split(",")
         for topic in expected_topics:
             if topic not in actual_topics_list:
                 result = result and False
