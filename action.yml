@@ -12,6 +12,10 @@ inputs:
     description: 'The path of target template to validate'
     required: false
     default: '.'
+  runAzdUp:
+    description: 'Run azd up'
+    required: false
+    default: 'true'
 outputs:
   resultFile:
     description: "A file path to a results file."
@@ -33,7 +37,17 @@ runs:
           echo "REPOSITORY_PATH=$repository_path" >> $GITHUB_ENV
         fi
       shell: bash
-    
+
+    - name: Check for .devcontainer config
+      id: check_devcontainer
+      run: |
+        if [ -f "${{ env.REPOSITORY_PATH }}/.devcontainer/devcontainer.json" ]; then
+          echo "USE_DEVCONTAINER=true" >> $GITHUB_ENV
+        else
+          echo "USE_DEVCONTAINER=false" >> $GITHUB_ENV
+        fi
+      shell: bash
+        
     - name: Add execute permission to hooks script
       working-directory: ${{ env.REPOSITORY_PATH }}
       run: |
@@ -75,6 +89,7 @@ runs:
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
 
     - name: Copy validator into devcontainer
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
       run: |
         mkdir -p ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}
         cp -r ${{ github.action_path }}/src ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/src
@@ -85,30 +100,64 @@ runs:
 
     - uses: actions/github-script@v6
       id: script
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
       with:
         debug: true
         script: |
           const token = process.env['ACTIONS_RUNTIME_TOKEN']
           const runtimeUrl = process.env['ACTIONS_ID_TOKEN_REQUEST_URL']
+          const aadToken = await core.getIDToken('api://AzureADTokenExchange');
           core.setOutput('TOKEN', token.trim())
+          core.setOutput('AAD_TOKEN', aadToken.trim())
           core.setOutput('ID_TOKEN_URL', runtimeUrl.trim())
+
+    # A workaround to those template that using Docker 
+    - name: Start Docker
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          if [ -f Dockerfile ]; then
+            sudo service docker start
+          fi
+        subFolder: ${{ env.REPOSITORY_PATH }}
 
     - name: Login azd in devcontainer
       id: azd-login
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
           azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
+          az login --service-principal -u "${{ env.AZURE_CLIENT_ID }}" --federated-token $AZURE_AD_TOKEN --tenant "${{ env.AZURE_TENANT_ID }}"
         subFolder: ${{ env.REPOSITORY_PATH }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
           ACTIONS_ID_TOKEN_REQUEST_TOKEN=${{ steps.script.outputs.TOKEN }}
+          AZURE_AD_TOKEN=${{ steps.script.outputs.AAD_TOKEN }}
       
-    - name: Run validator in devcontainer
-      id: validation
+    - name: Setup Python in devcontainer
+      id: setup-python
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
+          if ! command -v python &> /dev/null; then
+            echo "python not found, installing python..."
+            sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv
+          fi
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python3 -m pip install -r tva_${{ github.run_id }}/requirements.txt;
+        subFolder: ${{ env.REPOSITORY_PATH }}
+    
+    - name: Run validation
+      id: validation
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          source .venv/bin/activate
           if [ -f tva_${{ github.run_id }}/env_variables.txt ]; then
             while IFS= read -r line; do
               var_name=$(echo "$line" | cut -d'=' -f1)
@@ -117,14 +166,11 @@ runs:
               fi
             done < tva_${{ github.run_id }}/env_variables.txt
           fi
-          if ! command -v python &> /dev/null; then
-            echo "python not found, installing python..."
-            sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv
+          if [ "${{ inputs.runAzdUp }}" = "true" ]; then
+            python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif --azdup --azddown
+          else
+            python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif
           fi
-          python3 -m venv .venv
-          source .venv/bin/activate
-          python3 -m pip install -r tva_${{ github.run_id }}/requirements.txt;
-          python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --azdup --azddown --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif
         subFolder: ${{ env.REPOSITORY_PATH }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
@@ -136,10 +182,12 @@ runs:
           AZURE_SUBSCRIPTION_ID=${{ env.AZURE_SUBSCRIPTION_ID }}
           CREATE_ROLE_FOR_USER=false
           AZURE_PRINCIPAL_TYPE=ServicePrincipal
+          FORCE_TERRAFORM_REMOTE_STATE_CREATION=false
           TOPICS=${{ env.topics }}
     
     - name: Send output to main workflow
       id: send_output
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
@@ -147,6 +195,7 @@ runs:
         subFolder: ${{ env.REPOSITORY_PATH }}
 
     - id: set_output
+      if: ${{ env.USE_DEVCONTAINER == 'true' }}
       run: |
         echo "${{ steps.send_output.outputs.runCmdOutput }}" >> ${{ env.AZURE_ENV_NAME }}-output.log
         output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
@@ -156,3 +205,39 @@ runs:
       shell: bash 
       env:
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
+
+    - name: Install AZD
+      if: ${{ env.USE_DEVCONTAINER == 'false' }}
+      uses: Azure/setup-azd@v1.0.0
+
+    - name: Log in with Azure (Federated Credentials)
+      if: ${{ env.AZURE_CLIENT_ID != '' && env.USE_DEVCONTAINER == 'false' }}
+      run: |
+        azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
+      shell: bash
+      env:
+        AZURE_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ env.AZURE_TENANT_ID }}
+
+    - name: Run validation
+      id: run_validation
+      if: ${{ env.USE_DEVCONTAINER == 'false' }}
+      working-directory: ${{ env.REPOSITORY_PATH }}
+      run: |
+        pip install -r ${{ github.action_path }}/requirements.txt
+        if [ "${{ inputs.runAzdUp }}" = "true" ]; then
+          python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log --azdup --azddown
+        else
+          python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log
+        fi
+        output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
+        echo "resultFile is $output_link"
+        echo "resultFile=$output_link" >> $GITHUB_OUTPUT
+      shell: bash
+      env:
+        TOPICS: ${{ env.topics }}
+        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
+        AZURE_LOCATION: ${{ env.AZURE_LOCATION }}
+        AZURE_SUBSCRIPTION_ID: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        CREATE_ROLE_FOR_USER: false
+        AZURE_PRINCIPAL_TYPE: "ServicePrincipal"
