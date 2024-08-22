@@ -106,7 +106,9 @@ runs:
         script: |
           const token = process.env['ACTIONS_RUNTIME_TOKEN']
           const runtimeUrl = process.env['ACTIONS_ID_TOKEN_REQUEST_URL']
+          const aadToken = await core.getIDToken('api://AzureADTokenExchange');
           core.setOutput('TOKEN', token.trim())
+          core.setOutput('AAD_TOKEN', aadToken.trim())
           core.setOutput('ID_TOKEN_URL', runtimeUrl.trim())
 
     - name: Login azd in devcontainer
@@ -116,12 +118,12 @@ runs:
       with:
         runCmd: |
           azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
-          federated_token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=api://AzureADTokenExchange")
-          az login --service-principal -u "${{ env.AZURE_CLIENT_ID }}" --federated-token $federated_token --tenant "${{ env.AZURE_TENANT_ID }}"
+          az login --service-principal -u "${{ env.AZURE_CLIENT_ID }}" --federated-token $AZURE_AD_TOKEN --tenant "${{ env.AZURE_TENANT_ID }}"
         subFolder: ${{ env.REPOSITORY_PATH }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
           ACTIONS_ID_TOKEN_REQUEST_TOKEN=${{ steps.script.outputs.TOKEN }}
+          AZURE_AD_TOKEN=${{ steps.script.outputs.AAD_TOKEN }}
       
     - name: Setup Python in devcontainer
       id: setup-python
