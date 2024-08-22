@@ -110,7 +110,8 @@ runs:
           core.setOutput('TOKEN', token.trim())
           core.setOutput('AAD_TOKEN', aadToken.trim())
           core.setOutput('ID_TOKEN_URL', runtimeUrl.trim())
-    
+
+    # A workaround to those template that using Docker 
     - name: Start Docker
       if: ${{ env.USE_DEVCONTAINER == 'true' }}
       uses: devcontainers/ci@v0.3
