@@ -121,6 +121,7 @@ runs:
             sudo service docker start
           fi
         subFolder: ${{ env.REPOSITORY_PATH }}
+      continue-on-error: true
 
     - name: Login azd in devcontainer
       id: azd-login
@@ -135,6 +136,7 @@ runs:
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
           ACTIONS_ID_TOKEN_REQUEST_TOKEN=${{ steps.script.outputs.TOKEN }}
           AZURE_AD_TOKEN=${{ steps.script.outputs.AAD_TOKEN }}
+      continue-on-error: true
       
     - name: Setup Python in devcontainer
       id: setup-python
