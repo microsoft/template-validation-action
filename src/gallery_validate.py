@@ -214,7 +214,7 @@ def check_repository_management(repo_path, topics):
     repository_management_validators = [
         FileValidator("repository_management", readme_file, [markdown_file_extension], repo_path, [""], readme_h2_tags),
         FileValidator("repository_management", license_file, [markdown_file_extension, ""], repo_path),
-        FileValidator("repository_management", security_file, [markdown_file_extension], repo_path),
+        FileValidator("repository_management", security_file, [markdown_file_extension], repo_path, ["", github_folder]),
         FileValidator("repository_management", code_of_conduct_file, [markdown_file_extension], repo_path, [github_folder, ""]),
         FileValidator("repository_management", contributing_file, [markdown_file_extension], repo_path, ["", github_folder]),
         FileValidator("repository_management", issue_template_file, [markdown_file_extension, ""], repo_path, [github_folder], None, False, False, True)
