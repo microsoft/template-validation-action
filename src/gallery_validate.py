@@ -80,7 +80,7 @@ def check_msdo_result(msdo_result_file):
 
     else:
         result = False
-        message = ItemResultFormat.FAIL.format(
+        message = ItemResultFormat.WARNING.format(
             message="Security scan", detail_messages=ItemResultFormat.SUBITEM.format(message=f"Error: Scan result is missing."))
 
     return result, message
@@ -190,7 +190,7 @@ def check_topic_existence(actual_topics, expected_topics):
         messages.append(ItemResultFormat.PASS.format(
             message=f"Topics on repo contains {expected_topics}"))
     else:
-        messages.append(ItemResultFormat.FAIL.format(
+        messages.append(ItemResultFormat.WARNING.format(
             message=f"Topics on repo contains {expected_topics}", detail_messages=line_delimiter.join(subMessages)))
 
     return result, line_delimiter.join(messages)
@@ -231,7 +231,8 @@ def check_repository_management(repo_path, topics):
 
     # sample topics: "azd-templates,azure"
     result, message = check_topic_existence(topics, expected_topics)
-    final_result = final_result and result
+    # Missing topics does not block the validation
+    # final_result = final_result and result
     final_messages.append(message)
 
     return final_result, line_delimiter.join(final_messages)
@@ -311,7 +312,8 @@ def check_security_requirements(repo_path, msdo_result_file):
                                                               detail_messages=ItemResultFormat.DETAILS.format(message=line_delimiter.join(msdo_integrated_messages))))
 
     result, message = check_msdo_result(msdo_result_file)
-    final_result = final_result and result
+    # MSDO result is not blocking the validation
+    # final_result = final_result and result
     final_messages.append(message)
 
     return final_result, line_delimiter.join(final_messages)
