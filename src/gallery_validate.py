@@ -5,7 +5,9 @@ import logging
 import yaml
 from sarif import loader
 from validator.file_validator import *
+from validator.azd_validator import *
 from constants import *
+from utils import indent
 
 root_folder = "."
 github_folder = ".github"
@@ -41,9 +43,6 @@ expected_topics = ["azd-templates", "ai-azd-templates"]
 security_actions = ['microsoft/security-devops-action',
                     'github/codeql-action/upload-sarif']
 
-
-def indent(text, count=2):
-    return (' ' * count).join(text.splitlines(True))
 
 def check_msdo_result(msdo_result_file):
     logging.debug(f"Checking for msdo result: {msdo_result_file}...")
@@ -84,50 +83,6 @@ def check_msdo_result(msdo_result_file):
             message="Security scan", detail_messages=ItemResultFormat.SUBITEM.format(message=f"Error: Scan result is missing."))
 
     return result, message
-
-
-def check_for_azd_down(folder_path):
-    logging.debug(f"Checking with azd down in {folder_path}")
-    message = "azd down" if folder_path == "." else f"azd down in {folder_path}"
-    try:
-        command = f"azd down --force --purge --no-prompt"
-        result = subprocess.run(
-            command, cwd=folder_path, capture_output=True, text=True, check=True, shell=True)
-        logging.debug(f"{result.stdout}")
-        return True, ItemResultFormat.PASS.format(message=message)
-    except subprocess.CalledProcessError as e:
-        logging.debug(f"{e.stdout}")
-        logging.debug(f"{e.stderr}")
-        return False, ItemResultFormat.FAIL.format(message=message, detail_messages=ItemResultFormat.DETAILS.format(message=indent(e.stdout)))
-
-
-def check_for_azd_up(folder_path):
-    logging.debug(f"Checking with azd up in {folder_path}")
-    message = "azd up" if folder_path == "." else f"azd up in {folder_path}"
-    try:
-        use_local_tf_backend(folder_path)
-        command = f"azd up --no-prompt"
-        result = subprocess.run(
-            command, cwd=folder_path, capture_output=True, text=True, check=True, shell=True)
-        logging.debug(f"{result.stdout}")
-        return True, ItemResultFormat.PASS.format(message=message)
-    except subprocess.CalledProcessError as e:
-        logging.debug(f"{e.stdout}")
-        logging.debug(f"{e.stderr}")
-        return False, ItemResultFormat.FAIL.format(message=message, detail_messages=ItemResultFormat.DETAILS.format(message=indent(e.stdout)))
-
-
-def use_local_tf_backend(folder_path):
-    provider_file = os.path.join(folder_path, "infra", "provider.tf")
-    if not os.path.exists(provider_file):
-        return
-    with open(provider_file, 'r') as file:
-        content = file.read()
-    modified_content = content.replace('backend "azurerm" {}', 'backend "local" {}')
-    
-    with open(provider_file, 'w') as file:
-        file.write(modified_content)
-    logging.debug(f"Replace azurerm backend with local backend in {provider_file}.")
 
 
 def check_for_actions_in_workflow_file(repo_path, file_name, actions):
@@ -273,15 +228,11 @@ def check_functional_requirements(infra_yaml_paths, check_azd_up, check_azd_down
     final_messages.append("## Functional Requirements:")
 
     # check for the existence of the files
-    if check_azd_up:
-        for infra_yaml_path in infra_yaml_paths:
-            result, message = check_for_azd_up(infra_yaml_path)
-            final_result = final_result and result
-            final_messages.append(message)
-            if check_azd_down:
-                result, message = check_for_azd_down(infra_yaml_path)
-                final_result = final_result and result
-                final_messages.append(message)
+    for infra_yaml_path in infra_yaml_paths:
+        azd_validator = AzdValidator("AzdCatalog", infra_yaml_path, check_azd_up, check_azd_down)
+        result, message = azd_validator.validate()
+        final_result = final_result and result
+        final_messages.append(message)
 
     return final_result, line_delimiter.join(final_messages)
 
@@ -296,8 +247,7 @@ def check_security_requirements(repo_path, msdo_result_file):
     msdo_integrated_messages = []
     msdo_integrated_messages.append(
         "Not found security check related actions in the CI/CD pipeline.")
-    list = find_cicd_workflow_file(repo_path)
-    for file in list:
+    for file in find_cicd_workflow_file(repo_path):
         result, message = check_for_actions_in_workflow_file(
             repo_path, os.path.join(cicd_workflow_folder_path, file), security_actions)
         msdo_integrated_result = msdo_integrated_result or result
