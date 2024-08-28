@@ -36,6 +36,3 @@ class TestAzdValidator(unittest.TestCase):
         validator.validate()
         self.assertFalse(validator.result)
         self.assertIn(Signs.BLOCK, validator.resultMessage)
-
-if __name__ == '__main__':
-    unittest.main()

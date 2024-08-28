@@ -181,6 +181,3 @@ class TestGalleryValidate(unittest.TestCase):
         self.assertIn("Source code structure passed", message)
         self.assertIn("Functional requirements passed", message)
         self.assertIn("Security requirements passed", message)
-
-if __name__ == '__main__':
-    unittest.main()
