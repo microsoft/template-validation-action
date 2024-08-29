@@ -240,7 +240,8 @@ def check_functional_requirements(infra_yaml_paths, check_azd_up, check_azd_down
 def check_security_requirements(repo_path, msdo_result_file):
     final_result = True
     final_messages = [""]
-    final_messages.append("## Security Requirements:")
+    final_messages.append("## Security Requirements (only for production):")
+    final_messages.append("The following recommendations should be considered before productionizing this application.")
 
     # check for security action
     msdo_integrated_result = False
@@ -253,7 +254,8 @@ def check_security_requirements(repo_path, msdo_result_file):
         msdo_integrated_result = msdo_integrated_result or result
         msdo_integrated_messages.append(message)
 
-    final_result = final_result and msdo_integrated_result
+    # MSDO integration is not blocking the validation
+    # final_result = final_result and msdo_integrated_result
     if msdo_integrated_result:
         final_messages.append(ItemResultFormat.PASS.format(
             message="microsoft/security-devops-action is integrated to the CI/CD pipeline"))
