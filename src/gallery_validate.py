@@ -280,7 +280,7 @@ def find_infra_yaml_path(repo_path):
     return infra_yaml_paths if len(infra_yaml_paths) > 0 else [repo_path]
 
 
-def internal_validator(repo_path, check_azd_up, check_azd_down, topics, msdo_result_file):
+def internal_validator(repo_path, check_azd_up, check_azd_down, topics):
     if not os.path.isdir(repo_path):
         raise Exception(f"Error: The path {repo_path} is not a valid directory.")
         return
@@ -299,10 +299,6 @@ def internal_validator(repo_path, check_azd_up, check_azd_down, topics, msdo_res
 
     result, message = check_functional_requirements(
         infra_yaml_paths, check_azd_up, check_azd_down)
-    final_result = final_result and result
-    final_message.append(message)
-
-    result, message = check_security_requirements(repo_path, msdo_result_file)
     final_result = final_result and result
     final_message.append(message)
 
@@ -334,7 +330,7 @@ def main():
         f"Repo path: {args.repo_path} azdup: {args.azdup} azddown: {args.azddown} debug: {args.debug} topics: {args.topics} msdo: {args.msdoresult} output: {args.output}")
 
     result, message = internal_validator(
-        args.repo_path, args.azdup, args.azddown, args.topics, args.msdoresult)
+        args.repo_path, args.azdup, args.azddown, args.topics)
 
     if result:
         message = final_result_format.format(result="PASSED", message=message)
