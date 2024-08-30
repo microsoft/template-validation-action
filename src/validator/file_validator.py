@@ -14,6 +14,7 @@ class FileValidator(ValidatorBase):
         self.caseSensitive = caseSensitive
         self.h2Tags = h2Tags
         self.isFolderAllowed = isFolderAllowed
+        self.errorAsWarning = errorAsWarning
 
     def validate(self):
         logging.debug(f"{self.name}: Checking for file {self.fileName} with {self.extensionList} "
@@ -40,7 +41,7 @@ class FileValidator(ValidatorBase):
                                         for tag in self.h2Tags:
                                             if (self.caseSensitive == False and tag.lower() not in content.lower()) or (self.caseSensitive == True and tag not in content) :
                                                 self.result = False
-                                                subMessages.append(ItemResultFormat.SUBITEM.format(message=f"Error: {tag} is missing in {file}."))
+                                                subMessages.append(ItemResultFormat.SUBITEM.format(sign=Signs.WARNING if self.errorAsWarning else Signs.BLOCK, message=f"Error: {tag} is missing in {file}."))
                                     fileContent.close()
                                 if self.result:
                                     messages.append(ItemResultFormat.PASS.format(message=f"{potential_name} File"))
@@ -58,7 +59,7 @@ class FileValidator(ValidatorBase):
         errorMessage = f"{potential_name} File or {self.fileName} Folder" if self.isFolderAllowed else f"{potential_name} File"
         detailMessage = f"Error: {potential_name} file or {self.fileName} folder is missing." if self.isFolderAllowed else f"Error: {potential_name} file is missing."
         messages.append(ItemResultFormat.FAIL.format(message=errorMessage,
-                                                     detail_messages=ItemResultFormat.SUBITEM.format(message=detailMessage)))
+                                                     detail_messages=ItemResultFormat.SUBITEM.format(sign=Signs.WARNING if self.errorAsWarning else Signs.BLOCK, message=detailMessage)))
 
         self.message = line_delimiter.join(messages)
         return self.result, self.message

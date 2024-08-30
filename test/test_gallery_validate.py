@@ -32,7 +32,7 @@ class TestGalleryValidate(unittest.TestCase):
         result, message = check_msdo_result("dummy_path")
         
         self.assertFalse(result)
-        self.assertIn(f"    {Signs.BLOCK} error: AZR-000001 - Error description\n    Detailed description", message)
+        self.assertIn(f"    {Signs.WARNING} error: AZR-000001 - Error description\n    Detailed description", message)
 
     @patch('gallery_validate.loader.load_sarif_file')
     @patch('os.path.isfile')
@@ -45,7 +45,7 @@ class TestGalleryValidate(unittest.TestCase):
         result, message = check_msdo_result("dummy_path")
         
         self.assertTrue(result)
-        self.assertIn(f"    {Signs.BLOCK} warning: AZR-000002 - Warning description\n    Detailed description", message)
+        self.assertIn(f"    {Signs.WARNING} warning: AZR-000002 - Warning description\n    Detailed description", message)
 
     @patch('gallery_validate.loader.load_sarif_file')
     @patch('os.path.isfile')
@@ -66,7 +66,7 @@ class TestGalleryValidate(unittest.TestCase):
         result, message = check_msdo_result("dummy_path")
         
         self.assertFalse(result)
-        self.assertIn(f"  {Signs.BLOCK} Error: Scan result is missing.", message)
+        self.assertIn(f"  {Signs.WARNING} Error: Scan result is missing.", message)
 
     @patch('os.listdir')
     @patch('gallery_validate.check_folder_existence')
@@ -164,20 +164,17 @@ class TestGalleryValidate(unittest.TestCase):
     @patch('gallery_validate.check_repository_management')
     @patch('gallery_validate.check_source_code_structure')
     @patch('gallery_validate.check_functional_requirements')
-    @patch('gallery_validate.check_security_requirements')
     @patch('os.path.isdir')
-    def test_internal_validator(self, mock_isdir, mock_check_security_requirements, mock_check_functional_requirements, mock_check_source_code_structure, mock_check_repository_management, mock_find_infra_yaml_path):
+    def test_internal_validator(self, mock_isdir, mock_check_functional_requirements, mock_check_source_code_structure, mock_check_repository_management, mock_find_infra_yaml_path):
         mock_isdir.return_value = True
         mock_find_infra_yaml_path.return_value = ["dummy_infra_yaml_path"]
         mock_check_repository_management.return_value = (True, "Repo management passed")
         mock_check_source_code_structure.return_value = (True, "Source code structure passed")
         mock_check_functional_requirements.return_value = (True, "Functional requirements passed")
-        mock_check_security_requirements.return_value = (True, "Security requirements passed")
 
-        result, message = internal_validator("dummy_repo_path", True, True, "dummy_topics", "dummy_msdo_result_file")
+        result, message = internal_validator("dummy_repo_path", True, True, "dummy_topics")
         
         self.assertTrue(result)
         self.assertIn("Repo management passed", message)
         self.assertIn("Source code structure passed", message)
         self.assertIn("Functional requirements passed", message)
-        self.assertIn("Security requirements passed", message)
