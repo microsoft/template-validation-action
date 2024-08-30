@@ -59,13 +59,13 @@ def check_msdo_result(msdo_result_file):
                 if severity == severity_error and item['Code'] not in severity_error_exceptions:
                     result = result and False
                     subMessages.append(
-                        ItemResultFormat.SUBITEM.format(message=f"{severity}: {item['Code']} - {indent(item['Description'], 4)}"))
+                        ItemResultFormat.SUBITEM.format(sign=Signs.WARNING, message=f"{severity}: {item['Code']} - {indent(item['Description'], 4)}"))
                 elif item['Code'] in severity_error_exceptions:
                     subMessages.append(
-                        ItemResultFormat.SUBITEM.format(message=f"warning: {item['Code']} - {indent(item['Description'], 4)}"))
+                        ItemResultFormat.SUBITEM.format(sign=Signs.WARNING, message=f"warning: {item['Code']} - {indent(item['Description'], 4)}"))
                 else:
                     subMessages.append(
-                        ItemResultFormat.SUBITEM.format(message=f"{severity}: {item['Code']} - {indent(item['Description'], 4)}"))
+                        ItemResultFormat.SUBITEM.format(sign=Signs.WARNING, message=f"{severity}: {item['Code']} - {indent(item['Description'], 4)}"))
 
         if result and len(subMessages) == 0:
             message = ItemResultFormat.PASS.format(
@@ -80,7 +80,7 @@ def check_msdo_result(msdo_result_file):
     else:
         result = False
         message = ItemResultFormat.WARNING.format(
-            message="Security scan", detail_messages=ItemResultFormat.SUBITEM.format(message=f"Error: Scan result is missing."))
+            message="Security scan", detail_messages=ItemResultFormat.SUBITEM.format(sign=Signs.WARNING, message=f"Error: Scan result is missing."))
 
     return result, message
 
@@ -108,7 +108,7 @@ def check_for_actions_in_workflow_file(repo_path, file_name, actions):
                     if not check_steps(job['steps'], action):
                         result = result and False
                         messages.append(
-                            ItemResultFormat.SUBITEM.format(message=f"Error: {action} is missing in {file_name}."))
+                            ItemResultFormat.SUBITEM.format(sign=Signs.WARNING, message=f"Error: {action} is missing in {file_name}."))
     return result, line_delimiter.join(messages)
 
 
@@ -133,13 +133,13 @@ def check_topic_existence(actual_topics, expected_topics):
     subMessages = []
     if actual_topics is None:
         result = False
-        subMessages.append(ItemResultFormat.SUBITEM.format(message=f"Error: topics string is NULL."))
+        subMessages.append(ItemResultFormat.SUBITEM.format(sign=Signs.WARNING, message=f"Error: topics string is NULL."))
     else:
         actual_topics_list = actual_topics.replace('"', '').split(",")
         for topic in expected_topics:
             if topic not in actual_topics_list:
                 result = result and False
-                subMessages.append(ItemResultFormat.SUBITEM.format(message=f"Error: {topic} is missing in topics."))
+                subMessages.append(ItemResultFormat.SUBITEM.format(sign=Signs.WARNING, message=f"Error: {topic} is missing in topics."))
 
     if result:
         messages.append(ItemResultFormat.PASS.format(
@@ -156,7 +156,7 @@ def check_folder_existence(repo_path, folder_name):
     messages = []
     if not os.path.isdir(os.path.join(repo_path, folder_name)):
         messages.append(ItemResultFormat.FAIL.format(
-            message=f"{folder_name} Folder", detail_messages=ItemResultFormat.SUBITEM.format(message=f"Error: {folder_name} folder is missing.")))
+            message=f"{folder_name} Folder", detail_messages=ItemResultFormat.SUBITEM.format(sign=Signs.BLOCK, message=f"Error: {folder_name} folder is missing.")))
         return False, line_delimiter.join(messages)
     else:
         messages.append(ItemResultFormat.PASS.format(

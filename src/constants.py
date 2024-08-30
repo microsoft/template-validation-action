@@ -24,4 +24,4 @@ class ItemResultFormat:
     WARNING = "{sign} <b>{{message}}</b>. <a href={detail_link}>[How to fix?]</a>\n\n{{detail_messages}}\n".format(
         sign=Signs.WARNING, detail_link=details_help_link)
     DETAILS = "  <details>\n  <summary> Details </summary>\n\n  {message}\n\n</details>"
-    SUBITEM = "  {sign} {{message}}".format(sign=Signs.BLOCK)
+    SUBITEM = "  {sign} {message}"
