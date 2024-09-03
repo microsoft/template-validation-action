@@ -3,7 +3,13 @@ import subprocess
 import logging
 from validator.validator_base import ValidatorBase
 from constants import *
-from utils import indent
+from utils import indent, retry
+
+# defines string array of retryable error messages
+retryable_error_messages = [
+    "Cannot connect to the Docker daemon",
+    "spawn ETXTBSY"
+]
 
 class AzdValidator(ValidatorBase):
     def __init__(self, validatorCatalog, folderPath, check_azd_up=True, check_azd_down=True, errorAsWarning=False):
@@ -11,7 +17,8 @@ class AzdValidator(ValidatorBase):
         self.folderPath = folderPath
         self.check_azd_up = check_azd_up
         self.check_azd_down = check_azd_down
-    
+
+    @retry(3, retryable_error_messages)
     def validate(self):
         self.result = True
         self.messages = []
@@ -62,40 +69,3 @@ class AzdValidator(ValidatorBase):
             logging.debug(f"{e.stdout}")
             logging.debug(f"{e.stderr}")
             return False, ItemResultFormat.FAIL.format(message=message, detail_messages=ItemResultFormat.DETAILS.format(message=indent(e.stdout)))
-
-from validator.azd_validator import AzdValidator
-
-def internal_validator(repo_path, check_azd_up, check_azd_down, topics, msdo_result_file):
-    if not os.path.isdir(repo_path):
-        raise Exception(f"Error: The path {repo_path} is not a valid directory.")
-        return
-
-    final_result = True
-    final_message = []
-    infra_yaml_paths = find_infra_yaml_path(repo_path)
-
-    result, message = check_repository_management(repo_path, topics)
-    final_result = final_result and result
-    final_message.append(message)
-
-    result, message = check_source_code_structure(repo_path, infra_yaml_paths[0])
-    final_result = final_result and result
-    final_message.append(message)
-
-    if check_azd_up:
-        for infra_yaml_path in infra_yaml_paths:
-            azd_up_validator = AzdValidator("AzdUpCatalog", infra_yaml_path, "azd up --no-prompt")
-            azd_up_validator.validate()
-            final_result = final_result and azd_up_validator.result
-            final_message.append(azd_up_validator.resultMessage)
-            if check_azd_down:
-                azd_down_validator = AzdValidator("AzdDownCatalog", infra_yaml_path, "azd down --force --purge --no-prompt")
-                azd_down_validator.validate()
-                final_result = final_result and azd_down_validator.result
-                final_message.append(azd_down_validator.resultMessage)
-
-    result, message = check_security_requirements(repo_path, msdo_result_file)
-    final_result = final_result and result
-    final_message.append(message)
-
-    return final_result, line_delimiter.join(final_message)
