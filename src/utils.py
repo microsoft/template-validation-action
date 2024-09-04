@@ -13,9 +13,7 @@ def retry(times, retryMessages):
         def fn(*args, **kwargs):
             attempt = 0
             while attempt < times:
-                print(f"Attempt: {attempt}")
                 result, messages = func(*args, **kwargs)
-                print(f"Result: {result}, Messages: {messages}, retryMessages: {retryMessages}, any(message in messages for message in retryMessages): {any(message in messages for message in retryMessages)}")
                 if not result and any(message in messages for message in retryMessages):
                     logging.warning(f"Retryable error message found in {func.__name__} output. Retrying.")
                     attempt += 1
