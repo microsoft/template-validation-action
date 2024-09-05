@@ -68,15 +68,6 @@ runs:
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
 
-    - name: Run Microsoft Security DevOps Analysis
-      uses: microsoft/security-devops-action@v1
-      id: msdo
-      with:
-        tools: templateanalyzer
-      env:
-        GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ${{ env.REPOSITORY_PATH }}
-      continue-on-error: true
-
     - name: Set environment name with timestamp
       id: set_env_name
       run: |
@@ -94,7 +85,6 @@ runs:
         mkdir -p ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}
         cp -r ${{ github.action_path }}/src ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/src
         cp ${{ github.action_path }}/requirements.txt ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/requirements.txt
-        cp ${{ steps.msdo.outputs.sarifFile }} ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/msdo.sarif
         env > ${{ env.REPOSITORY_PATH }}/tva_${{ github.run_id }}/env_variables.txt
       shell: bash
 
@@ -117,7 +107,7 @@ runs:
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
-          if [ -f Dockerfile ]; then
+          if find . -type f -iname 'dockerfile' | grep -q .; then
             sudo service docker start
           fi
         subFolder: ${{ env.REPOSITORY_PATH }}
@@ -169,9 +159,9 @@ runs:
             done < tva_${{ github.run_id }}/env_variables.txt
           fi
           if [ "${{ inputs.runAzdUp }}" = "true" ]; then
-            python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif --azdup --azddown
+            python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --azdup --azddown
           else
-            python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS --msdoresult tva_${{ github.run_id }}/msdo.sarif
+            python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log --debug --topics $TOPICS
           fi
         subFolder: ${{ env.REPOSITORY_PATH }}
         env: |
@@ -216,9 +206,9 @@ runs:
       run: |
         pip install -r ${{ github.action_path }}/requirements.txt
         if [ "${{ inputs.runAzdUp }}" = "true" ]; then
-          python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log --azdup --azddown
+          python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --output ${{ env.AZURE_ENV_NAME }}-output.log --azdup --azddown
         else
-          python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --output ${{ env.AZURE_ENV_NAME }}-output.log
+          python ${{ github.action_path }}/src/gallery_validate.py . --debug --topics ${{ env.TOPICS }} --output ${{ env.AZURE_ENV_NAME }}-output.log
         fi
       shell: bash
       env:
