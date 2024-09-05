@@ -68,4 +68,4 @@ class AzdValidator(ValidatorBase):
         except subprocess.CalledProcessError as e:
             logging.debug(f"{e.stdout}")
             logging.debug(f"{e.stderr}")
-            return False, ItemResultFormat.FAIL.format(message=message, detail_messages=ItemResultFormat.DETAILS.format(message=indent(e.stdout)))
+            return False, ItemResultFormat.FAIL.format(message=message, detail_messages=ItemResultFormat.DETAILS.format(message=indent(e.stdout.replace("\\", ""))))

@@ -93,3 +93,19 @@ class TestAzdValidator(unittest.TestCase):
         self.assertEqual(mock_runCommand.call_count, 4)
         self.assertIn(Signs.BLOCK, validator.resultMessage)
         self.assertIn("Cannot connect to the Docker daemon", validator.resultMessage)
+
+
+    @patch('subprocess.run')
+    def test_replace_backslashes_in_output(self, mock_runCommand):
+        # Simulate subprocess output with backslashes
+        mock_runCommand.side_effect = subprocess.CalledProcessError(1, "azd down", output="azd down failed with \\\"error\\\": \\\"message\\\"")
+
+        validator = AzdValidator("AzdUpCatalog", ".", True, False)
+        validator.validate()
+
+        # Check that the result is successful
+        self.assertFalse(validator.result)
+        self.assertIn(Signs.BLOCK, validator.resultMessage)
+        # Verify that backslashes are replaced in the output
+        self.assertIn("\"error\": \"message\"", validator.resultMessage)
+        self.assertEqual(mock_runCommand.call_count, 1)
