@@ -16,6 +16,10 @@ inputs:
     description: 'Run azd up'
     required: false
     default: 'true'
+  runMsdo:
+    description: 'Run microsoft security devops action'
+    required: false
+    default: 'true'
 outputs:
   resultFile:
     description: "A file path to a results file."
@@ -69,6 +73,7 @@ runs:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
 
     - name: Run Microsoft Security DevOps Analysis
+      if: ${{ inputs.runMsdo == 'true' }}
       uses: microsoft/security-devops-action@v1
       id: msdo
       with:
@@ -117,7 +122,7 @@ runs:
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
-          if [ -f Dockerfile ]; then
+          if find . -type f -iname 'dockerfile' | grep -q .; then
             sudo service docker start
           fi
         subFolder: ${{ env.REPOSITORY_PATH }}
