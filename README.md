@@ -112,7 +112,7 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
 
 | Name                      | Required | Description                       |
 | ------------------------- | -------- | ----------------------------------|
-| working-directory         | false    | The directory to run the validation in. Defaults to `.` (the root of the repository). Use this if your template is in a subdirectory. |
+| workingDirectory         | false    | The directory to run the validation in. Defaults to `.` (the root of the repository). Use this if your template is in a subdirectory. |
 | validatePaths             | false    | A comma-separated list of static files or folder path to check for existence. Defaults to `README.md, LICENSE, SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, ISSUE_TEMPLATE.md, azure-dev.yaml, azure.yaml, infra, .devcontainer`. Leave empty to skip this check. |
 | topics                    | false    | A comma-separated list of topics to check for in the repository. Defaults to `azd-template, ai-azd-template`. Leave empty to skip this check. |
 | validateAzd               | false    | Whether to validate the deployment functionality with Azure Developer CLI (azd). Defaults to `true`. Set to `false` to skip azd validation. |
