@@ -59,6 +59,8 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
 
 #### Run in Subfolder
 
+Suppose there is a folder at root-level, called `ai-template`, where the `azure.yml` configuration is found:
+
 ```yaml
   - uses: microsoft/template-validation-action@v0.1
     with:
@@ -73,6 +75,8 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
 ```
 
 #### Customized Validation Rules
+
+By default, the action validates all paths, unless specific paths are configured. You can find the reference input name in the [#Inputs] table below. 
 
 ```yaml
   - uses: microsoft/template-validation-action@v0.1
