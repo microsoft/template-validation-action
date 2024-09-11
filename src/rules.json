@@ -70,6 +70,18 @@
     "validator": "FileValidator",
     "error_as_warning": false
   },
+  "./infra": {
+    "catalog": "source_code_structure",
+    "folder_name": "infra",
+    "candidate_path": ["."],
+    "validator": "FolderValidator"
+  },
+  ".devcontainer": {
+    "catalog": "source_code_structure",
+    "folder_name": ".devcontainer",
+    "candidate_path": [".github"],
+    "validator": "FolderFileValidator"
+  },
   "azd up": {
     "catalog": "functional_requirements",
     "validator": "AzdValidator",

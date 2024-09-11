@@ -4,6 +4,7 @@ from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 # from validator.msdo_validator import MsdoValidator
 from validator.topic_validator import TopicValidator
+from validator.folder_validator import FolderValidator
 
 class RuleParse:
     def __init__(self, rules_file_path, args):
@@ -28,6 +29,10 @@ class RuleParse:
                 h2_tags = rule_details.get('assert_in', None)
                 accept_folder = rule_details.get('accept_folder', False)
                 validator = FileValidator(catalog, rule_name, ext, ".", candidate_path, h2_tags, case_sensitive, error_as_warning, accept_folder)
+            
+            elif validator_type == 'FolderValidator':
+                candidate_path = rule_details.get('candidate_path', [""])
+                validator = FolderValidator(catalog, rule_name, candidate_path, error_as_warning)
             
             elif validator_type == 'AzdValidator':
                 if rule_name == 'azd up' and not self.args.azdup:
