@@ -1,6 +1,7 @@
 {
   "README": {
-    "ext": [".md"],
+    "catalog": "repository_management",
+    "ext": ["md"],
     "candidate_path": ["."],
     "assert_in": [
       "## Features",
@@ -13,50 +14,69 @@
     "error_as_warning": false
   },
   "LICENSE": {
-    "ext": [".md", ""],
+    "catalog": "repository_management",
+    "ext": ["md", ""],
     "candidate_path": ["."],
     "case_sensitive": false,
     "validator": "FileValidator",
     "error_as_warning": false
   },
   "SECURITY": {
-    "ext": [".md"],
+    "catalog": "repository_management",
+    "ext": ["md"],
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
     "error_as_warning": false
   },
   "CODE_OF_CONDUCT": {
-    "ext": [".md"],
+    "catalog": "repository_management",
+    "ext": ["md"],
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
     "error_as_warning": false
   },
   "CONTRIBUTING": {
-    "ext": [".md"],
+    "catalog": "repository_management",
+    "ext": ["md"],
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
     "error_as_warning": false
   },
   "ISSUE_TEMPLATE": {
-    "ext": [".md"],
+    "catalog": "repository_management",
+    "ext": ["md"],
     "candidate_path": [".github"],
     "accept_folder": true,
     "case_sensitive": false,
     "validator": "FileValidator",
     "error_as_warning": false
   },
+  "azure-dev": {
+    "catalog": "source_code_structure",
+    "ext": ["yml", "yaml"],
+    "candidate_path": ["."],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "azure": {
+    "catalog": "source_code_structure",
+    "ext": ["yml", "yaml"],
+    "candidate_path": ["."],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
   "azd up": {
+    "catalog": "functional_requirements",
     "validator": "AzdValidator",
     "error_as_warning": false
   },
-  "msdo": {
-    "validator": "MsdoValidator",
-    "error_as_warning": true
-  },
   "expected_topics": {
+    "catalog": "repository_management",
     "topics": ["azd-templates", "ai-azd-templates"],
     "validator": "TopicValidator",
     "error_as_warning": true
