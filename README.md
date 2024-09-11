@@ -140,6 +140,7 @@ By default, the action validates all paths, unless specific paths are configured
 | AZURE_LOCATION              | Azure location for resources. Required for azd validation.              |
 | GITHUB_TOKEN                | GitHub token for authentication. Required for GitHub topics validation. |
 | README_H2_TAG               | Expected H2 tag(s) in the README file for validation.                   |
+| REPOSITORY_NAME             | The name of the repository for GitHub topics validation. Using the name of current repository if not set. |
 
 ## Built-in Rules
 
