@@ -13,7 +13,7 @@ class TopicValidator(ValidatorBase):
         self.actual_topics = actual_topics
 
     def validate(self):
-        logging.debug(f"Checking for topics...")
+        logging.debug("Checking for topics...")
         messages = []
         result = True
 
@@ -22,7 +22,7 @@ class TopicValidator(ValidatorBase):
             result = False
             subMessages.append(
                 ItemResultFormat.SUBITEM.format(
-                    sign=Signs.WARNING, message=f"Error: topics string is NULL."
+                    sign=Signs.WARNING, message="Error: topics string is NULL."
                 )
             )
         else:

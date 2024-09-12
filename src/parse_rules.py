@@ -1,5 +1,4 @@
 import json
-import os
 from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 

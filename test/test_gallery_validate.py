@@ -1,11 +1,7 @@
 import unittest
-from unittest.mock import patch, MagicMock
-import os
+from unittest.mock import patch
 import argparse
 from gallery_validate import main
-from parse_rules import RuleParser
-from execution_engine import ExecutionEngine
-from result_aggregator import ResultAggregator
 
 
 class TestGalleryValidate(unittest.TestCase):

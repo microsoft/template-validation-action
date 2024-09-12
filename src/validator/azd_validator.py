@@ -20,7 +20,7 @@ class AzdValidator(ValidatorBase):
         check_azd_down=True,
         errorAsWarning=False,
     ):
-        super().__init__(f"AzdValidator", validatorCatalog, errorAsWarning)
+        super().__init__("AzdValidator", validatorCatalog, errorAsWarning)
         self.folderPath = folderPath
         self.check_azd_up = check_azd_up
         self.check_azd_down = check_azd_down

@@ -1,6 +1,3 @@
-import pytest
-import os
-import sys
 from validator.file_validator import FileValidator
 from constants import ItemResultFormat, Signs
 
@@ -10,7 +7,7 @@ def test_file_validator_file_found_exist():
         "TestCatalog", "LICENSE", [""], "test/data", ["."], None, False
     )
     result, message = validator.validate()
-    assert result == True
+    assert result is True
     assert message == ItemResultFormat.PASS.format(message="LICENSE File")
 
 
@@ -19,7 +16,7 @@ def test_file_validator_file_found_case_non_sensitive():
         "TestCatalog", "license", [""], "test/data", ["."], None, False
     )
     result, message = validator.validate()
-    assert result == True
+    assert result is True
     assert message == ItemResultFormat.PASS.format(message="license File")
 
 
@@ -28,7 +25,7 @@ def test_file_validator_file_not_found_case_sensitive():
         "TestCatalog", "license", [""], "test/data", ["."], None, True
     )
     result, message = validator.validate()
-    assert result == False
+    assert result is False
     assert message == ItemResultFormat.FAIL.format(
         message="license File",
         detail_messages=ItemResultFormat.SUBITEM.format(
@@ -42,7 +39,7 @@ def test_file_validator_file_found_case_sensitive():
         "TestCatalog", "LICENSE", [""], "test/data", ["."], None, True
     )
     result, message = validator.validate()
-    assert result == True
+    assert result is True
     assert message == ItemResultFormat.PASS.format(message="LICENSE File")
 
 
@@ -51,7 +48,7 @@ def test_file_validator_file_found_mutiple_extension():
         "TestCatalog", "LICENSE", ["md", "txt", ""], "test/data", ["."], None, False
     )
     result, message = validator.validate()
-    assert result == True
+    assert result is True
     assert message == ItemResultFormat.PASS.format(message="LICENSE.md File")
 
 
@@ -60,7 +57,7 @@ def test_file_validator_file_not_found_mutiple_extension():
         "TestCatalog", "LICENSE", ["md", "txt"], "test/data", ["."], None, False
     )
     result, message = validator.validate()
-    assert result == False
+    assert result is False
     assert message == ItemResultFormat.FAIL.format(
         message="LICENSE.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
@@ -74,7 +71,7 @@ def test_file_validator_file_found_in_subfolder():
         "TestCatalog", "LICENSE", [""], "test", ["data"], None, False
     )
     result, message = validator.validate()
-    assert result == True
+    assert result is True
     assert message == ItemResultFormat.PASS.format(message="LICENSE File")
 
 
@@ -83,7 +80,7 @@ def test_file_validator_file_not_found_in_subfolder():
         "TestCatalog", "license", [""], "test", ["data"], None, True
     )
     result, message = validator.validate()
-    assert result == False
+    assert result is False
     assert message == ItemResultFormat.FAIL.format(
         message="license File",
         detail_messages=ItemResultFormat.SUBITEM.format(
@@ -97,7 +94,7 @@ def test_file_validator_H2Tag_found_case_non_sensitive():
         "TestCatalog", "README", ["md"], "test/data", ["."], ["## Test h2"], False
     )
     result, message = validator.validate()
-    assert result == True
+    assert result is True
     assert message == ItemResultFormat.PASS.format(message="README.md File")
 
 
@@ -106,7 +103,7 @@ def test_file_validator_H2Tag_found_case_sensitive():
         "TestCatalog", "README", ["md"], "test/data", ["."], ["## Test H2"], True
     )
     result, message = validator.validate()
-    assert result == True
+    assert result is True
     assert message == ItemResultFormat.PASS.format(message="README.md File")
 
 
@@ -121,7 +118,7 @@ def test_file_validator_H2Tag_not_found_case_non_sensitive():
         False,
     )
     result, message = validator.validate()
-    assert result == False
+    assert result is False
     assert message == ItemResultFormat.FAIL.format(
         message="README.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
@@ -142,7 +139,7 @@ def test_file_validator_H2Tag_not_found_case_sensitive():
         True,
     )
     result, message = validator.validate()
-    assert result == False
+    assert result is False
     assert message == ItemResultFormat.FAIL.format(
         message="README.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
@@ -165,7 +162,7 @@ def test_file_validator_folder_allowed_and_exists():
         True,
     )
     result, message = validator.validate()
-    assert result == True
+    assert result is True
     assert message == ItemResultFormat.PASS.format(message="ISSUE_TEMPLATE Folder")
 
 
@@ -182,7 +179,7 @@ def test_file_validator_folder_allowed_but_not_exists():
         True,
     )
     result, message = validator.validate()
-    assert result == False
+    assert result is False
     assert message == ItemResultFormat.FAIL.format(
         message="NON_EXISTENT_FOLDER.md File or NON_EXISTENT_FOLDER Folder",
         detail_messages=ItemResultFormat.SUBITEM.format(

@@ -15,7 +15,7 @@ how_to_fix = "## <i>How to fix?</i>\n<b>The full Definition of Done of the AI-Ga
 )
 
 final_result_format = "# AI Gallery Standard Validation: {{result}} \n{{message}}\n\n{end_message}".format(
-    link=details_help_link, end_message=how_to_fix
+    end_message=how_to_fix
 )
 
 

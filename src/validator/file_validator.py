@@ -1,5 +1,5 @@
-from validator.validator_base import *
-from constants import *
+from validator.validator_base import ValidatorBase
+from constants import line_delimiter, ItemResultFormat, Signs
 import os
 import logging
 
@@ -49,9 +49,9 @@ class FileValidator(ValidatorBase):
                     else os.path.join(self.rootFolder, folder)
                 )
                 if (
-                    self.caseSensitive == False
+                    self.caseSensitive is False
                     and candidateFolder.lower() == root.lower()
-                ) or (self.caseSensitive == True and root == candidateFolder):
+                ) or (self.caseSensitive is True and root == candidateFolder):
                     for extension in self.extensionList:
                         candidateFile = (
                             self.fileName
@@ -60,9 +60,9 @@ class FileValidator(ValidatorBase):
                         )
                         for file in files:
                             if (
-                                self.caseSensitive == False
+                                self.caseSensitive is False
                                 and file.lower() == candidateFile.lower()
-                            ) or (self.caseSensitive == True and file == candidateFile):
+                            ) or (self.caseSensitive is True and file == candidateFile):
                                 self.result = True
                                 logging.debug(f"- {file} is found in '{root}'.")
                                 subMessages = []
@@ -73,10 +73,10 @@ class FileValidator(ValidatorBase):
                                         content = fileContent.read()
                                         for tag in self.h2Tags:
                                             if (
-                                                self.caseSensitive == False
+                                                self.caseSensitive is False
                                                 and tag.lower() not in content.lower()
                                             ) or (
-                                                self.caseSensitive == True
+                                                self.caseSensitive is True
                                                 and tag not in content
                                             ):
                                                 self.result = False
@@ -106,7 +106,7 @@ class FileValidator(ValidatorBase):
                                     )
                                 self.resultMessage = line_delimiter.join(messages)
                                 return self.result, self.resultMessage
-                    if self.isFolderAllowed == True and self.fileName in dirs:
+                    if self.isFolderAllowed is True and self.fileName in dirs:
                         self.result = True
                         messages.append(
                             ItemResultFormat.PASS.format(
