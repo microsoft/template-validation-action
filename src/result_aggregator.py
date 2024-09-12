@@ -35,24 +35,3 @@ class ResultAggregator:
 
         summary[0] += "PASSED" if overall_passed else "FAILED"
         return "\n".join(summary)
-
-
-# Example usage
-if __name__ == "__main__":
-    from parse_rules import RuleParse
-    from execution_engine import ExecutionEngine
-    import os
-
-    rules_file_path = os.path.join(os.path.dirname(__file__), "rules.json")
-    parser = RuleParse(rules_file_path)
-    validators = parser.parse()
-
-    engine = ExecutionEngine(validators)
-    results = engine.execute()
-
-    aggregator = ResultAggregator()
-    for result in results:
-        aggregator.add_result(result[0], result[1], result[2])
-
-    summary = aggregator.generate_summary()
-    print(summary)

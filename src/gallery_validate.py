@@ -1,7 +1,7 @@
 import os
 import argparse
 import logging
-from parse_rules import RuleParse
+from parse_rules import RuleParser
 from execution_engine import ExecutionEngine
 from result_aggregator import ResultAggregator
 
@@ -37,7 +37,7 @@ def main():
 
     # Parse rules and generate validators
     rules_file_path = os.path.join(os.path.dirname(__file__), "rules.json")
-    parser = RuleParse(rules_file_path, args)
+    parser = RuleParser(rules_file_path, args)
     validators = parser.parse()
 
     # Execute validators
@@ -55,8 +55,6 @@ def main():
     if args.output:
         with open(args.output, "w") as output_file:
             output_file.write(summary)
-    else:
-        print(summary)
 
 
 if __name__ == "__main__":

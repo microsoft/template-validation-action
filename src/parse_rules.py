@@ -8,7 +8,7 @@ from validator.topic_validator import TopicValidator
 from validator.folder_validator import FolderValidator
 
 
-class RuleParse:
+class RuleParser:
     def __init__(self, rules_file_path, args):
         self.rules_file_path = rules_file_path
         self.args = args
@@ -69,25 +69,3 @@ class RuleParse:
             validators.append(validator)
 
         return validators
-
-
-# Example usage
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Parse rules and generate validators.")
-    parser.add_argument(
-        "--azdup", action="store_true", help="Check infra code with azd up."
-    )
-    parser.add_argument(
-        "--azddown", action="store_true", help="Check infra code with azd down."
-    )
-    args = parser.parse_args()
-
-    rules_file_path = os.path.join(os.path.dirname(__file__), "rules.json")
-    parser = RuleParse(rules_file_path, args)
-    validators = parser.parse()
-    for validator in validators:
-        print(
-            f"Validator: {validator.__class__.__name__}, Rule: {validator.validatorCatalog}"
-        )

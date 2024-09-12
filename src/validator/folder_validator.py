@@ -24,7 +24,7 @@ class FolderValidator(ValidatorBase):
             if os.path.isdir(folder_path):
                 messages.append(
                     ItemResultFormat.PASS.format(
-                        message=f"{self.folderName} Folder found in {candidate_folder}"
+                        message=f"{self.folderName} Folder"
                     )
                 )
                 folder_found = True
@@ -36,7 +36,7 @@ class FolderValidator(ValidatorBase):
                     message=f"{self.folderName} Folder",
                     detail_messages=ItemResultFormat.SUBITEM.format(
                         sign=Signs.BLOCK,
-                        message=f"Error: {self.folderName} folder is missing in all candidate folders.",
+                        message=f"Error: {self.folderName} folder is missing.",
                     ),
                 )
             )
