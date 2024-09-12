@@ -33,7 +33,7 @@ class FileValidator(ValidatorBase):
                         for file in files:
                             if ((self.caseSensitive == False and file.lower() == candidateFile.lower()) or (self.caseSensitive == True and file == candidateFile)):
                                 self.result = True
-                                logging.debug(f"- {file} is found in {root}.")
+                                logging.debug(f"- {file} is found in '{root}'.")
                                 subMessages = []
                                 if self.h2Tags is not None:
                                     with open(os.path.join(root, file), 'r') as fileContent:

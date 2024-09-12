@@ -37,9 +37,7 @@ class RuleParse:
             elif validator_type == 'AzdValidator':
                 if rule_name == 'azd up' and not self.args.azdup:
                     continue
-                if rule_name == 'azd down' and not self.args.azddown:
-                    continue
-                validator = AzdValidator(catalog, ".", rule_name, error_as_warning)
+                validator = AzdValidator(catalog, ".", True, True, error_as_warning)
 
             # TODO 
             # elif validator_type == 'MsdoValidator':

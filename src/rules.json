@@ -57,7 +57,7 @@
   "azure-dev": {
     "catalog": "source_code_structure",
     "ext": ["yml", "yaml"],
-    "candidate_path": ["."],
+    "candidate_path": [".github/workflows"],
     "case_sensitive": false,
     "validator": "FileValidator",
     "error_as_warning": false

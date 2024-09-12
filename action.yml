@@ -48,16 +48,6 @@ runs:
         fi
       shell: bash
         
-    - name: Add execute permission to hooks script
-      working-directory: ${{ env.REPOSITORY_PATH }}
-      run: |
-        if [ -d "hooks" ] && [ "$(ls -A hooks/*.sh 2>/dev/null)" ]; then
-          chmod +x hooks/*.sh
-        else
-          echo "No hooks directory or no .sh files found in hooks directory"
-        fi
-      shell: bash
-
     - name: Extract topics
       id: extract_repo_info
       run: |
