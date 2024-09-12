@@ -25,14 +25,20 @@ jobs:
 
         - name: Install dependencies
           run: |
+            python -m venv venv
+            source venv/bin/activate
             pip install -r requirements.txt
             pip install pytest
 
         - name: Lint with ruff
-          run: python3 -m ruff check .
+          run: |
+            source venv/bin/activate
+            python3 -m ruff check .
 
         - name: Check formatting with ruff
-          run: python3 -m ruff format --check .
+          run: |
+            source venv/bin/activate
+            python3 -m ruff format --check .
 
         - name: Run pytest
           run: |
