@@ -52,8 +52,9 @@ class TestGalleryValidate(unittest.TestCase):
 
         mock_result_aggregator.generate_summary.assert_called_once()
 
-        self.assertEqual(mock_result_aggregator.generate_summary.return_value, "Summary")
-
+        self.assertEqual(
+            mock_result_aggregator.generate_summary.return_value, "Summary"
+        )
 
 
 if __name__ == "__main__":

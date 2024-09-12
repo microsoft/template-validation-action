@@ -23,9 +23,7 @@ class FolderValidator(ValidatorBase):
             folder_path = os.path.join(candidate_folder, self.folderName)
             if os.path.isdir(folder_path):
                 messages.append(
-                    ItemResultFormat.PASS.format(
-                        message=f"{self.folderName} Folder"
-                    )
+                    ItemResultFormat.PASS.format(message=f"{self.folderName} Folder")
                 )
                 folder_found = True
                 break
