@@ -8,13 +8,18 @@ from constants import ItemResultFormat, line_delimiter
 from utils import indent, retry
 
 # defines string array of retryable error messages
-retryable_error_messages = [
-    "Cannot connect to the Docker daemon",
-    "spawn ETXTBSY"
-]
+retryable_error_messages = ["Cannot connect to the Docker daemon", "spawn ETXTBSY"]
+
 
 class AzdValidator(ValidatorBase):
-    def __init__(self, validatorCatalog, folderPath, check_azd_up=True, check_azd_down=True, errorAsWarning=False):
+    def __init__(
+        self,
+        validatorCatalog,
+        folderPath,
+        check_azd_up=True,
+        check_azd_down=True,
+        errorAsWarning=False,
+    ):
         super().__init__(f"AzdValidator", validatorCatalog, errorAsWarning)
         self.folderPath = folderPath
         self.check_azd_up = check_azd_up
@@ -38,7 +43,7 @@ class AzdValidator(ValidatorBase):
             self.messages.append(message)
         self.resultMessage = line_delimiter.join(self.messages)
         return self.result, self.resultMessage
-    
+
     def validate_up(self):
         logging.debug(f"Running azd up in {self.folderPath}")
         try:
@@ -83,23 +88,38 @@ class AzdValidator(ValidatorBase):
         provider_file = os.path.join(self.folderPath, "infra", "provider.tf")
         if not os.path.exists(provider_file):
             return
-        with open(provider_file, 'r') as file:
+        with open(provider_file, "r") as file:
             content = file.read()
         modified_content = content.replace('backend "azurerm" {}', 'backend "local" {}')
-        
-        with open(provider_file, 'w') as file:
+
+        with open(provider_file, "w") as file:
             file.write(modified_content)
         logging.debug(f"Replace azurerm backend with local backend in {provider_file}.")
 
     def runCommand(self, command, arguments):
-        message = f"{command}" if self.folderPath == "." else f"{command} in {self.folderPath}"
+        message = (
+            f"{command}"
+            if self.folderPath == "."
+            else f"{command} in {self.folderPath}"
+        )
         try:
             result = subprocess.run(
-                " ".join([command, arguments]), cwd=self.folderPath, capture_output=True, text=True, check=True, shell=True)
+                " ".join([command, arguments]),
+                cwd=self.folderPath,
+                capture_output=True,
+                text=True,
+                check=True,
+                shell=True,
+            )
             logging.debug(f"{result.stdout}")
             self.extract_resource_group(result.stdout)
             return True, ItemResultFormat.PASS.format(message=message)
         except subprocess.CalledProcessError as e:
             logging.debug(f"{e.stdout}")
             logging.debug(f"{e.stderr}")
-            return False, ItemResultFormat.AZD_FAIL.format(message=message, detail_messages=ItemResultFormat.DETAILS.format(message=indent(e.stdout.replace("\\", ""))))
+            return False, ItemResultFormat.AZD_FAIL.format(
+                message=message,
+                detail_messages=ItemResultFormat.DETAILS.format(
+                    message=indent(e.stdout.replace("\\", ""))
+                ),
+            )

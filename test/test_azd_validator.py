@@ -5,6 +5,7 @@ from validator.azd_validator import AzdValidator
 from constants import Signs
 from utils import indent
 
+
 class TestAzdValidator(unittest.TestCase):
     @patch('validator.azd_validator.AzdValidator.list_resources')
     @patch('subprocess.run')
@@ -21,7 +22,9 @@ class TestAzdValidator(unittest.TestCase):
     @patch('validator.azd_validator.AzdValidator.list_resources')
     @patch('subprocess.run')
     def test_azd_up_failure(self, mock_run, mock_list_resources):
-        mock_run.side_effect = subprocess.CalledProcessError(1, "azd up", output="azd up failed")
+        mock_run.side_effect = subprocess.CalledProcessError(
+            1, "azd up", output="azd up failed"
+        )
         mock_list_resources.return_value = None
         validator = AzdValidator("AzdUpCatalog", ".", True, False)
         validator.validate()
@@ -45,7 +48,9 @@ class TestAzdValidator(unittest.TestCase):
     @patch('validator.azd_validator.AzdValidator.list_resources')
     @patch('subprocess.run')
     def test_azd_down_failure(self, mock_run, mock_list_resources):
-        mock_run.side_effect = subprocess.CalledProcessError(1, "azd down", output="azd down failed")
+        mock_run.side_effect = subprocess.CalledProcessError(
+            1, "azd down", output="azd down failed"
+        )
         mock_list_resources.return_value = None
         validator = AzdValidator("AzdDownCatalog", ".", False, True)
         validator.validate()
@@ -59,9 +64,13 @@ class TestAzdValidator(unittest.TestCase):
     def test_validate_retry_logic_ETXTBSY(self, mock_runCommand, mock_list_resources):
         # Simulate a retryable error
         mock_runCommand.side_effect = [
-            subprocess.CalledProcessError(1, "azd up", output="Retryable error message: spawn ETXTBSY"),
-            subprocess.CalledProcessError(1, "azd up", output="Retryable error message: spawn ETXTBSY"),
-            MagicMock(returncode=0, stdout="azd up success")
+            subprocess.CalledProcessError(
+                1, "azd up", output="Retryable error message: spawn ETXTBSY"
+            ),
+            subprocess.CalledProcessError(
+                1, "azd up", output="Retryable error message: spawn ETXTBSY"
+            ),
+            MagicMock(returncode=0, stdout="azd up success"),
         ]
         mock_list_resources.return_value = None
         validator = AzdValidator("AzdUpCatalog", ".", True, False)
@@ -77,9 +86,17 @@ class TestAzdValidator(unittest.TestCase):
     def test_validate_retry_logic_DOCKER(self, mock_runCommand, mock_list_resources):
         # Simulate a retryable error
         mock_runCommand.side_effect = [
-            subprocess.CalledProcessError(1, "azd up", output="Retryable error message: Cannot connect to the Docker daemon"),
-            subprocess.CalledProcessError(1, "azd up", output="Retryable error message: Cannot connect to the Docker daemon"),
-            MagicMock(returncode=0, stdout="azd up success")
+            subprocess.CalledProcessError(
+                1,
+                "azd up",
+                output="Retryable error message: Cannot connect to the Docker daemon",
+            ),
+            subprocess.CalledProcessError(
+                1,
+                "azd up",
+                output="Retryable error message: Cannot connect to the Docker daemon",
+            ),
+            MagicMock(returncode=0, stdout="azd up success"),
         ]
         mock_list_resources.return_value = None
         validator = AzdValidator("AzdUpCatalog", ".", True, False)
@@ -95,10 +112,26 @@ class TestAzdValidator(unittest.TestCase):
     def test_validate_retry_logic_finally_failed(self, mock_runCommand, mock_list_resources):
         # Simulate a retryable error
         mock_runCommand.side_effect = [
-            subprocess.CalledProcessError(1, "azd up", output="Retryable error message: Cannot connect to the Docker daemon"),
-            subprocess.CalledProcessError(1, "azd up", output="Retryable error message: Cannot connect to the Docker daemon"),
-            subprocess.CalledProcessError(1, "azd up", output="Retryable error message: Cannot connect to the Docker daemon"),
-            subprocess.CalledProcessError(1, "azd up", output="Retryable error message: Cannot connect to the Docker daemon"),
+            subprocess.CalledProcessError(
+                1,
+                "azd up",
+                output="Retryable error message: Cannot connect to the Docker daemon",
+            ),
+            subprocess.CalledProcessError(
+                1,
+                "azd up",
+                output="Retryable error message: Cannot connect to the Docker daemon",
+            ),
+            subprocess.CalledProcessError(
+                1,
+                "azd up",
+                output="Retryable error message: Cannot connect to the Docker daemon",
+            ),
+            subprocess.CalledProcessError(
+                1,
+                "azd up",
+                output="Retryable error message: Cannot connect to the Docker daemon",
+            ),
         ]
         mock_list_resources.return_value = None
         validator = AzdValidator("AzdUpCatalog", ".", True, False)
@@ -114,15 +147,18 @@ class TestAzdValidator(unittest.TestCase):
     @patch('subprocess.run')
     def test_replace_backslashes_in_output(self, mock_runCommand, mock_list_resources):
         # Simulate subprocess output with backslashes
-        mock_runCommand.side_effect = subprocess.CalledProcessError(1, "azd down", output="azd down failed with \\\"error\\\": \\\"message\\\"")
+        mock_runCommand.side_effect = subprocess.CalledProcessError(
+            1, "azd down", output='azd down failed with \\"error\\": \\"message\\"'
+        )
         mock_list_resources.return_value = None
+
         validator = AzdValidator("AzdUpCatalog", ".", True, False)
         validator.validate()
         # Check that the result is unsuccessful
         self.assertFalse(validator.result)
         self.assertIn(Signs.BLOCK, validator.resultMessage)
         # Verify that backslashes are replaced in the output
-        self.assertIn("\"error\": \"message\"", validator.resultMessage)
+        self.assertIn('"error": "message"', validator.resultMessage)
         self.assertEqual(mock_runCommand.call_count, 1)
         self.assertEqual(mock_list_resources.call_count, 1)
 
