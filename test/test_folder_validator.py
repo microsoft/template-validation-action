@@ -10,9 +10,7 @@ class TestFolderValidator(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual(
             message,
-            ItemResultFormat.PASS.format(
-                message="ISSUE_TEMPLATE Folder"
-            ),
+            ItemResultFormat.PASS.format(message="ISSUE_TEMPLATE Folder"),
         )
 
     def test_folder_validator_folder_not_exists(self):
