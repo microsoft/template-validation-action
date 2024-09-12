@@ -6,26 +6,37 @@ on:
       - main  # Change this to your default branch if different
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
+  test_package:
+    name: Test ${{ matrix.os }} Python ${{ matrix.python_version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-20.04"]
+        python_version: ["3.11"]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'  # Specify the Python version you need
+        - name: Setup python
+          uses: actions/setup-python@v5
+          with:
+            python-version: ${{ matrix.python_version }}
+            architecture: x64
 
-      - name: Install dependencies
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-          pip install pytest
+        - name: Install dependencies
+          run: |
+            python -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+            pip install pytest
 
-      - name: Run pytest
-        run: |
-          source venv/bin/activate
-          pytest test/
+        - name: Lint with ruff
+          run: python3 -m ruff check .
+
+        - name: Check formatting with ruff
+          run: python3 -m ruff format --check .
+
+        - name: Run pytest
+          run: |
+            source venv/bin/activate
+            pytest test/
