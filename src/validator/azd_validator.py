@@ -2,7 +2,8 @@ import os
 import subprocess
 import logging
 from validator.validator_base import ValidatorBase
-from constants import *
+from list_azd_resources import list_resources
+from constants import ItemResultFormat, line_delimiter
 from utils import indent, retry
 
 # defines string array of retryable error messages
@@ -12,11 +13,12 @@ retryable_error_messages = [
 ]
 
 class AzdValidator(ValidatorBase):
-    def __init__(self, validatorCatalog, folderPath, check_azd_up=True, check_azd_down=True, errorAsWarning=False):
+    def __init__(self, validatorCatalog, folderPath, check_azd_up=True, check_azd_down=True, list_resources=False, errorAsWarning=False):
         super().__init__(f"AzdValidator", validatorCatalog, errorAsWarning)
         self.folderPath = folderPath
         self.check_azd_up = check_azd_up
         self.check_azd_down = check_azd_down
+        self.list_resources = list_resources
 
     @retry(3, retryable_error_messages)
     def validate(self):
@@ -26,6 +28,9 @@ class AzdValidator(ValidatorBase):
             result, message = self.validate_up()
             self.result = self.result and result
             self.messages.append(message)
+            if self.list_resources:
+                self.messages.append(self.list_resources())
+
         if self.check_azd_down:
             result, message = self.validate_down()
             self.result = self.result and result
@@ -41,6 +46,19 @@ class AzdValidator(ValidatorBase):
             logging.warning(f"Failed to update tf backend: {e}")
 
         return self.runCommand("azd up", "--no-prompt")
+
+    def list_resources(self):
+        get_rg_command = "azd env get-value AZURE_RESOURCE_GROUP"
+        get_subs_command = "azd env get-value AZURE_SUBSCRIPTION_ID"
+        rg = subprocess.run(get_rg_command, shell=True, text=True, capture_output=True).stdout.strip()
+        subs = subprocess.run(get_subs_command, shell=True, text=True, capture_output=True).stdout.strip()
+
+        resources, ai_deployments = list_resources(rg, subs)
+        return ItemResultFormat.DETAILS.format(
+            message=indent(
+                f"List of all resource types in the resource group {rg}:\n{line_delimiter.join(resources)}\n List of all deployments for the cognitive services account {ai_account}:\n{line_delimiter.join(ai_deployments)}"
+            )
+        )
 
     def validate_down(self):
         logging.debug(f"Running azd down in {self.folderPath}")

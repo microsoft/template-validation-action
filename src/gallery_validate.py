@@ -229,7 +229,7 @@ def check_functional_requirements(infra_yaml_paths, check_azd_up, check_azd_down
 
     # check for the existence of the files
     for infra_yaml_path in infra_yaml_paths:
-        azd_validator = AzdValidator("AzdCatalog", infra_yaml_path, check_azd_up, check_azd_down)
+        azd_validator = AzdValidator("AzdCatalog", infra_yaml_path, check_azd_up, check_azd_down, True)
         result, message = azd_validator.validate()
         final_result = final_result and result
         final_messages.append(message)
