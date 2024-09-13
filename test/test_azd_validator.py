@@ -107,5 +107,5 @@ class TestAzdValidator(unittest.TestCase):
         self.assertFalse(validator.result)
         self.assertIn(Signs.BLOCK, validator.resultMessage)
         # Verify that backslashes are replaced in the output
-        self.assertIn("\"error\": \"message\"", validator.resultMessage)
+        self.assertIn('\\"error\\": \\"message\\"', validator.resultMessage)
         self.assertEqual(mock_runCommand.call_count, 1)
