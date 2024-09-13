@@ -80,7 +80,7 @@
     "catalog": "source_code_structure",
     "folder_name": ".devcontainer",
     "candidate_path": [".github"],
-    "validator": "FolderFileValidator"
+    "validator": "FolderValidator"
   },
   "azd up": {
     "catalog": "functional_requirements",
