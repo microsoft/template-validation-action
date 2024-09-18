@@ -1,0 +1,365 @@
+{
+  "assistant-data-openai-python-promptflow": {
+    "services": [
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.KeyVault/vaults",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.MachineLearningServices/workspaces",
+      "Microsoft.MachineLearningServices/workspaces",
+      "Microsoft.MachineLearningServices/workspaces/onlineEndpoints",
+      "Microsoft.MachineLearningServices/workspaces/onlineEndpoints/deployments",
+      "microsoft.insights/actiongroups",
+      "microsoft.alertsmanagement/smartDetectorAlertRules"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:1106",
+      "OpenAI.Standard.gpt-35-turbo:0301"
+    ]
+  },
+  "azure-search-openai-demo-csharp": {
+    "services": [
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.KeyVault/vaults",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Search/searchServices",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.Web/serverFarms",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.Portal/dashboards",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.App/containerApps",
+      "Microsoft.Web/sites",
+      "microsoft.insights/actiongroups",
+      "microsoft.alertsmanagement/smartDetectorAlertRules"
+    ],
+    "models": [
+      "OpenAI.Standard.text-embedding-ada-002:2",
+      "OpenAI.Standard.gpt-4o-mini:2024-07-18"
+    ]
+  },
+  "azure-search-openai-demo": {
+    "services": [
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.Web/serverFarms",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.Search/searchServices",
+      "Microsoft.Portal/dashboards",
+      "Microsoft.Web/sites",
+      "microsoft.insights/actiongroups",
+      "microsoft.alertsmanagement/smartDetectorAlertRules"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:0613",
+      "OpenAI.Standard.text-embedding-ada-002:2"
+    ]
+  },
+  "azure-search-openai-javascript": {
+    "services": [
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.Web/staticSites",
+      "Microsoft.Search/searchServices",
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.Portal/dashboards",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.App/containerApps",
+      "Microsoft.App/containerApps",
+      "microsoft.alertsmanagement/smartDetectorAlertRules"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:0613",
+      "OpenAI.Standard.text-embedding-ada-002:2"
+    ]
+  },
+  "azure-search-openai-demo-java": {
+    "aks": {
+      "services": [
+        "Microsoft.ServiceBus/namespaces",
+        "Microsoft.Search/searchServices",
+        "Microsoft.Storage/storageAccounts",
+        "Microsoft.KeyVault/vaults",
+        "Microsoft.OperationalInsights/workspaces",
+        "Microsoft.CognitiveServices/accounts",
+        "Microsoft.CognitiveServices/accounts",
+        "Microsoft.Insights/components",
+        "Microsoft.EventGrid/systemTopics",
+        "Microsoft.ContainerRegistry/registries",
+        "Microsoft.ContainerService/managedClusters",
+        "Microsoft.OperationsManagement/solutions",
+        "microsoft.alertsmanagement/smartDetectorAlertRules"
+      ],
+      "models": [
+        "OpenAI.Standard.gpt-35-turbo:0613",
+        "OpenAI.Standard.text-embedding-ada-002:2"
+      ]
+    },
+    "app-service": {
+      "services": [
+        "Microsoft.Web/serverFarms",
+        "Microsoft.Storage/storageAccounts",
+        "Microsoft.Search/searchServices",
+        "Microsoft.CognitiveServices/accounts",
+        "Microsoft.OperationalInsights/workspaces",
+        "Microsoft.CognitiveServices/accounts",
+        "Microsoft.Insights/components",
+        "microsoft.alertsmanagement/smartDetectorAlertRules",
+        "Microsoft.Web/sites",
+        "Microsoft.Web/sites"
+      ],
+      "models": [
+        "OpenAI.Standard.gpt-35-turbo:0613",
+        "OpenAI.Standard.text-embedding-ada-002:2"
+      ]
+    },
+    "aca": {
+      "services": [
+        "Microsoft.ServiceBus/namespaces",
+        "Microsoft.Storage/storageAccounts",
+        "Microsoft.Search/searchServices",
+        "Microsoft.CognitiveServices/accounts",
+        "Microsoft.CognitiveServices/accounts",
+        "Microsoft.OperationalInsights/workspaces",
+        "Microsoft.EventGrid/systemTopics",
+        "Microsoft.Insights/components",
+        "Microsoft.ContainerRegistry/registries",
+        "Microsoft.App/managedEnvironments",
+        "microsoft.insights/actiongroups",
+        "microsoft.alertsmanagement/smartDetectorAlertRules",
+        "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "Microsoft.App/containerApps",
+        "Microsoft.App/containerApps",
+        "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "Microsoft.App/containerApps"
+      ],
+      "models": [
+        "OpenAI.Standard.gpt-35-turbo:0613",
+        "OpenAI.Standard.text-embedding-ada-002:2"
+      ]
+    }
+  },
+  "serverless-chat-langchainjs": {
+    "services": [
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.Web/staticSites",
+      "Microsoft.Web/serverFarms",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.DocumentDB/databaseAccounts",
+      "Microsoft.Insights/components",
+      "Microsoft.Portal/dashboards",
+      "Microsoft.Web/sites",
+      "microsoft.alertsmanagement/smartDetectorAlertRules"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-4:turbo-2024-04-09",
+      "OpenAI.Standard.text-embedding-ada-002:2"
+    ]
+  },
+  "azure-openai-chat-frontend": {
+    "services": [
+      "Microsoft.Web/staticSites",
+      "Microsoft.OperationalInsights/workspaces"
+    ],
+    "models": []
+  },
+  "openai-plugin-fastapi": {
+    "services": [
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.Insights/components",
+      "Microsoft.Portal/dashboards",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.App/containerApps"
+    ],
+    "models": []
+  },
+  "azure-openai-assistant-javascript": {
+    "services": [
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.Web/serverFarms",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Web/staticSites",
+      "Microsoft.Web/sites"
+    ],
+    "models": ["OpenAI.Standard.gpt-35-turbo:1106"]
+  },
+  "openai-chat-app-quickstart": {
+    "services": [
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.App/containerApps"
+    ],
+    "models": ["OpenAI.Standard.gpt-35-turbo:0613"]
+  },
+  "rag-postgres-openai-python": {
+    "services": [
+      "Microsoft.DBforPostgreSQL/flexibleServers",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.Portal/dashboards",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.App/containerApps",
+      "microsoft.insights/actiongroups",
+      "microsoft.alertsmanagement/smartDetectorAlertRules"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:0125",
+      "OpenAI.Standard.text-embedding-ada-002:2"
+    ]
+  },
+  "llama-index-javascript": {
+    "services": [
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.KeyVault/vaults",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.Insights/components",
+      "Microsoft.Portal/dashboards",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.App/containerApps"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:1106",
+      "OpenAI.Standard.text-embedding-3-large:1"
+    ]
+  },
+  "llama-index-python": {
+    "services": [
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.KeyVault/vaults",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.Portal/dashboards",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.App/containerApps"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:1106",
+      "OpenAI.Standard.text-embedding-3-large:1"
+    ]
+  },
+  "openai-chat-vision-quickstart": {
+    "services": [
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.App/containerApps"
+    ],
+    "models": ["OpenAI.GlobalStandard.gpt-4o:2024-05-13"]
+  },
+  "agent-openai-python-prompty": {
+    "services": [
+      "Microsoft.Bing/accounts",
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.Search/searchServices",
+      "Microsoft.KeyVault/vaults",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.MachineLearningServices/workspaces",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.App/containerApps",
+      "microsoft.insights/actiongroups",
+      "microsoft.alertsmanagement/smartDetectorAlertRules",
+      "Microsoft.App/containerApps"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:1106",
+      "OpenAI.Standard.text-embedding-ada-002:2",
+      "OpenAI.GlobalStandard.gpt-4o:2024-05-13",
+      "OpenAI.Standard.gpt-4:0613"
+    ]
+  },
+  "contoso-chat": {
+    "services": [
+      "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.DocumentDB/databaseAccounts",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.KeyVault/vaults",
+      "Microsoft.Search/searchServices",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.MachineLearningServices/workspaces",
+      "microsoft.alertsmanagement/smartDetectorAlertRules",
+      "Microsoft.MachineLearningServices/workspaces",
+      "Microsoft.App/managedEnvironments",
+      "Microsoft.App/containerApps"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:0613",
+      "OpenAI.Standard.text-embedding-ada-002:2",
+      "OpenAI.GlobalStandard.gpt-4o:2024-05-13",
+      "OpenAI.Standard.gpt-4:1106-Preview"
+    ]
+  },
+  "agent-python-openai-prompty-langchain": {
+    "services": [
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.KeyVault/vaults",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.MachineLearningServices/workspaces",
+      "Microsoft.MachineLearningServices/workspaces",
+      "Microsoft.MachineLearningServices/workspaces/onlineEndpoints",
+      "Microsoft.MachineLearningServices/workspaces/onlineEndpoints/deployments",
+      "microsoft.insights/actiongroups",
+      "microsoft.alertsmanagement/smartDetectorAlertRules"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:0613",
+      "OpenAI.Standard.text-embedding-ada-002:2"
+    ]
+  },
+  "agent-openai-python-prompty-langchain-pinecone": {
+    "services": [
+      "Microsoft.ContainerRegistry/registries",
+      "Microsoft.OperationalInsights/workspaces",
+      "Microsoft.Storage/storageAccounts",
+      "Microsoft.KeyVault/vaults",
+      "Microsoft.CognitiveServices/accounts",
+      "Microsoft.Insights/components",
+      "Microsoft.MachineLearningServices/workspaces",
+      "Microsoft.MachineLearningServices/workspaces",
+      "Microsoft.MachineLearningServices/workspaces/onlineEndpoints",
+      "Microsoft.MachineLearningServices/workspaces/onlineEndpoints/deployments",
+      "microsoft.insights/actiongroups",
+      "microsoft.alertsmanagement/smartDetectorAlertRules"
+    ],
+    "models": [
+      "OpenAI.Standard.gpt-35-turbo:0613",
+      "OpenAI.Standard.text-embedding-ada-002:2"
+    ]
+  }
+}
