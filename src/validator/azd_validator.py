@@ -14,12 +14,11 @@ retryable_error_messages = [
 ]
 
 class AzdValidator(ValidatorBase):
-    def __init__(self, validatorCatalog, folderPath, check_azd_up=True, check_azd_down=True, list_resources=False, errorAsWarning=False):
+    def __init__(self, validatorCatalog, folderPath, check_azd_up=True, check_azd_down=True, errorAsWarning=False):
         super().__init__(f"AzdValidator", validatorCatalog, errorAsWarning)
         self.folderPath = folderPath
         self.check_azd_up = check_azd_up
         self.check_azd_down = check_azd_down
-        self.if_list_resources = list_resources
         self.resource_group = None
 
     @retry(3, retryable_error_messages)
@@ -30,9 +29,8 @@ class AzdValidator(ValidatorBase):
             result, message = self.validate_up()
             self.result = self.result and result
             self.messages.append(message)
-            if self.if_list_resources:
-                # self.messages.append(self.list_resources())
-                self.list_resources()
+            # self.messages.append(self.list_resources())
+            self.list_resources()
 
         if self.check_azd_down:
             result, message = self.validate_down()
