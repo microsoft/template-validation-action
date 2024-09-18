@@ -54,7 +54,7 @@ class AzdValidator(ValidatorBase):
         return self.runCommand("azd up", "--no-prompt")
 
     def extract_resource_group(self, stdout):
-        match = re.search(r'\(✓\) Done: Resource group: ([\w-]+) \(\d+\.\d+s\)', stdout)
+        match = re.search(r"\(✓\) Done: Resource group: ([\w-]+) \(\d+\.\d+s\)", stdout)
         if match:
             self.resource_group = match.group(1)
             logging.debug(f"Extracted resource group: {self.resource_group}")
@@ -63,11 +63,15 @@ class AzdValidator(ValidatorBase):
         try:
             if not self.resource_group:
                 get_rg_command = "azd env get-value AZURE_RESOURCE_GROUP"
-                rgResult = subprocess.run(get_rg_command, shell=True, text=True, capture_output=True)
+                rgResult = subprocess.run(
+                    get_rg_command, shell=True, text=True, capture_output=True
+                )
                 if rgResult.returncode == 0:
                     self.resource_group = rgResult.stdout.strip()
             get_subs_command = "azd env get-value AZURE_SUBSCRIPTION_ID"
-            subs = subprocess.run(get_subs_command, shell=True, text=True, capture_output=True).stdout.strip()
+            subs = subprocess.run(
+                get_subs_command, shell=True, text=True, capture_output=True
+            ).stdout.strip()
 
             resources, ai_deployments = list_resources(self.resource_group, subs)
             return ItemResultFormat.DETAILS.format(
