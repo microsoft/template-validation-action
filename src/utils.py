@@ -6,7 +6,7 @@ def find_infra_yaml_path(repo_path):
     infra_yaml_paths = []
     for root, dirs, files in os.walk(repo_path):
         for extension in ["yaml", "yml"]:
-            if "infra" + "." + extension in files:
+            if "azure" + "." + extension in files:
                 infra_yaml_paths.append(root)
     return infra_yaml_paths if len(infra_yaml_paths) > 0 else [repo_path]
 

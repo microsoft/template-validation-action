@@ -1,4 +1,5 @@
 import json
+import logging
 from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 # from validator.msdo_validator import MsdoValidator
@@ -11,7 +12,6 @@ class RuleParser:
     def __init__(self, rules_file_path, args):
         self.rules_file_path = rules_file_path
         self.args = args
-        self.infra_yaml_paths = find_infra_yaml_path(args.repo_path)
 
     def parse(self):
         with open(self.rules_file_path, "r") as file:
@@ -41,17 +41,28 @@ class RuleParser:
                     error_as_warning,
                     accept_folder,
                 )
+                validators.append(validator)
 
             elif validator_type == "FolderValidator":
                 candidate_path = rule_details.get("candidate_path", ["."])
                 validator = FolderValidator(
                     catalog, rule_name, candidate_path, error_as_warning
                 )
+                validators.append(validator)
 
             elif validator_type == "AzdValidator":
                 if not self.args.azdup:
                     continue
-                validator = AzdValidator(catalog, ".", True, True, error_as_warning)
+                infra_yaml_paths = find_infra_yaml_path(self.args.repo_path)
+                logging.debug(f"infra_yaml_paths: {infra_yaml_paths}")
+                if not infra_yaml_paths:
+                    validators.append(
+                        AzdValidator(catalog, ".", False, False, error_as_warning)
+                    )
+                for infra_yaml_path in infra_yaml_paths:
+                    validators.append(
+                        AzdValidator(catalog, infra_yaml_path, True, True, error_as_warning)
+                    )
 
             # TODO
             # elif validator_type == 'MsdoValidator':
@@ -62,11 +73,10 @@ class RuleParser:
                 validator = TopicValidator(
                     catalog, rule_name, topics, self.args.topics, error_as_warning
                 )
+                validators.append(validator)
 
             else:
                 continue
-
-            validators.append(validator)
 
         return validators
     
