@@ -1,7 +1,7 @@
 import os
 import argparse
 import logging
-from parse_rules import RuleParser
+from rule_parser import RuleParser
 from execution_engine import ExecutionEngine
 from result_aggregator import ResultAggregator
 

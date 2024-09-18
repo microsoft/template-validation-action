@@ -2,7 +2,7 @@ import argparse
 import unittest
 import json
 from unittest.mock import patch, mock_open
-from parse_rules import RuleParser
+from rule_parser import RuleParser
 from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
@@ -42,9 +42,9 @@ class TestParseRules(unittest.TestCase):
             }
         ),
     )
-    def test_parse_rules(self, mock_file):
+    def test_rule_parser(self, mock_file):
         args = argparse.Namespace(
-            azdup=True, azddown=True, topics="azd-templates,azure"
+            azdup=True, azddown=True, topics="azd-templates,azure", repo_path="."
         )
         parser = RuleParser("dummy_path", args)
         validators = parser.parse()

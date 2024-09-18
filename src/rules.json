@@ -65,7 +65,7 @@
   "azure": {
     "catalog": "source_code_structure",
     "ext": ["yml", "yaml"],
-    "candidate_path": ["."],
+    "candidate_path": ["*"],
     "case_sensitive": false,
     "validator": "FileValidator",
     "error_as_warning": false
@@ -73,13 +73,13 @@
   "./infra": {
     "catalog": "source_code_structure",
     "folder_name": "infra",
-    "candidate_path": ["."],
+    "candidate_path": ["*"],
     "validator": "FolderValidator"
   },
   ".devcontainer": {
     "catalog": "source_code_structure",
     "folder_name": ".devcontainer",
-    "candidate_path": [".github"],
+    "candidate_path": ["."],
     "validator": "FolderValidator"
   },
   "azd up": {

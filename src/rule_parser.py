@@ -1,16 +1,17 @@
 import json
 from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
-
 # from validator.msdo_validator import MsdoValidator
 from validator.topic_validator import TopicValidator
 from validator.folder_validator import FolderValidator
+from utils import find_infra_yaml_path
 
 
 class RuleParser:
     def __init__(self, rules_file_path, args):
         self.rules_file_path = rules_file_path
         self.args = args
+        self.infra_yaml_paths = find_infra_yaml_path(args.repo_path)
 
     def parse(self):
         with open(self.rules_file_path, "r") as file:
@@ -25,7 +26,7 @@ class RuleParser:
 
             if validator_type == "FileValidator":
                 ext = rule_details.get("ext", [])
-                candidate_path = rule_details.get("candidate_path", [""])
+                candidate_path = rule_details.get("candidate_path", ["."])
                 case_sensitive = rule_details.get("case_sensitive", False)
                 h2_tags = rule_details.get("assert_in", None)
                 accept_folder = rule_details.get("accept_folder", False)
@@ -42,13 +43,13 @@ class RuleParser:
                 )
 
             elif validator_type == "FolderValidator":
-                candidate_path = rule_details.get("candidate_path", [""])
+                candidate_path = rule_details.get("candidate_path", ["."])
                 validator = FolderValidator(
                     catalog, rule_name, candidate_path, error_as_warning
                 )
 
             elif validator_type == "AzdValidator":
-                if rule_name == "azd up" and not self.args.azdup:
+                if not self.args.azdup:
                     continue
                 validator = AzdValidator(catalog, ".", True, True, error_as_warning)
 
@@ -68,3 +69,4 @@ class RuleParser:
             validators.append(validator)
 
         return validators
+    
