@@ -1,6 +1,7 @@
 import os
 import subprocess
 import logging
+import re
 from validator.validator_base import ValidatorBase
 from list_azd_resources import list_resources
 from constants import ItemResultFormat, line_delimiter
@@ -18,7 +19,8 @@ class AzdValidator(ValidatorBase):
         self.folderPath = folderPath
         self.check_azd_up = check_azd_up
         self.check_azd_down = check_azd_down
-        self.list_resources = list_resources
+        self.if_list_resources = list_resources
+        self.resource_group = None
 
     @retry(3, retryable_error_messages)
     def validate(self):
@@ -28,8 +30,9 @@ class AzdValidator(ValidatorBase):
             result, message = self.validate_up()
             self.result = self.result and result
             self.messages.append(message)
-            if self.list_resources:
-                self.messages.append(self.list_resources())
+            if self.if_list_resources:
+                # self.messages.append(self.list_resources())
+                self.list_resources()
 
         if self.check_azd_down:
             result, message = self.validate_down()
@@ -47,18 +50,32 @@ class AzdValidator(ValidatorBase):
 
         return self.runCommand("azd up", "--no-prompt")
 
-    def list_resources(self):
-        get_rg_command = "azd env get-value AZURE_RESOURCE_GROUP"
-        get_subs_command = "azd env get-value AZURE_SUBSCRIPTION_ID"
-        rg = subprocess.run(get_rg_command, shell=True, text=True, capture_output=True).stdout.strip()
-        subs = subprocess.run(get_subs_command, shell=True, text=True, capture_output=True).stdout.strip()
+    def extract_resource_group(self, stdout):
+        match = re.search(r'\(✓\) Done: Resource group: ([\w-]+) \(\d+\.\d+s\)', stdout)
+        if match:
+            self.resource_group = match.group(1)
+            logging.debug(f"Extracted resource group: {self.resource_group}")
 
-        resources, ai_deployments = list_resources(rg, subs)
-        return ItemResultFormat.DETAILS.format(
-            message=indent(
-                f"List of all resource types in the resource group {rg}:\n{line_delimiter.join(resources)}\n List of all deployments for the cognitive services account {ai_account}:\n{line_delimiter.join(ai_deployments)}"
+    def list_resources(self):
+        try:
+            if not self.resource_group:
+                get_rg_command = "azd env get-value AZURE_RESOURCE_GROUP"
+                rgResult = subprocess.run(get_rg_command, shell=True, text=True, capture_output=True)
+                if rgResult.returncode == 0:
+                    self.resource_group = rgResult.stdout.strip()
+            get_subs_command = "azd env get-value AZURE_SUBSCRIPTION_ID"
+            subs = subprocess.run(get_subs_command, shell=True, text=True, capture_output=True).stdout.strip()
+
+            resources, ai_deployments = list_resources(self.resource_group, subs)
+            return ItemResultFormat.DETAILS.format(
+                message=indent(
+                    f"List of all resource types in the resource group {self.resource_group}:\n{line_delimiter.join(resources)}\n List of all AI deployments:\n{line_delimiter.join(ai_deployments)}"
+                )
             )
-        )
+        except Exception as e:
+            logging.warning(f"Failed to list resources: {e}")
+            pass
+        return ""
 
     def validate_down(self):
         logging.debug(f"Running azd down in {self.folderPath}")
@@ -82,6 +99,7 @@ class AzdValidator(ValidatorBase):
             result = subprocess.run(
                 " ".join([command, arguments]), cwd=self.folderPath, capture_output=True, text=True, check=True, shell=True)
             logging.debug(f"{result.stdout}")
+            self.extract_resource_group(result.stdout)
             return True, ItemResultFormat.PASS.format(message=message)
         except subprocess.CalledProcessError as e:
             logging.debug(f"{e.stdout}")

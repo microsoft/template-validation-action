@@ -16,9 +16,9 @@ def list_resources(resource_group, subscription_id):
         resource_types.append(resource.type)
         if resource.type == 'Microsoft.CognitiveServices/accounts':
             ai_accounts.append(resource.name)
-    logging.debug(f"List of all resource types in the resource group {resource_group}:")
+    logging.info(f"List of all resource types in the resource group {resource_group}:")
     for resource_type in resource_types:
-        logging.debug(resource_type)
+        logging.info(resource_type)
 
     ai_deployments = []
     if ai_accounts:
@@ -26,14 +26,14 @@ def list_resources(resource_group, subscription_id):
             cognitive_client = CognitiveServicesManagementClient(credential, subscription_id)
             deployments = cognitive_client.deployments.list(resource_group_name=resource_group, account_name=ai_account)
             
-            logging.debug(f"List of all deployments for the cognitive services account {ai_account}:")
+            logging.info(f"List of all deployments for the cognitive services account {ai_account}:")
             for deployment in deployments:
                 model_format = deployment.properties.model.format
                 sku_name = deployment.sku.name
                 model_name = deployment.properties.model.name
                 model_version = deployment.properties.model.version
                 ai_deployment = f"{model_format}.{sku_name}.{model_name}:{model_version}"
-                logging.debug(ai_deployment)
+                logging.info(ai_deployment)
                 ai_deployments.append(ai_deployment)
     else:
         logging.debug("No Cognitive Services account found.")
