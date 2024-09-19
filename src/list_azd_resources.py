@@ -3,7 +3,6 @@ from azure.identity import AzureDeveloperCliCredential
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.cognitiveservices import CognitiveServicesManagementClient
 
-
 def list_resources(resource_group, subscription_id):
     credential = AzureDeveloperCliCredential()
     resource_client = ResourceManagementClient(credential, subscription_id)
