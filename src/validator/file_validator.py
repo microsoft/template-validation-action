@@ -23,7 +23,7 @@ class FileValidator(ValidatorBase):
         self.rootFolder = rootFolder
         self.candidatePaths = candidatePaths
         self.caseSensitive = caseSensitive
-        self.h2Tags = h2Tags
+        self.h2Tags = [h2Tag.strip() for h2Tag in h2Tags] if h2Tags is not None else None
         self.isFolderAllowed = isFolderAllowed
         self.errorAsWarning = errorAsWarning
 
@@ -37,7 +37,7 @@ class FileValidator(ValidatorBase):
         potential_name = (
             self.fileName
             if self.extensionList[0] == ""
-            else self.fileName + "." + self.extensionList[0]
+            else self.fileName + self.extensionList[0]
         )
 
         for root, dirs, files in os.walk(self.rootFolder):
@@ -58,7 +58,7 @@ class FileValidator(ValidatorBase):
                         candidateFile = (
                             self.fileName
                             if extension == ""
-                            else self.fileName + "." + extension
+                            else self.fileName + extension
                         )
                         for file in files:
                             if (

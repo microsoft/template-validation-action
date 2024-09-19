@@ -1,7 +1,7 @@
 {
   "README": {
     "catalog": "repository_management",
-    "ext": ["md"],
+    "ext": [".md"],
     "candidate_path": ["."],
     "assert_in": [
       "## Features",
@@ -15,7 +15,7 @@
   },
   "LICENSE": {
     "catalog": "repository_management",
-    "ext": ["md", ""],
+    "ext": [".md", ""],
     "candidate_path": ["."],
     "case_sensitive": false,
     "validator": "FileValidator",
@@ -23,7 +23,7 @@
   },
   "SECURITY": {
     "catalog": "repository_management",
-    "ext": ["md"],
+    "ext": [".md"],
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
@@ -31,7 +31,7 @@
   },
   "CODE_OF_CONDUCT": {
     "catalog": "repository_management",
-    "ext": ["md"],
+    "ext": [".md"],
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
@@ -39,7 +39,7 @@
   },
   "CONTRIBUTING": {
     "catalog": "repository_management",
-    "ext": ["md"],
+    "ext": [".md"],
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
@@ -47,7 +47,7 @@
   },
   "ISSUE_TEMPLATE": {
     "catalog": "repository_management",
-    "ext": ["md"],
+    "ext": [".md"],
     "candidate_path": [".github"],
     "accept_folder": true,
     "case_sensitive": false,
@@ -56,7 +56,7 @@
   },
   "azure-dev": {
     "catalog": "source_code_structure",
-    "ext": ["yml", "yaml"],
+    "ext": [".yml", ".yaml"],
     "candidate_path": [".github/workflows"],
     "case_sensitive": false,
     "validator": "FileValidator",
@@ -64,7 +64,7 @@
   },
   "azure": {
     "catalog": "source_code_structure",
-    "ext": ["yml", "yaml"],
+    "ext": [".yml", ".yaml"],
     "candidate_path": ["*"],
     "case_sensitive": false,
     "validator": "FileValidator",
