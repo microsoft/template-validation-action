@@ -20,7 +20,7 @@ class FolderValidator(ValidatorBase):
         folder_found = False
 
         if "*" in self.candidatePaths:
-            self.candidatePaths = [
+            self.candidatePaths = ["."] + [
                 os.path.join(root, d) for root, dirs, _ in os.walk(".") for d in dirs
             ]
 
