@@ -6,6 +6,7 @@ from validator.validator_base import ValidatorBase
 from list_azd_resources import list_resources
 from constants import ItemResultFormat, line_delimiter
 from utils import indent, retry
+from validator.azd_command import AzdCommand
 
 # defines string array of retryable error messages
 retryable_error_messages = ["Cannot connect to the Docker daemon", "spawn ETXTBSY"]
@@ -16,31 +17,30 @@ class AzdValidator(ValidatorBase):
         self,
         validatorCatalog,
         folderPath,
-        check_azd_up=True,
-        check_azd_down=True,
+        command: AzdCommand,
         errorAsWarning=False,
     ):
         super().__init__("AzdValidator", validatorCatalog, errorAsWarning)
         self.folderPath = folderPath
-        self.check_azd_up = check_azd_up
-        self.check_azd_down = check_azd_down
+        self.command = command
         self.resource_group = None
 
     @retry(3, retryable_error_messages)
     def validate(self):
         self.result = True
         self.messages = []
-        if self.check_azd_up:
+
+        if self.command == AzdCommand.UP:
             result, message = self.validate_up()
             self.result = self.result and result
             self.messages.append(message)
-            # self.messages.append(self.list_resources())
             self.list_resources()
 
-        if self.check_azd_down:
+        elif self.command == AzdCommand.DOWN:
             result, message = self.validate_down()
             self.result = self.result and result
             self.messages.append(message)
+
         self.resultMessage = line_delimiter.join(self.messages)
         return self.result, self.resultMessage
 

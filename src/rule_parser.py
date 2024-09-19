@@ -5,7 +5,8 @@ from validator.azd_validator import AzdValidator
 # from validator.msdo_validator import MsdoValidator
 from validator.topic_validator import TopicValidator
 from validator.folder_validator import FolderValidator
-from utils import find_infra_yaml_path
+from validator.azd_command import AzdCommand
+import utils
 
 
 class RuleParser:
@@ -53,15 +54,21 @@ class RuleParser:
             elif validator_type == "AzdValidator":
                 if not self.args.azdup:
                     continue
-                infra_yaml_paths = find_infra_yaml_path(self.args.repo_path)
+                infra_yaml_paths = utils.find_infra_yaml_path(self.args.repo_path)
                 logging.debug(f"infra_yaml_paths: {infra_yaml_paths}")
                 if not infra_yaml_paths:
                     validators.append(
-                        AzdValidator(catalog, ".", False, False, error_as_warning)
+                        AzdValidator(catalog, ".", AzdCommand.UP, error_as_warning)
+                    )
+                    validators.append(
+                        AzdValidator(catalog, ".", AzdCommand.DOWN, error_as_warning)
                     )
                 for infra_yaml_path in infra_yaml_paths:
                     validators.append(
-                        AzdValidator(catalog, infra_yaml_path, True, True, error_as_warning)
+                        AzdValidator(catalog, infra_yaml_path, AzdCommand.UP, error_as_warning)
+                    )
+                    validators.append(
+                        AzdValidator(catalog, infra_yaml_path, AzdCommand.DOWN, error_as_warning)
                     )
 
             # TODO

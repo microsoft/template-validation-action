@@ -6,9 +6,12 @@ from rule_parser import RuleParser
 from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
+from validator.azd_command import AzdCommand
+import utils
 
 
 class TestParseRules(unittest.TestCase):
+    @patch('utils.find_infra_yaml_path')
     @patch(
         "builtins.open",
         new_callable=mock_open,
@@ -42,14 +45,15 @@ class TestParseRules(unittest.TestCase):
             }
         ),
     )
-    def test_rule_parser(self, mock_file):
+    def test_rule_parser(self, mock_file, mock_find_infra_yaml_path):
+        mock_find_infra_yaml_path.return_value = ["mocked/path/to/infra.yaml"]
         args = argparse.Namespace(
             azdup=True, azddown=True, topics="azd-templates,azure", repo_path="."
         )
         parser = RuleParser("dummy_path", args)
         validators = parser.parse()
 
-        self.assertEqual(len(validators), 3)
+        self.assertEqual(len(validators), 4)
 
         file_validator = validators[0]
         self.assertIsInstance(file_validator, FileValidator)
@@ -66,9 +70,18 @@ class TestParseRules(unittest.TestCase):
         azd_validator = validators[1]
         self.assertIsInstance(azd_validator, AzdValidator)
         self.assertEqual(azd_validator.catalog, "Functional Requirements")
+        self.assertEqual(azd_validator.folderPath, "mocked/path/to/infra.yaml")
+        self.assertEqual(azd_validator.command, AzdCommand.UP)
         self.assertFalse(azd_validator.errorAsWarning)
 
-        topic_validator = validators[2]
+        azd_validator = validators[2]
+        self.assertIsInstance(azd_validator, AzdValidator)
+        self.assertEqual(azd_validator.catalog, "Functional Requirements")
+        self.assertEqual(azd_validator.folderPath, "mocked/path/to/infra.yaml")
+        self.assertEqual(azd_validator.command, AzdCommand.DOWN)
+        self.assertFalse(azd_validator.errorAsWarning)
+
+        topic_validator = validators[3]
         self.assertIsInstance(topic_validator, TopicValidator)
         self.assertEqual(topic_validator.catalog, "Repository Management")
         self.assertEqual(

@@ -2,6 +2,7 @@ import unittest
 import subprocess
 from unittest.mock import patch, MagicMock
 from validator.azd_validator import AzdValidator
+from validator.azd_command import AzdCommand
 from constants import Signs
 from utils import indent
 
@@ -12,7 +13,7 @@ class TestAzdValidator(unittest.TestCase):
     def test_azd_up_success(self, mock_run, mock_list_resources):
         mock_run.return_value = MagicMock(stdout="azd up success", returncode=0)
         mock_list_resources.return_value = None
-        validator = AzdValidator("AzdUpCatalog", ".", True, False)
+        validator = AzdValidator("AzdUpCatalog", ".", AzdCommand.UP)
         validator.validate()
         self.assertTrue(validator.result)
         self.assertIn(Signs.CHECK, validator.resultMessage)
@@ -26,7 +27,7 @@ class TestAzdValidator(unittest.TestCase):
             1, "azd up", output="azd up failed"
         )
         mock_list_resources.return_value = None
-        validator = AzdValidator("AzdUpCatalog", ".", True, False)
+        validator = AzdValidator("AzdUpCatalog", ".", AzdCommand.UP)
         validator.validate()
         self.assertFalse(validator.result)
         self.assertIn(Signs.BLOCK, validator.resultMessage)
@@ -38,7 +39,7 @@ class TestAzdValidator(unittest.TestCase):
     def test_azd_down_success(self, mock_run, mock_list_resources):
         mock_run.return_value = MagicMock(stdout="azd down success", returncode=0)
         mock_list_resources.return_value = None
-        validator = AzdValidator("AzdDownCatalog", ".", False, True)
+        validator = AzdValidator("AzdDownCatalog", ".", AzdCommand.DOWN)
         validator.validate()
         self.assertTrue(validator.result)
         self.assertIn(Signs.CHECK, validator.resultMessage)
@@ -52,7 +53,7 @@ class TestAzdValidator(unittest.TestCase):
             1, "azd down", output="azd down failed"
         )
         mock_list_resources.return_value = None
-        validator = AzdValidator("AzdDownCatalog", ".", False, True)
+        validator = AzdValidator("AzdDownCatalog", ".", AzdCommand.DOWN)
         validator.validate()
         self.assertFalse(validator.result)
         self.assertIn(Signs.BLOCK, validator.resultMessage)
@@ -73,7 +74,7 @@ class TestAzdValidator(unittest.TestCase):
             MagicMock(returncode=0, stdout="azd up success"),
         ]
         mock_list_resources.return_value = None
-        validator = AzdValidator("AzdUpCatalog", ".", True, False)
+        validator = AzdValidator("AzdUpCatalog", ".", AzdCommand.UP)
         validator.validate()
         # Check that runCommand was called 3 times
         self.assertTrue(validator.result)
@@ -99,7 +100,7 @@ class TestAzdValidator(unittest.TestCase):
             MagicMock(returncode=0, stdout="azd up success"),
         ]
         mock_list_resources.return_value = None
-        validator = AzdValidator("AzdUpCatalog", ".", True, False)
+        validator = AzdValidator("AzdUpCatalog", ".", AzdCommand.UP)
         validator.validate()
         # Check that runCommand was called 3 times
         self.assertTrue(validator.result)
@@ -136,7 +137,7 @@ class TestAzdValidator(unittest.TestCase):
             ),
         ]
         mock_list_resources.return_value = None
-        validator = AzdValidator("AzdUpCatalog", ".", True, False)
+        validator = AzdValidator("AzdUpCatalog", ".", AzdCommand.UP)
         validator.validate()
         # Check that runCommand was called 4 times
         self.assertFalse(validator.result)
@@ -154,7 +155,7 @@ class TestAzdValidator(unittest.TestCase):
         )
         mock_list_resources.return_value = None
 
-        validator = AzdValidator("AzdUpCatalog", ".", True, False)
+        validator = AzdValidator("AzdUpCatalog", ".", AzdCommand.UP)
         validator.validate()
         # Check that the result is unsuccessful
         self.assertFalse(validator.result)
@@ -178,7 +179,7 @@ class TestAzdValidator(unittest.TestCase):
             ["deployment1", "deployment2"],
         )
 
-        validator = AzdValidator("AzdUpCatalog", ".", True, False)
+        validator = AzdValidator("AzdUpCatalog", ".", AzdCommand.UP)
         result = validator.list_resources()
 
         # Check that the subprocess calls were made correctly
