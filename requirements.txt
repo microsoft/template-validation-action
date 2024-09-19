@@ -2,5 +2,6 @@ azure-identity
 azure.mgmt.resource
 azure.mgmt.cognitiveservices
 pyyaml
-sarif-tools
 pytest
+ruff
+sarif-tools

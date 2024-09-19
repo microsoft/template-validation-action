@@ -1,8 +1,8 @@
 import logging
-import subprocess
 from azure.identity import AzureDeveloperCliCredential
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.cognitiveservices import CognitiveServicesManagementClient
+
 
 def list_resources(resource_group, subscription_id):
     credential = AzureDeveloperCliCredential()
@@ -14,7 +14,7 @@ def list_resources(resource_group, subscription_id):
     ai_accounts = []
     for resource in resources:
         resource_types.append(resource.type)
-        if resource.type == 'Microsoft.CognitiveServices/accounts':
+        if resource.type == "Microsoft.CognitiveServices/accounts":
             ai_accounts.append(resource.name)
     logging.info(f"List of all resource types in the resource group {resource_group}:")
     for resource_type in resource_types:
@@ -23,16 +23,24 @@ def list_resources(resource_group, subscription_id):
     ai_deployments = []
     if ai_accounts:
         for ai_account in ai_accounts:
-            cognitive_client = CognitiveServicesManagementClient(credential, subscription_id)
-            deployments = cognitive_client.deployments.list(resource_group_name=resource_group, account_name=ai_account)
-            
-            logging.info(f"List of all deployments for the cognitive services account {ai_account}:")
+            cognitive_client = CognitiveServicesManagementClient(
+                credential, subscription_id
+            )
+            deployments = cognitive_client.deployments.list(
+                resource_group_name=resource_group, account_name=ai_account
+            )
+
+            logging.info(
+                f"List of all deployments for the cognitive services account {ai_account}:"
+            )
             for deployment in deployments:
                 model_format = deployment.properties.model.format
                 sku_name = deployment.sku.name
                 model_name = deployment.properties.model.name
                 model_version = deployment.properties.model.version
-                ai_deployment = f"{model_format}.{sku_name}.{model_name}:{model_version}"
+                ai_deployment = (
+                    f"{model_format}.{sku_name}.{model_name}:{model_version}"
+                )
                 logging.info(ai_deployment)
                 ai_deployments.append(ai_deployment)
     else:

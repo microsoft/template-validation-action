@@ -1,4 +1,5 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+
 
 class ValidatorBase:
     def __init__(self, name, catalog, errorAsWarning=False):
@@ -7,7 +8,7 @@ class ValidatorBase:
         self.errorAsWarning = errorAsWarning
         self.result = False
         self.resultMessage = "Validation not performed."
-    
+
     @abstractmethod
     def validate(self):
         pass

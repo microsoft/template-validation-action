@@ -1,0 +1,94 @@
+{
+  "README": {
+    "catalog": "repository_management",
+    "ext": ["md"],
+    "candidate_path": ["."],
+    "assert_in": [
+      "## Features",
+      "## Getting Started",
+      "## Guidance",
+      "## Resources"
+    ],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "LICENSE": {
+    "catalog": "repository_management",
+    "ext": ["md", ""],
+    "candidate_path": ["."],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "SECURITY": {
+    "catalog": "repository_management",
+    "ext": ["md"],
+    "candidate_path": [".", ".github"],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "CODE_OF_CONDUCT": {
+    "catalog": "repository_management",
+    "ext": ["md"],
+    "candidate_path": [".", ".github"],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "CONTRIBUTING": {
+    "catalog": "repository_management",
+    "ext": ["md"],
+    "candidate_path": [".", ".github"],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "ISSUE_TEMPLATE": {
+    "catalog": "repository_management",
+    "ext": ["md"],
+    "candidate_path": [".github"],
+    "accept_folder": true,
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "azure-dev": {
+    "catalog": "source_code_structure",
+    "ext": ["yml", "yaml"],
+    "candidate_path": [".github/workflows"],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "azure": {
+    "catalog": "source_code_structure",
+    "ext": ["yml", "yaml"],
+    "candidate_path": ["*"],
+    "case_sensitive": false,
+    "validator": "FileValidator",
+    "error_as_warning": false
+  },
+  "infra": {
+    "catalog": "source_code_structure",
+    "candidate_path": ["*"],
+    "validator": "FolderValidator"
+  },
+  ".devcontainer": {
+    "catalog": "source_code_structure",
+    "candidate_path": ["."],
+    "validator": "FolderValidator"
+  },
+  "azd up": {
+    "catalog": "functional_requirements",
+    "validator": "AzdValidator",
+    "error_as_warning": false
+  },
+  "expected_topics": {
+    "catalog": "repository_management",
+    "topics": ["azd-templates", "ai-azd-templates"],
+    "validator": "TopicValidator",
+    "error_as_warning": true
+  }
+}
