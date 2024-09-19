@@ -7,11 +7,10 @@ from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
 from validator.azd_command import AzdCommand
-import utils
 
 
 class TestParseRules(unittest.TestCase):
-    @patch('utils.find_infra_yaml_path')
+    @patch("utils.find_infra_yaml_path")
     @patch(
         "builtins.open",
         new_callable=mock_open,

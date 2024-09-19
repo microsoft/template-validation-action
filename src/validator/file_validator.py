@@ -46,7 +46,9 @@ class FileValidator(ValidatorBase):
                 candidateFolder = (
                     self.rootFolder
                     if folder == "."
-                    else root if folder == "*" else os.path.join(self.rootFolder, folder)
+                    else root
+                    if folder == "*"
+                    else os.path.join(self.rootFolder, folder)
                 )
                 if (
                     self.caseSensitive is False

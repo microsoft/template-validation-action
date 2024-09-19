@@ -2,6 +2,7 @@ import json
 import logging
 from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
+
 # from validator.msdo_validator import MsdoValidator
 from validator.topic_validator import TopicValidator
 from validator.folder_validator import FolderValidator
@@ -65,10 +66,14 @@ class RuleParser:
                     )
                 for infra_yaml_path in infra_yaml_paths:
                     validators.append(
-                        AzdValidator(catalog, infra_yaml_path, AzdCommand.UP, error_as_warning)
+                        AzdValidator(
+                            catalog, infra_yaml_path, AzdCommand.UP, error_as_warning
+                        )
                     )
                     validators.append(
-                        AzdValidator(catalog, infra_yaml_path, AzdCommand.DOWN, error_as_warning)
+                        AzdValidator(
+                            catalog, infra_yaml_path, AzdCommand.DOWN, error_as_warning
+                        )
                     )
 
             # TODO
@@ -86,4 +91,3 @@ class RuleParser:
                 continue
 
         return validators
-    
