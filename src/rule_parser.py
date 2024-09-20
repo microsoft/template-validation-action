@@ -34,8 +34,8 @@ class RuleParser:
                     "catalog": "source_code_structure",
                     "ext": self.normalize_extensions(ext),
                 }
-        logging.info(f"Validate paths: {custom_rules}")
-        logging.info(f"Rules: {rules}")
+        logging.debug(f"Validate paths: {custom_rules}")
+        logging.debug(f"Rules: {rules}")
 
         validators = []
 
@@ -45,7 +45,7 @@ class RuleParser:
             error_as_warning = rule_details.get("error_as_warning", False)
 
             if validator_type == "FileValidator":
-                if custom_rules == "" or (custom_rules and rule_name not in custom_rules):
+                if self.args.validate_paths == "None" or (custom_rules and rule_name not in custom_rules):
                     continue
                     
                 ext = rule_details.get("ext", [])
@@ -68,7 +68,7 @@ class RuleParser:
                 validators.append(validator)
 
             elif validator_type == "FolderValidator":
-                if custom_rules == "" or (custom_rules and rule_name not in custom_rules):
+                if self.args.validate_paths == "None" or (custom_rules and rule_name not in custom_rules):
                     continue
                     
                 candidate_path = rule_details.get("candidate_path", ["."])
@@ -106,7 +106,7 @@ class RuleParser:
             # validator = MsdoValidator(catalog, ".", rule_name, error_as_warning)
 
             elif validator_type == "TopicValidator":
-                if self.args.expected_topics == "":
+                if self.args.expected_topics == "None":
                     continue
 
                 topics = rule_details.get("topics", [])
@@ -120,7 +120,7 @@ class RuleParser:
             else:
                 continue
 
-        logging.info(f"Validators: {[validator.name for validator in validators]}")
+        logging.debug(f"Validators: {[validator.name for validator in validators]}")
         return validators
 
     def normalize_extensions(self, ext):

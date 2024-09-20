@@ -29,7 +29,7 @@ def main():
     logging.basicConfig(format="%(message)s", level=log_level)
 
     logging.debug(
-        f"Repo path: {args.repo_path} validate_paths: {args.validate_paths} validate_azd: {args.validate_azd} debug: {args.debug} topics: {args.topics} msdo: {args.msdoresult} output: {args.output}"
+        f"Repo path: {args.repo_path} validate_paths: {args.validate_paths} validate_azd: {args.validate_azd} debug: {args.debug} topics: {args.topics} expected_topics: {args.expected_topics} msdo: {args.msdoresult} output: {args.output}"
     )
 
     # Parse rules and generate validators

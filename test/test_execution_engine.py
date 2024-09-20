@@ -29,6 +29,5 @@ class TestExecutionEngine(unittest.TestCase):
         self.assertEqual(results[0], ("FileValidator", True, "File validation passed."))
         self.assertEqual(results[1], ("AzdValidator", True, "Azd validation passed."))
 
-
 if __name__ == "__main__":
     unittest.main()
