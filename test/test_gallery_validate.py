@@ -3,6 +3,7 @@ from unittest.mock import patch
 import argparse
 from gallery_validate import main
 
+
 class TestGalleryValidate(unittest.TestCase):
     @patch("gallery_validate.ResultAggregator")
     @patch("gallery_validate.ExecutionEngine")
@@ -51,6 +52,7 @@ class TestGalleryValidate(unittest.TestCase):
         self.assertEqual(
             mock_result_aggregator.generate_summary.return_value, "Summary"
         )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -23,7 +23,9 @@ class FileValidator(ValidatorBase):
         self.rootFolder = rootFolder
         self.candidatePaths = candidatePaths
         self.caseSensitive = caseSensitive
-        self.h2Tags = [h2Tag.strip() for h2Tag in h2Tags] if h2Tags is not None else None
+        self.h2Tags = (
+            [h2Tag.strip() for h2Tag in h2Tags] if h2Tags is not None else None
+        )
         self.isFolderAllowed = isFolderAllowed
         self.errorAsWarning = errorAsWarning
 

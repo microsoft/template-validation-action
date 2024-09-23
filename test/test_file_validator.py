@@ -1,3 +1,4 @@
+import unittest
 from validator.file_validator import FileValidator
 from constants import ItemResultFormat, Signs
 
@@ -187,6 +188,7 @@ def test_file_validator_folder_allowed_but_not_exists():
             message="Error: NON_EXISTENT_FOLDER.md file or NON_EXISTENT_FOLDER folder is missing.",
         ),
     )
+
 
 if __name__ == "__main__":
     unittest.main()

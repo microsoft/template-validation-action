@@ -19,15 +19,19 @@ class RuleParser:
     def parse(self):
         with open(self.rules_file_path, "r") as file:
             rules = json.load(file)
-        
-        validate_files = self.args.validate_paths.split(",") if self.args.validate_paths else []
+
+        validate_files = (
+            self.args.validate_paths.split(",") if self.args.validate_paths else []
+        )
         custom_rules = [os.path.splitext(file)[0].strip() for file in validate_files]
         for full_filename in validate_files:
             filename, ext = os.path.splitext(full_filename)
             filename = filename.strip()
             if rules.get(filename):
                 rules[filename]["ext"] = self.normalize_extensions(ext)
-                rules[filename]["assert_in"] = os.getenv(f"{filename.upper().replace('.', '_')}_H2_TAG", "").split(",")
+                rules[filename]["assert_in"] = os.getenv(
+                    f"{filename.upper().replace('.', '_')}_H2_TAG", ""
+                ).split(",")
             else:
                 rules[filename] = {
                     "validator": "FileValidator",
@@ -45,9 +49,11 @@ class RuleParser:
             error_as_warning = rule_details.get("error_as_warning", False)
 
             if validator_type == "FileValidator":
-                if self.args.validate_paths == "None" or (custom_rules and rule_name not in custom_rules):
+                if self.args.validate_paths == "None" or (
+                    custom_rules and rule_name not in custom_rules
+                ):
                     continue
-                    
+
                 ext = rule_details.get("ext", [])
                 candidate_path = rule_details.get("candidate_path", ["."])
                 case_sensitive = rule_details.get("case_sensitive", False)
@@ -68,9 +74,11 @@ class RuleParser:
                 validators.append(validator)
 
             elif validator_type == "FolderValidator":
-                if self.args.validate_paths == "None" or (custom_rules and rule_name not in custom_rules):
+                if self.args.validate_paths == "None" or (
+                    custom_rules and rule_name not in custom_rules
+                ):
                     continue
-                    
+
                 candidate_path = rule_details.get("candidate_path", ["."])
                 validator = FolderValidator(
                     catalog, rule_name, candidate_path, error_as_warning
@@ -125,7 +133,7 @@ class RuleParser:
 
     def normalize_extensions(self, ext):
         ext_map = {
-            '.yml': ['.yml', '.yaml'],
-            '.yaml': ['.yml', '.yaml'],
+            ".yml": [".yml", ".yaml"],
+            ".yaml": [".yml", ".yaml"],
         }
         return ext_map.get(ext.strip(), [ext])

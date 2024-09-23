@@ -47,7 +47,11 @@ class TestParseRules(unittest.TestCase):
     def test_rule_parser(self, mock_file, mock_find_infra_yaml_path):
         mock_find_infra_yaml_path.return_value = ["mocked/path/to/infra.yaml"]
         args = argparse.Namespace(
-            validate_azd=True, topics="azd-templates,azure", repo_path=".", validate_paths=None, expected_topics=None
+            validate_azd=True,
+            topics="azd-templates,azure",
+            repo_path=".",
+            validate_paths=None,
+            expected_topics=None,
         )
         parser = RuleParser("dummy_path", args)
         validators = parser.parse()
