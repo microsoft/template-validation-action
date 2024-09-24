@@ -157,7 +157,7 @@ runs:
               fi
             done < tva_${{ github.run_id }}/env_variables.txt
           fi
-          arguments="--topics ${{ env.TOPICS }}"
+          arguments='--topics ${{ env.TOPICS }}'
           if [ -n "${{ env.expected_topics }}" ]; then
             arguments+=" --expected_topics ${{ env.expected_topics }}"
           fi
