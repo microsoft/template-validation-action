@@ -98,7 +98,7 @@ class AzdValidator(ValidatorBase):
 
         with open(provider_file, "w") as file:
             file.write(modified_content)
-        logging.debug(f"Replace azurerm backend with local backend in {provider_file}.")
+        logging.info(f"Replace azurerm backend with local backend in {provider_file}.")
 
     def runCommand(self, command, arguments):
         message = (
@@ -115,12 +115,12 @@ class AzdValidator(ValidatorBase):
                 check=True,
                 shell=True,
             )
-            logging.debug(f"{result.stdout}")
+            logging.info(f"{result.stdout}")
             self.extract_resource_group(result.stdout)
             return True, ItemResultFormat.PASS.format(message=message)
         except subprocess.CalledProcessError as e:
-            logging.debug(f"{e.stdout}")
-            logging.debug(f"{e.stderr}")
+            logging.info(f"{e.stdout}")
+            logging.warning(f"{e.stderr}")
             return False, ItemResultFormat.AZD_FAIL.format(
                 message=message,
                 detail_messages=ItemResultFormat.DETAILS.format(

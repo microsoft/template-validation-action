@@ -14,12 +14,13 @@ class TestGalleryValidate(unittest.TestCase):
     ):
         mock_parse_args.return_value = argparse.Namespace(
             repo_path="dummy_repo_path",
-            azdup=True,
-            azddown=True,
-            debug=True,
+            validate_paths=None,
+            validate_azd=True,
             topics="azd-templates,azure",
+            expected_topics=None,
             msdoresult="dummy_msdo_result_file",
             output=None,
+            debug=True,
         )
 
         mock_rule_parser = MockRuleParser.return_value

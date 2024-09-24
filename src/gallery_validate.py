@@ -12,19 +12,30 @@ def main():
     )
     parser.add_argument("repo_path", type=str, help="The path to the repo to validate.")
     parser.add_argument(
-        "--azdup", action="store_true", help="Check infra code with azd up."
+        "--validate_paths",
+        type=str,
+        help="A comma-separated list of the file or folder path to check for existence.",
     )
     parser.add_argument(
-        "--azddown", action="store_true", help="Check infra code with azd down."
+        "--validate_azd",
+        action="store_true",
+        help="Whether to validate the deployment functionality with Azd CLI.",
     )
-    parser.add_argument("--debug", action="store_true", help="Enable debug logging.")
-    parser.add_argument("--topics", type=str, help="The topics to be checked.")
+    parser.add_argument(
+        "--topics", type=str, help="A comma-separated list of the actual topics."
+    )
+    parser.add_argument(
+        "--expected_topics",
+        type=str,
+        help="A comma-separated list of topics to check for.",
+    )
     parser.add_argument(
         "--msdoresult",
         type=str,
         help="The output file path of microsoft security devops analysis.",
     )
     parser.add_argument("--output", type=str, help="The output file path.")
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging.")
 
     args = parser.parse_args()
 
@@ -32,7 +43,7 @@ def main():
     logging.basicConfig(format="%(message)s", level=log_level)
 
     logging.debug(
-        f"Repo path: {args.repo_path} azdup: {args.azdup} azddown: {args.azddown} debug: {args.debug} topics: {args.topics} msdo: {args.msdoresult} output: {args.output}"
+        f"Repo path: {args.repo_path} validate_paths: {args.validate_paths} validate_azd: {args.validate_azd} debug: {args.debug} topics: {args.topics} expected_topics: {args.expected_topics} msdo: {args.msdoresult} output: {args.output}"
     )
 
     # Parse rules and generate validators

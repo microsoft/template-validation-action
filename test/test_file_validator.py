@@ -1,3 +1,4 @@
+import unittest
 from validator.file_validator import FileValidator
 from constants import ItemResultFormat, Signs
 
@@ -43,18 +44,18 @@ def test_file_validator_file_found_case_sensitive():
     assert message == ItemResultFormat.PASS.format(message="LICENSE File")
 
 
-def test_file_validator_file_found_mutiple_extension():
+def test_file_validator_file_found_multiple_extension():
     validator = FileValidator(
-        "TestCatalog", "LICENSE", ["md", "txt", ""], "test/data", ["."], None, False
+        "TestCatalog", "LICENSE", [".md", ".txt", ""], "test/data", ["."], None, False
     )
     result, message = validator.validate()
     assert result is True
     assert message == ItemResultFormat.PASS.format(message="LICENSE.md File")
 
 
-def test_file_validator_file_not_found_mutiple_extension():
+def test_file_validator_file_not_found_multiple_extension():
     validator = FileValidator(
-        "TestCatalog", "LICENSE", ["md", "txt"], "test/data", ["."], None, False
+        "TestCatalog", "LICENSE", [".md", ".txt"], "test/data", ["."], None, False
     )
     result, message = validator.validate()
     assert result is False
@@ -91,7 +92,7 @@ def test_file_validator_file_not_found_in_subfolder():
 
 def test_file_validator_H2Tag_found_case_non_sensitive():
     validator = FileValidator(
-        "TestCatalog", "README", ["md"], "test/data", ["."], ["## Test h2"], False
+        "TestCatalog", "README", [".md"], "test/data", ["."], ["## Test h2"], False
     )
     result, message = validator.validate()
     assert result is True
@@ -100,7 +101,7 @@ def test_file_validator_H2Tag_found_case_non_sensitive():
 
 def test_file_validator_H2Tag_found_case_sensitive():
     validator = FileValidator(
-        "TestCatalog", "README", ["md"], "test/data", ["."], ["## Test H2"], True
+        "TestCatalog", "README", [".md"], "test/data", ["."], ["## Test H2"], True
     )
     result, message = validator.validate()
     assert result is True
@@ -111,7 +112,7 @@ def test_file_validator_H2Tag_not_found_case_non_sensitive():
     validator = FileValidator(
         "TestCatalog",
         "README",
-        ["md"],
+        [".md"],
         "test/data",
         ["."],
         ["## Test h2 Not Found"],
@@ -132,7 +133,7 @@ def test_file_validator_H2Tag_not_found_case_sensitive():
     validator = FileValidator(
         "TestCatalog",
         "README",
-        ["md"],
+        [".md"],
         "test/data",
         ["."],
         ["## Test H2 Not Found"],
@@ -170,7 +171,7 @@ def test_file_validator_folder_allowed_but_not_exists():
     validator = FileValidator(
         "TestCatalog",
         "NON_EXISTENT_FOLDER",
-        ["md"],
+        [".md"],
         "test/data",
         ["."],
         None,
@@ -187,3 +188,7 @@ def test_file_validator_folder_allowed_but_not_exists():
             message="Error: NON_EXISTENT_FOLDER.md file or NON_EXISTENT_FOLDER folder is missing.",
         ),
     )
+
+
+if __name__ == "__main__":
+    unittest.main()

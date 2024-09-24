@@ -208,3 +208,7 @@ class TestAzdValidator(unittest.TestCase):
             2,
         )
         self.assertIn(expected_result, result)
+
+
+if __name__ == "__main__":
+    unittest.main()
