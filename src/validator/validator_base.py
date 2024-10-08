@@ -2,10 +2,10 @@ from abc import abstractmethod
 
 
 class ValidatorBase:
-    def __init__(self, name, catalog, errorAsWarning=False):
+    def __init__(self, name, catalog, level):
         self.name = name
         self.catalog = catalog
-        self.errorAsWarning = errorAsWarning
+        self.level = level
         self.result = False
         self.resultMessage = "Validation not performed."
 

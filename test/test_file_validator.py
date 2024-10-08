@@ -1,6 +1,7 @@
 import unittest
 from validator.file_validator import FileValidator
 from constants import ItemResultFormat, Signs
+from level import Level
 
 
 def test_file_validator_file_found_exist():
@@ -30,7 +31,7 @@ def test_file_validator_file_not_found_case_sensitive():
     assert message == ItemResultFormat.FAIL.format(
         message="license File",
         detail_messages=ItemResultFormat.SUBITEM.format(
-            sign=Signs.BLOCK, message="Error: license file is missing."
+            sign=Signs.BLOCK, message="license file is missing."
         ),
     )
 
@@ -62,7 +63,7 @@ def test_file_validator_file_not_found_multiple_extension():
     assert message == ItemResultFormat.FAIL.format(
         message="LICENSE.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
-            sign=Signs.BLOCK, message="Error: LICENSE.md file is missing."
+            sign=Signs.BLOCK, message="LICENSE.md file is missing."
         ),
     )
 
@@ -85,7 +86,7 @@ def test_file_validator_file_not_found_in_subfolder():
     assert message == ItemResultFormat.FAIL.format(
         message="license File",
         detail_messages=ItemResultFormat.SUBITEM.format(
-            sign=Signs.BLOCK, message="Error: license file is missing."
+            sign=Signs.BLOCK, message="license file is missing."
         ),
     )
 
@@ -124,7 +125,7 @@ def test_file_validator_H2Tag_not_found_case_non_sensitive():
         message="README.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
             sign=Signs.BLOCK,
-            message="Error: ## Test h2 Not Found is missing in README.md.",
+            message="## Test h2 Not Found is missing in README.md.",
         ),
     )
 
@@ -145,7 +146,7 @@ def test_file_validator_H2Tag_not_found_case_sensitive():
         message="README.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
             sign=Signs.BLOCK,
-            message="Error: ## Test H2 Not Found is missing in README.md.",
+            message="## Test H2 Not Found is missing in README.md.",
         ),
     )
 
@@ -159,7 +160,7 @@ def test_file_validator_folder_allowed_and_exists():
         ["."],
         None,
         False,
-        False,
+        Level.MODERATE,
         True,
     )
     result, message = validator.validate()
@@ -176,7 +177,7 @@ def test_file_validator_folder_allowed_but_not_exists():
         ["."],
         None,
         False,
-        False,
+        Level.MODERATE,
         True,
     )
     result, message = validator.validate()
@@ -184,8 +185,8 @@ def test_file_validator_folder_allowed_but_not_exists():
     assert message == ItemResultFormat.FAIL.format(
         message="NON_EXISTENT_FOLDER.md File or NON_EXISTENT_FOLDER Folder",
         detail_messages=ItemResultFormat.SUBITEM.format(
-            sign=Signs.BLOCK,
-            message="Error: NON_EXISTENT_FOLDER.md file or NON_EXISTENT_FOLDER folder is missing.",
+            sign=Signs.WARNING,
+            message="NON_EXISTENT_FOLDER.md file or NON_EXISTENT_FOLDER folder is missing.",
         ),
     )
 

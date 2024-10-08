@@ -2,14 +2,15 @@ import os
 import logging
 from validator.validator_base import ValidatorBase
 from constants import ItemResultFormat, Signs, line_delimiter
+from level import Level
 
 
 class FolderValidator(ValidatorBase):
     def __init__(
-        self, validatorCatalog, folderName, candidatePaths, errorAsWarning=False
+        self, validatorCatalog, folderName, candidatePaths, level=Level.HIGH
     ):
         super().__init__(
-            f"{folderName}FolderValidator", validatorCatalog, errorAsWarning
+            f"{folderName}FolderValidator", validatorCatalog, level
         )
         self.folderName = folderName
         self.candidatePaths = candidatePaths
@@ -38,8 +39,8 @@ class FolderValidator(ValidatorBase):
                 ItemResultFormat.FAIL.format(
                     message=f"{self.folderName} Folder",
                     detail_messages=ItemResultFormat.SUBITEM.format(
-                        sign=Signs.BLOCK,
-                        message=f"Error: {self.folderName} folder is missing.",
+                        sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
+                        message=f"{self.folderName} folder is missing.",
                     ),
                 )
             )

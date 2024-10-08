@@ -23,7 +23,7 @@ class TestFolderValidator(unittest.TestCase):
                 message="non_existent_folder Folder",
                 detail_messages=ItemResultFormat.SUBITEM.format(
                     sign=Signs.BLOCK,
-                    message="Error: non_existent_folder folder is missing.",
+                    message="non_existent_folder folder is missing.",
                 ),
             ),
         )

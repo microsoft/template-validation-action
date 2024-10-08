@@ -3,14 +3,19 @@ class Level(object):
     MODERATE = 2
     HIGH = 3
 
-    @staticmethod
     def validate(level):
-        if level == Level.MODERATE:
-            return Level.MODERATE
-        elif level == Level.HIGH:
-            return Level.HIGH
-        elif level == Level.LOW:
-            return Level.LOW
+        if isinstance(level, str):
+            level = level.strip().lower()
+            if level == 'low':
+                return Level.LOW
+            elif level == 'moderate':
+                return Level.MODERATE
+            elif level == 'high':
+                return Level.HIGH
+            else:
+                return Level.MODERATE
+        if level == Level.MODERATE or level == Level.LOW or level == Level.HIGH:
+            return level
         else:
             return Level.MODERATE
 

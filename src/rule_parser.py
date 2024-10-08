@@ -8,6 +8,7 @@ from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
 from validator.folder_validator import FolderValidator
 from validator.azd_command import AzdCommand
+from level import Level
 import utils
 
 
@@ -46,7 +47,7 @@ class RuleParser:
         for rule_name, rule_details in rules.items():
             validator_type = rule_details.get("validator")
             catalog = rule_details.get("catalog", "")
-            error_as_warning = rule_details.get("error_as_warning", False)
+            level = Level.validate(rule_details.get("level", Level.MODERATE))
 
             if validator_type == "FileValidator":
                 if self.args.validate_paths == "None" or (
@@ -68,7 +69,7 @@ class RuleParser:
                     candidate_path,
                     h2_tags,
                     case_sensitive,
-                    error_as_warning,
+                    level,
                     accept_folder,
                 )
                 validators.append(validator)
@@ -81,7 +82,7 @@ class RuleParser:
 
                 candidate_path = rule_details.get("candidate_path", ["."])
                 validator = FolderValidator(
-                    catalog, rule_name, candidate_path, error_as_warning
+                    catalog, rule_name, candidate_path, level
                 )
                 validators.append(validator)
 
@@ -92,26 +93,26 @@ class RuleParser:
                 logging.debug(f"infra_yaml_paths: {infra_yaml_paths}")
                 if not infra_yaml_paths:
                     validators.append(
-                        AzdValidator(catalog, ".", AzdCommand.UP, error_as_warning)
+                        AzdValidator(catalog, ".", AzdCommand.UP, level)
                     )
                     validators.append(
-                        AzdValidator(catalog, ".", AzdCommand.DOWN, error_as_warning)
+                        AzdValidator(catalog, ".", AzdCommand.DOWN, level)
                     )
                 for infra_yaml_path in infra_yaml_paths:
                     validators.append(
                         AzdValidator(
-                            catalog, infra_yaml_path, AzdCommand.UP, error_as_warning
+                            catalog, infra_yaml_path, AzdCommand.UP, level
                         )
                     )
                     validators.append(
                         AzdValidator(
-                            catalog, infra_yaml_path, AzdCommand.DOWN, error_as_warning
+                            catalog, infra_yaml_path, AzdCommand.DOWN, level
                         )
                     )
 
             # TODO
             # elif validator_type == 'MsdoValidator':
-            # validator = MsdoValidator(catalog, ".", rule_name, error_as_warning)
+            # validator = MsdoValidator(catalog, ".", rule_name, level)
 
             elif validator_type == "TopicValidator":
                 if self.args.expected_topics == "None":
@@ -121,7 +122,7 @@ class RuleParser:
                 if self.args.expected_topics:
                     topics = self.args.expected_topics.split(",")
                 validator = TopicValidator(
-                    catalog, rule_name, topics, self.args.topics, error_as_warning
+                    catalog, rule_name, topics, self.args.topics, level
                 )
                 validators.append(validator)
 

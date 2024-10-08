@@ -3,6 +3,15 @@ from level import Level
 
 class TestLevel(unittest.TestCase):
 
+    def test_validate_low_string(self):
+        self.assertEqual(Level.validate("LOW"), Level.LOW)
+
+    def test_validate_moderate_string(self):
+        self.assertEqual(Level.validate("MODERATE"), Level.MODERATE)
+
+    def test_validate_high_string(self):
+        self.assertEqual(Level.validate("HIGH"), Level.HIGH)
+    
     def test_validate_low(self):
         self.assertEqual(Level.validate(Level.LOW), Level.LOW)
 

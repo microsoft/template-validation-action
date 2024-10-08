@@ -1,5 +1,6 @@
 from validator.validator_base import ValidatorBase
 from constants import line_delimiter, ItemResultFormat, Signs
+from level import Level
 import os
 import logging
 
@@ -14,10 +15,10 @@ class FileValidator(ValidatorBase):
         candidatePaths=[""],
         h2Tags=None,
         caseSensitive=False,
-        errorAsWarning=False,
+        level=Level.HIGH,
         isFolderAllowed=False,
     ):
-        super().__init__(f"{fileName}FileValidator", validatorCatalog, errorAsWarning)
+        super().__init__(f"{fileName}FileValidator", validatorCatalog, level)
         self.fileName = fileName
         self.extensionList = extensionList
         self.rootFolder = rootFolder
@@ -27,7 +28,7 @@ class FileValidator(ValidatorBase):
             [h2Tag.strip() for h2Tag in h2Tags] if h2Tags is not None else None
         )
         self.isFolderAllowed = isFolderAllowed
-        self.errorAsWarning = errorAsWarning
+        self.level = level
 
     def validate(self):
         logging.debug(
@@ -86,10 +87,10 @@ class FileValidator(ValidatorBase):
                                                 self.result = False
                                                 subMessages.append(
                                                     ItemResultFormat.SUBITEM.format(
-                                                        sign=Signs.WARNING
-                                                        if self.errorAsWarning
-                                                        else Signs.BLOCK,
-                                                        message=f"Error: {tag} is missing in {file}.",
+                                                        sign=Signs.BLOCK
+                                                        if Level.isBlocker(self.level)
+                                                        else Signs.WARNING,
+                                                        message=f"{tag} is missing in {file}.",
                                                     )
                                                 )
                                     fileContent.close()
@@ -126,15 +127,15 @@ class FileValidator(ValidatorBase):
             else f"{potential_name} File"
         )
         detailMessage = (
-            f"Error: {potential_name} file or {self.fileName} folder is missing."
+            f"{potential_name} file or {self.fileName} folder is missing."
             if self.isFolderAllowed
-            else f"Error: {potential_name} file is missing."
+            else f"{potential_name} file is missing."
         )
         messages.append(
             ItemResultFormat.FAIL.format(
                 message=errorMessage,
                 detail_messages=ItemResultFormat.SUBITEM.format(
-                    sign=Signs.WARNING if self.errorAsWarning else Signs.BLOCK,
+                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
                     message=detailMessage,
                 ),
             )

@@ -1,13 +1,14 @@
 import logging
 from validator.validator_base import ValidatorBase
 from constants import ItemResultFormat, Signs, line_delimiter
+from level import Level
 
 
 class TopicValidator(ValidatorBase):
     def __init__(
-        self, catalog, name, expected_topics, actual_topics, error_as_warning=False
+        self, catalog, name, expected_topics, actual_topics, level=Level.MODERATE
     ):
-        super().__init__("TopicValidator", catalog, error_as_warning)
+        super().__init__("TopicValidator", catalog, level)
         self.name = name
         self.expected_topics = expected_topics
         self.actual_topics = actual_topics
@@ -22,7 +23,7 @@ class TopicValidator(ValidatorBase):
             result = False
             subMessages.append(
                 ItemResultFormat.SUBITEM.format(
-                    sign=Signs.WARNING, message="Error: topics string is NULL."
+                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING, message="topics string is NULL."
                 )
             )
         else:
@@ -32,8 +33,8 @@ class TopicValidator(ValidatorBase):
                     result = result and False
                     subMessages.append(
                         ItemResultFormat.SUBITEM.format(
-                            sign=Signs.WARNING,
-                            message=f"Error: {topic} is missing in topics.",
+                            sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
+                            message=f"{topic} is missing in topics.",
                         )
                     )
 
