@@ -37,6 +37,7 @@ class FolderValidator(ValidatorBase):
         if not folder_found:
             messages.append(
                 ItemResultFormat.FAIL.format(
+                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
                     message=f"{self.folderName} Folder",
                     detail_messages=ItemResultFormat.SUBITEM.format(
                         sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,

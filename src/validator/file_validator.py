@@ -103,6 +103,7 @@ class FileValidator(ValidatorBase):
                                 else:
                                     messages.append(
                                         ItemResultFormat.FAIL.format(
+                                            sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
                                             message=f"{potential_name} File",
                                             detail_messages=line_delimiter.join(
                                                 subMessages
@@ -133,6 +134,7 @@ class FileValidator(ValidatorBase):
         )
         messages.append(
             ItemResultFormat.FAIL.format(
+                sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
                 message=errorMessage,
                 detail_messages=ItemResultFormat.SUBITEM.format(
                     sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,

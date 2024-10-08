@@ -29,6 +29,7 @@ def test_file_validator_file_not_found_case_sensitive():
     result, message = validator.validate()
     assert result is False
     assert message == ItemResultFormat.FAIL.format(
+        sign=Signs.BLOCK,
         message="license File",
         detail_messages=ItemResultFormat.SUBITEM.format(
             sign=Signs.BLOCK, message="license file is missing."
@@ -61,6 +62,7 @@ def test_file_validator_file_not_found_multiple_extension():
     result, message = validator.validate()
     assert result is False
     assert message == ItemResultFormat.FAIL.format(
+        sign=Signs.BLOCK,
         message="LICENSE.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
             sign=Signs.BLOCK, message="LICENSE.md file is missing."
@@ -84,6 +86,7 @@ def test_file_validator_file_not_found_in_subfolder():
     result, message = validator.validate()
     assert result is False
     assert message == ItemResultFormat.FAIL.format(
+        sign=Signs.BLOCK,
         message="license File",
         detail_messages=ItemResultFormat.SUBITEM.format(
             sign=Signs.BLOCK, message="license file is missing."
@@ -122,6 +125,7 @@ def test_file_validator_H2Tag_not_found_case_non_sensitive():
     result, message = validator.validate()
     assert result is False
     assert message == ItemResultFormat.FAIL.format(
+        sign=Signs.BLOCK,
         message="README.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
             sign=Signs.BLOCK,
@@ -143,6 +147,7 @@ def test_file_validator_H2Tag_not_found_case_sensitive():
     result, message = validator.validate()
     assert result is False
     assert message == ItemResultFormat.FAIL.format(
+        sign=Signs.BLOCK,
         message="README.md File",
         detail_messages=ItemResultFormat.SUBITEM.format(
             sign=Signs.BLOCK,
@@ -183,6 +188,7 @@ def test_file_validator_folder_allowed_but_not_exists():
     result, message = validator.validate()
     assert result is False
     assert message == ItemResultFormat.FAIL.format(
+        sign=Signs.WARNING,
         message="NON_EXISTENT_FOLDER.md File or NON_EXISTENT_FOLDER Folder",
         detail_messages=ItemResultFormat.SUBITEM.format(
             sign=Signs.WARNING,

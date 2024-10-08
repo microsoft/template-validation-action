@@ -46,7 +46,8 @@ class TopicValidator(ValidatorBase):
             )
         else:
             messages.append(
-                ItemResultFormat.WARNING.format(
+                ItemResultFormat.FAIL.format(
+                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
                     message=f"Topics on repo contains {self.expected_topics}",
                     detail_messages=line_delimiter.join(subMessages),
                 )
