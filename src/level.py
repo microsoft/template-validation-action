@@ -6,11 +6,11 @@ class Level(object):
     def validate(level):
         if isinstance(level, str):
             level = level.strip().lower()
-            if level == 'low':
+            if level == "low":
                 return Level.LOW
-            elif level == 'moderate':
+            elif level == "moderate":
                 return Level.MODERATE
-            elif level == 'high':
+            elif level == "high":
                 return Level.HIGH
             else:
                 return Level.MODERATE

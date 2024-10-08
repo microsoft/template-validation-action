@@ -23,7 +23,8 @@ class TopicValidator(ValidatorBase):
             result = False
             subMessages.append(
                 ItemResultFormat.SUBITEM.format(
-                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING, message="topics string is NULL."
+                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
+                    message="topics string is NULL.",
                 )
             )
         else:
@@ -33,7 +34,9 @@ class TopicValidator(ValidatorBase):
                     result = result and False
                     subMessages.append(
                         ItemResultFormat.SUBITEM.format(
-                            sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
+                            sign=Signs.BLOCK
+                            if Level.isBlocker(self.level)
+                            else Signs.WARNING,
                             message=f"{topic} is missing in topics.",
                         )
                     )

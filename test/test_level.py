@@ -1,8 +1,8 @@
 import unittest
 from level import Level
 
-class TestLevel(unittest.TestCase):
 
+class TestLevel(unittest.TestCase):
     def test_validate_low_string(self):
         self.assertEqual(Level.validate("LOW"), Level.LOW)
 
@@ -11,7 +11,7 @@ class TestLevel(unittest.TestCase):
 
     def test_validate_high_string(self):
         self.assertEqual(Level.validate("HIGH"), Level.HIGH)
-    
+
     def test_validate_low(self):
         self.assertEqual(Level.validate(Level.LOW), Level.LOW)
 
@@ -29,7 +29,7 @@ class TestLevel(unittest.TestCase):
         self.assertTrue(Level.MODERATE < Level.HIGH)
         self.assertFalse(Level.HIGH < Level.MODERATE)
         self.assertFalse(Level.MODERATE < Level.LOW)
-    
+
     def test_gt_comparison(self):
         self.assertTrue(Level.HIGH > Level.MODERATE)
         self.assertTrue(Level.MODERATE > Level.LOW)
@@ -41,5 +41,6 @@ class TestLevel(unittest.TestCase):
         self.assertFalse(Level.isBlocker(Level.MODERATE))
         self.assertFalse(Level.isBlocker(Level.LOW))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

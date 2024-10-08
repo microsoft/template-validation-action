@@ -81,9 +81,7 @@ class RuleParser:
                     continue
 
                 candidate_path = rule_details.get("candidate_path", ["."])
-                validator = FolderValidator(
-                    catalog, rule_name, candidate_path, level
-                )
+                validator = FolderValidator(catalog, rule_name, candidate_path, level)
                 validators.append(validator)
 
             elif validator_type == "AzdValidator":
@@ -92,22 +90,16 @@ class RuleParser:
                 infra_yaml_paths = utils.find_infra_yaml_path(self.args.repo_path)
                 logging.debug(f"infra_yaml_paths: {infra_yaml_paths}")
                 if not infra_yaml_paths:
-                    validators.append(
-                        AzdValidator(catalog, ".", AzdCommand.UP, level)
-                    )
+                    validators.append(AzdValidator(catalog, ".", AzdCommand.UP, level))
                     validators.append(
                         AzdValidator(catalog, ".", AzdCommand.DOWN, level)
                     )
                 for infra_yaml_path in infra_yaml_paths:
                     validators.append(
-                        AzdValidator(
-                            catalog, infra_yaml_path, AzdCommand.UP, level
-                        )
+                        AzdValidator(catalog, infra_yaml_path, AzdCommand.UP, level)
                     )
                     validators.append(
-                        AzdValidator(
-                            catalog, infra_yaml_path, AzdCommand.DOWN, level
-                        )
+                        AzdValidator(catalog, infra_yaml_path, AzdCommand.DOWN, level)
                     )
 
             # TODO
