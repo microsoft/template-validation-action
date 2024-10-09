@@ -23,7 +23,9 @@ class TopicValidator(ValidatorBase):
             result = False
             subMessages.append(
                 ItemResultFormat.SUBITEM.format(
-                    sign=Signs.BLOCK if Severity.isBlocker(self.severity) else Signs.WARNING,
+                    sign=Signs.BLOCK
+                    if Severity.isBlocker(self.severity)
+                    else Signs.WARNING,
                     message="topics string is NULL.",
                 )
             )
@@ -50,7 +52,9 @@ class TopicValidator(ValidatorBase):
         else:
             messages.append(
                 ItemResultFormat.FAIL.format(
-                    sign=Signs.BLOCK if Severity.isBlocker(self.severity) else Signs.WARNING,
+                    sign=Signs.BLOCK
+                    if Severity.isBlocker(self.severity)
+                    else Signs.WARNING,
                     message=f"Topics on repo contains {self.expected_topics}",
                     detail_messages=line_delimiter.join(subMessages),
                 )

@@ -14,7 +14,11 @@ class Severity(object):
                 return Severity.HIGH
             else:
                 return Severity.MODERATE
-        if severity == Severity.MODERATE or severity == Severity.LOW or severity == Severity.HIGH:
+        if (
+            severity == Severity.MODERATE
+            or severity == Severity.LOW
+            or severity == Severity.HIGH
+        ):
             return severity
         else:
             return Severity.MODERATE

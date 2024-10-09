@@ -1,5 +1,6 @@
 from severity import Severity
 
+
 class ResultAggregator:
     def __init__(self):
         self.categories = {
@@ -17,7 +18,9 @@ class ResultAggregator:
                 (severity, result, message)
             )
         elif "functional_requirements" in catalog:
-            self.categories["Functional Requirements"].append((severity, result, message))
+            self.categories["Functional Requirements"].append(
+                (severity, result, message)
+            )
         elif "security_requirements" in catalog:
             self.categories["Security Requirements"].append((severity, result, message))
         else:
@@ -34,8 +37,14 @@ class ResultAggregator:
             summary.append(f"\n## {category}:")
             for severity, result, message in results:
                 overall_passed = overall_passed and result
-                overall_severity = overall_severity if result else max(overall_severity, severity)
+                overall_severity = (
+                    overall_severity if result else max(overall_severity, severity)
+                )
                 summary.append(message)
 
-        summary[0] += "CONFORMING" if overall_passed else f"NON-CONFORMING, Severity: {Severity.to_string(overall_severity)}"
+        summary[0] += (
+            "CONFORMING"
+            if overall_passed
+            else f"NON-CONFORMING, Severity: {Severity.to_string(overall_severity)}"
+        )
         return "\n".join(summary)

@@ -88,7 +88,9 @@ class FileValidator(ValidatorBase):
                                                 subMessages.append(
                                                     ItemResultFormat.SUBITEM.format(
                                                         sign=Signs.BLOCK
-                                                        if Severity.isBlocker(self.severity)
+                                                        if Severity.isBlocker(
+                                                            self.severity
+                                                        )
                                                         else Signs.WARNING,
                                                         message=f"{tag} is missing in {file}.",
                                                     )
@@ -136,10 +138,14 @@ class FileValidator(ValidatorBase):
         )
         messages.append(
             ItemResultFormat.FAIL.format(
-                sign=Signs.BLOCK if Severity.isBlocker(self.severity) else Signs.WARNING,
+                sign=Signs.BLOCK
+                if Severity.isBlocker(self.severity)
+                else Signs.WARNING,
                 message=errorMessage,
                 detail_messages=ItemResultFormat.SUBITEM.format(
-                    sign=Signs.BLOCK if Severity.isBlocker(self.severity) else Signs.WARNING,
+                    sign=Signs.BLOCK
+                    if Severity.isBlocker(self.severity)
+                    else Signs.WARNING,
                     message=detailMessage,
                 ),
             )

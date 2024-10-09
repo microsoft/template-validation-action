@@ -6,7 +6,9 @@ from severity import Severity
 
 
 class FolderValidator(ValidatorBase):
-    def __init__(self, validatorCatalog, folderName, candidatePaths, severity=Severity.HIGH):
+    def __init__(
+        self, validatorCatalog, folderName, candidatePaths, severity=Severity.HIGH
+    ):
         super().__init__(f"{folderName}FolderValidator", validatorCatalog, severity)
         self.folderName = folderName
         self.candidatePaths = candidatePaths
@@ -33,7 +35,9 @@ class FolderValidator(ValidatorBase):
         if not folder_found:
             messages.append(
                 ItemResultFormat.FAIL.format(
-                    sign=Signs.BLOCK if Severity.isBlocker(self.severity) else Signs.WARNING,
+                    sign=Signs.BLOCK
+                    if Severity.isBlocker(self.severity)
+                    else Signs.WARNING,
                     message=f"{self.folderName} Folder",
                     detail_messages=ItemResultFormat.SUBITEM.format(
                         sign=Signs.BLOCK

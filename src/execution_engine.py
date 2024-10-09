@@ -8,7 +8,12 @@ class ExecutionEngine:
             try:
                 validator.validate()
                 results.append(
-                    (validator.catalog, validator.severity, validator.result, validator.resultMessage)
+                    (
+                        validator.catalog,
+                        validator.severity,
+                        validator.result,
+                        validator.resultMessage,
+                    )
                 )
             except Exception as e:
                 results.append((validator.catalog, validator.severity, False, str(e)))

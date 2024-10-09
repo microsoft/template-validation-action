@@ -123,7 +123,9 @@ class AzdValidator(ValidatorBase):
             logging.info(f"{e.stdout}")
             logging.warning(f"{e.stderr}")
             return False, ItemResultFormat.AZD_FAIL.format(
-                sign=Signs.BLOCK if Severity.isBlocker(self.severity) else Signs.WARNING,
+                sign=Signs.BLOCK
+                if Severity.isBlocker(self.severity)
+                else Signs.WARNING,
                 message=message,
                 detail_messages=ItemResultFormat.DETAILS.format(
                     message=indent(e.stdout.replace("\\", ""))

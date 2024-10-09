@@ -29,8 +29,13 @@ class TestExecutionEngine(unittest.TestCase):
         results = engine.execute()
 
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0], ("FileValidator", Severity.MODERATE, True, "File validation passed."))
-        self.assertEqual(results[1], ("AzdValidator", Severity.HIGH, True, "Azd validation passed."))
+        self.assertEqual(
+            results[0],
+            ("FileValidator", Severity.MODERATE, True, "File validation passed."),
+        )
+        self.assertEqual(
+            results[1], ("AzdValidator", Severity.HIGH, True, "Azd validation passed.")
+        )
 
 
 if __name__ == "__main__":
