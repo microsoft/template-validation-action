@@ -28,6 +28,9 @@ class ResultAggregator:
 
     def generate_summary(self):
         summary = ["# AI Gallery Standard Validation: "]
+        summary.append(
+            "\nPlease review the warnings below. If your template is already published, it may be subject to removal from a collection.\nHead to this link for more information: [template-lifecycle](https://aka.ms/ai-gallery/template-lifecycle)"
+        )
         overall_passed = True
         overall_severity = Severity.LOW
 
