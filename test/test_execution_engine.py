@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from execution_engine import ExecutionEngine
 from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
-from level import Level
+from severity import Severity
 
 
 class TestExecutionEngine(unittest.TestCase):
@@ -12,14 +12,14 @@ class TestExecutionEngine(unittest.TestCase):
         file_validator = MagicMock(spec=FileValidator)
         file_validator.catalog = "FileValidator"
         file_validator.validate.return_value = None
-        file_validator.level = Level.MODERATE
+        file_validator.severity = Severity.MODERATE
         file_validator.result = True
         file_validator.resultMessage = "File validation passed."
 
         azd_validator = MagicMock(spec=AzdValidator)
         azd_validator.catalog = "AzdValidator"
         azd_validator.validate.return_value = None
-        azd_validator.level = Level.HIGH
+        azd_validator.severity = Severity.HIGH
         azd_validator.result = True
         azd_validator.resultMessage = "Azd validation passed."
 
@@ -29,8 +29,8 @@ class TestExecutionEngine(unittest.TestCase):
         results = engine.execute()
 
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0], ("FileValidator", Level.MODERATE, True, "File validation passed."))
-        self.assertEqual(results[1], ("AzdValidator", Level.HIGH, True, "Azd validation passed."))
+        self.assertEqual(results[0], ("FileValidator", Severity.MODERATE, True, "File validation passed."))
+        self.assertEqual(results[1], ("AzdValidator", Severity.HIGH, True, "Azd validation passed."))
 
 
 if __name__ == "__main__":

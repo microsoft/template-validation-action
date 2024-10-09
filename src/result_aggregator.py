@@ -1,4 +1,4 @@
-from level import Level
+from severity import Severity
 
 class ResultAggregator:
     def __init__(self):
@@ -26,7 +26,7 @@ class ResultAggregator:
     def generate_summary(self):
         summary = ["# AI Gallery Standard Validation: "]
         overall_passed = True
-        overall_severity = Level.LOW
+        overall_severity = Severity.LOW
 
         for category, results in self.categories.items():
             if not results:
@@ -37,5 +37,5 @@ class ResultAggregator:
                 overall_severity = overall_severity if result else max(overall_severity, severity)
                 summary.append(message)
 
-        summary[0] += "CONFORMING" if overall_passed else f"NON-CONFORMING, Severity: {Level.toString(overall_severity)}"
+        summary[0] += "CONFORMING" if overall_passed else f"NON-CONFORMING, Severity: {Severity.toString(overall_severity)}"
         return "\n".join(summary)

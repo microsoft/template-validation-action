@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 import argparse
 from gallery_validate import main
-from level import Level
+from severity import Severity
 
 
 class TestGalleryValidate(unittest.TestCase):
@@ -28,8 +28,8 @@ class TestGalleryValidate(unittest.TestCase):
         mock_rule_parser.parse.return_value = ["validator1", "validator2"]
 
         expected_results = [
-            ("validator1", Level.LOW, True, "Validation passed"),
-            ("validator2", Level.HIGH, False, "Validation failed"),
+            ("validator1", Severity.LOW, True, "Validation passed"),
+            ("validator2", Severity.HIGH, False, "Validation failed"),
         ]
         mock_execution_engine = MockExecutionEngine.return_value
         mock_execution_engine.execute.return_value = expected_results

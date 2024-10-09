@@ -1,6 +1,6 @@
 import unittest
 from result_aggregator import ResultAggregator
-from level import Level
+from severity import Severity
 
 
 class TestResultAggregator(unittest.TestCase):
@@ -9,20 +9,20 @@ class TestResultAggregator(unittest.TestCase):
 
         # Add mock results
         aggregator.add_result(
-            "repository_management_readme", Level.MODERATE, True, "- [x] README.md File"
+            "repository_management_readme", Severity.MODERATE, True, "- [x] README.md File"
         )
         aggregator.add_result(
-            "repository_management_license", Level.MODERATE, True, "- [x] LICENSE.md File"
+            "repository_management_license", Severity.MODERATE, True, "- [x] LICENSE.md File"
         )
         aggregator.add_result(
-            "repository_management_security", Level.MODERATE, False, "- :warning: SECURITY.md File"
+            "repository_management_security", Severity.MODERATE, False, "- :warning: SECURITY.md File"
         )
         aggregator.add_result(
-            "source_code_structure_azure_dev", Level.MODERATE, True, "- [x] azure-dev.yaml File"
+            "source_code_structure_azure_dev", Severity.MODERATE, True, "- [x] azure-dev.yaml File"
         )
-        aggregator.add_result("functional_requirements_azd_up", Level.MODERATE, True, "- [x] azd up")
+        aggregator.add_result("functional_requirements_azd_up", Severity.MODERATE, True, "- [x] azd up")
         aggregator.add_result(
-            "security_requirements_msdo", Level.MODERATE, False, "- :warning: MSDO validation failed"
+            "security_requirements_msdo", Severity.MODERATE, False, "- :warning: MSDO validation failed"
         )
 
         summary = aggregator.generate_summary()

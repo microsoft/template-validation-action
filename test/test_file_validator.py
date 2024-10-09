@@ -1,7 +1,7 @@
 import unittest
 from validator.file_validator import FileValidator
 from constants import ItemResultFormat, Signs
-from level import Level
+from severity import Severity
 
 
 def test_file_validator_file_found_exist():
@@ -165,7 +165,7 @@ def test_file_validator_folder_allowed_and_exists():
         ["."],
         None,
         False,
-        Level.MODERATE,
+        Severity.MODERATE,
         True,
     )
     result, message = validator.validate()
@@ -182,7 +182,7 @@ def test_file_validator_folder_allowed_but_not_exists():
         ["."],
         None,
         False,
-        Level.MODERATE,
+        Severity.MODERATE,
         True,
     )
     result, message = validator.validate()
