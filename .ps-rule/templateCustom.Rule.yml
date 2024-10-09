@@ -2,7 +2,7 @@
 apiVersion: github.com/microsoft/PSRule/v1
 kind: Baseline
 metadata:
-  name: TemplateValidation
+  name: TemplateValidation.MI_2024_10
 spec:
   rule:
     include:
