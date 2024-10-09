@@ -58,7 +58,7 @@ def main():
     # Aggregate results
     aggregator = ResultAggregator()
     for result in results:
-        aggregator.add_result(result[0], result[1], result[2])
+        aggregator.add_result(result[0], result[1], result[2], result[3])
 
     summary = aggregator.generate_summary()
 

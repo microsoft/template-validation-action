@@ -19,15 +19,15 @@ class Level(object):
         else:
             return Level.MODERATE
 
-    def __lt__(self, other):
-        if self.__class__ is other.__class__:
-            return self.value < other.value
-        return NotImplemented
-
-    def __gt__(self, other):
-        if self.__class__ is other.__class__:
-            return self.value > other.value
-        return NotImplemented
+    def toString(level):
+        if level == Level.LOW:
+            return "Low"
+        elif level == Level.MODERATE:
+            return "Moderate"
+        elif level == Level.HIGH:
+            return "High"
+        else:
+            return "Moderate"
 
     def isBlocker(self):
         return self >= Level.HIGH

@@ -14,10 +14,6 @@ how_to_fix = "## <i>How to fix?</i>\n<b>The full Definition of Done of the AI-Ga
     detail_link=details_help_link
 )
 
-final_result_format = "# AI Gallery Standard Validation: {{result}} \n{{message}}\n\n{end_message}".format(
-    end_message=how_to_fix
-)
-
 
 class ItemResultFormat:
     PASS = "{sign} <b>{{message}}</b>.".format(sign=Signs.CHECK)
