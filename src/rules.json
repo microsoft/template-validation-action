@@ -11,7 +11,7 @@
     ],
     "case_sensitive": false,
     "validator": "FileValidator",
-    "level": "moderate"
+    "severity": "moderate"
   },
   "LICENSE": {
     "catalog": "repository_management",
@@ -19,7 +19,7 @@
     "candidate_path": ["."],
     "case_sensitive": false,
     "validator": "FileValidator",
-    "level": "moderate"
+    "severity": "moderate"
   },
   "SECURITY": {
     "catalog": "repository_management",
@@ -27,7 +27,7 @@
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
-    "level": "moderate"
+    "severity": "moderate"
   },
   "CODE_OF_CONDUCT": {
     "catalog": "repository_management",
@@ -35,7 +35,7 @@
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
-    "level": "moderate"
+    "severity": "moderate"
   },
   "CONTRIBUTING": {
     "catalog": "repository_management",
@@ -43,7 +43,7 @@
     "candidate_path": [".", ".github"],
     "case_sensitive": false,
     "validator": "FileValidator",
-    "level": "moderate"
+    "severity": "moderate"
   },
   "ISSUE_TEMPLATE": {
     "catalog": "repository_management",
@@ -52,7 +52,7 @@
     "accept_folder": true,
     "case_sensitive": false,
     "validator": "FileValidator",
-    "level": "moderate"
+    "severity": "moderate"
   },
   "azure-dev": {
     "catalog": "source_code_structure",
@@ -60,7 +60,7 @@
     "candidate_path": [".github/workflows"],
     "case_sensitive": false,
     "validator": "FileValidator",
-    "level": "low"
+    "severity": "low"
   },
   "azure": {
     "catalog": "source_code_structure",
@@ -68,29 +68,29 @@
     "candidate_path": ["*"],
     "case_sensitive": false,
     "validator": "FileValidator",
-    "level": "high"
+    "severity": "high"
   },
   "infra": {
     "catalog": "source_code_structure",
     "candidate_path": ["*"],
     "validator": "FolderValidator",
-    "level": "high"
+    "severity": "high"
   },
   ".devcontainer": {
     "catalog": "source_code_structure",
     "candidate_path": ["."],
     "validator": "FolderValidator",
-    "level": "moderate"
+    "severity": "moderate"
   },
   "azd up": {
     "catalog": "functional_requirements",
     "validator": "AzdValidator",
-    "level": "high"
+    "severity": "high"
   },
   "expected_topics": {
     "catalog": "repository_management",
     "topics": ["azd-templates", "ai-azd-templates"],
     "validator": "TopicValidator",
-    "level": "moderate"
+    "severity": "low"
   }
 }
