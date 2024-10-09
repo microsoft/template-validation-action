@@ -46,6 +46,9 @@ class TestResultAggregator(unittest.TestCase):
 
         expected_summary = """# AI Gallery Standard Validation: NON-CONFORMING, Severity: Moderate
 
+Please review the warnings below. If your template is already published, it may be subject to removal from a collection.
+Head to this link for more information: [template-lifecycle](https://aka.ms/ai-gallery/template-lifecycle)
+
 ## Repository Management:
 - [x] README.md File
 - [x] LICENSE.md File
