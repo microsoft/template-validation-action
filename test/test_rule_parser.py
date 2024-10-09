@@ -7,6 +7,7 @@ from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
 from validator.azd_command import AzdCommand
+from level import Level
 
 
 class TestParseRules(unittest.TestCase):
@@ -28,18 +29,18 @@ class TestParseRules(unittest.TestCase):
                     ],
                     "case_sensitive": False,
                     "validator": "FileValidator",
-                    "error_as_warning": False,
+                    "level": "high",
                 },
                 "azd up": {
                     "catalog": "Functional Requirements",
                     "validator": "AzdValidator",
-                    "error_as_warning": False,
+                    "level": "high",
                 },
                 "expected_topics": {
                     "catalog": "Repository Management",
                     "topics": ["azd-templates", "ai-azd-templates"],
                     "validator": "TopicValidator",
-                    "error_as_warning": True,
+                    "level": "high",
                 },
             }
         ),
@@ -68,21 +69,21 @@ class TestParseRules(unittest.TestCase):
             ["## Features", "## Getting Started", "## Guidance", "## Resources"],
         )
         self.assertFalse(file_validator.caseSensitive)
-        self.assertFalse(file_validator.errorAsWarning)
+        self.assertEqual(file_validator.level, Level.HIGH)
 
         azd_validator = validators[1]
         self.assertIsInstance(azd_validator, AzdValidator)
         self.assertEqual(azd_validator.catalog, "Functional Requirements")
         self.assertEqual(azd_validator.folderPath, "mocked/path/to/infra.yaml")
         self.assertEqual(azd_validator.command, AzdCommand.UP)
-        self.assertFalse(azd_validator.errorAsWarning)
+        self.assertEqual(azd_validator.level, Level.HIGH)
 
         azd_validator = validators[2]
         self.assertIsInstance(azd_validator, AzdValidator)
         self.assertEqual(azd_validator.catalog, "Functional Requirements")
         self.assertEqual(azd_validator.folderPath, "mocked/path/to/infra.yaml")
         self.assertEqual(azd_validator.command, AzdCommand.DOWN)
-        self.assertFalse(azd_validator.errorAsWarning)
+        self.assertEqual(azd_validator.level, Level.HIGH)
 
         topic_validator = validators[3]
         self.assertIsInstance(topic_validator, TopicValidator)
@@ -90,7 +91,7 @@ class TestParseRules(unittest.TestCase):
         self.assertEqual(
             topic_validator.expected_topics, ["azd-templates", "ai-azd-templates"]
         )
-        self.assertTrue(topic_validator.errorAsWarning)
+        self.assertEqual(topic_validator.level, Level.HIGH)
 
 
 if __name__ == "__main__":

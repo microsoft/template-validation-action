@@ -4,9 +4,10 @@ import logging
 import re
 from validator.validator_base import ValidatorBase
 from list_azd_resources import list_resources
-from constants import ItemResultFormat, line_delimiter
+from constants import ItemResultFormat, line_delimiter, Signs
 from utils import indent, retry
 from validator.azd_command import AzdCommand
+from level import Level
 
 # defines string array of retryable error messages
 retryable_error_messages = ["Cannot connect to the Docker daemon", "spawn ETXTBSY"]
@@ -18,9 +19,9 @@ class AzdValidator(ValidatorBase):
         validatorCatalog,
         folderPath,
         command: AzdCommand,
-        errorAsWarning=False,
+        level=Level.HIGH,
     ):
-        super().__init__("AzdValidator", validatorCatalog, errorAsWarning)
+        super().__init__("AzdValidator", validatorCatalog, level)
         self.folderPath = folderPath
         self.command = command
         self.resource_group = None
@@ -122,6 +123,7 @@ class AzdValidator(ValidatorBase):
             logging.info(f"{e.stdout}")
             logging.warning(f"{e.stderr}")
             return False, ItemResultFormat.AZD_FAIL.format(
+                sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
                 message=message,
                 detail_messages=ItemResultFormat.DETAILS.format(
                     message=indent(e.stdout.replace("\\", ""))
