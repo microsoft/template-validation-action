@@ -24,6 +24,12 @@ class TestSeverity(unittest.TestCase):
     def test_validate_invalid(self):
         self.assertEqual(Severity.validate(999), Severity.MODERATE)
 
+    def test_to_string(self):
+        self.assertEqual(Severity.to_string(Severity.LOW), "Low")
+        self.assertEqual(Severity.to_string(Severity.MODERATE), "Moderate")
+        self.assertEqual(Severity.to_string(Severity.HIGH), "High")
+        self.assertEqual(Severity.to_string(999), "Moderate")
+
     def test_lt_comparison(self):
         self.assertTrue(Severity.LOW < Severity.MODERATE)
         self.assertTrue(Severity.MODERATE < Severity.HIGH)

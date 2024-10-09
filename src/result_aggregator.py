@@ -37,5 +37,5 @@ class ResultAggregator:
                 overall_severity = overall_severity if result else max(overall_severity, severity)
                 summary.append(message)
 
-        summary[0] += "CONFORMING" if overall_passed else f"NON-CONFORMING, Severity: {Severity.toString(overall_severity)}"
+        summary[0] += "CONFORMING" if overall_passed else f"NON-CONFORMING, Severity: {Severity.to_string(overall_severity)}"
         return "\n".join(summary)

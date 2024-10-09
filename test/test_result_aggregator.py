@@ -18,9 +18,9 @@ class TestResultAggregator(unittest.TestCase):
             "repository_management_security", Severity.MODERATE, False, "- :warning: SECURITY.md File"
         )
         aggregator.add_result(
-            "source_code_structure_azure_dev", Severity.MODERATE, True, "- [x] azure-dev.yaml File"
+            "source_code_structure_azure_dev", Severity.LOW, True, "- [x] azure-dev.yaml File"
         )
-        aggregator.add_result("functional_requirements_azd_up", Severity.MODERATE, True, "- [x] azd up")
+        aggregator.add_result("functional_requirements_azd_up", Severity.HIGH, True, "- [x] azd up")
         aggregator.add_result(
             "security_requirements_msdo", Severity.MODERATE, False, "- :warning: MSDO validation failed"
         )

@@ -19,7 +19,7 @@ class Severity(object):
         else:
             return Severity.MODERATE
 
-    def toString(severity):
+    def to_string(severity):
         if severity == Severity.LOW:
             return "Low"
         elif severity == Severity.MODERATE:
