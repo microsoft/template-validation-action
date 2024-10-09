@@ -48,6 +48,7 @@ class ResultAggregator:
         summary[0] += (
             "CONFORMING"
             if overall_passed
-            else f"NON-CONFORMING, Severity: {Severity.to_string(overall_severity)}"
+            else "NON-CONFORMING\n\n<p>Severity: "
+            + f"{Severity.to_string(overall_severity)}</p>"
         )
         return "\n".join(summary)

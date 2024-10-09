@@ -44,7 +44,9 @@ class TestResultAggregator(unittest.TestCase):
 
         summary = aggregator.generate_summary()
 
-        expected_summary = """# AI Gallery Standard Validation: NON-CONFORMING, Severity: Moderate
+        expected_summary = """# AI Gallery Standard Validation: NON-CONFORMING
+
+<p>Severity: Moderate</p>
 
 Please review the warnings below. If your template is already published, it may be subject to removal from a collection.
 Head to this link for more information: [template-lifecycle](https://aka.ms/ai-gallery/template-lifecycle)
