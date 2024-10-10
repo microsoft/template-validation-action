@@ -1,5 +1,7 @@
 name: 'Gallery Standard Validation'
 description: 'Validate the standard of the gallery'
+env:
+  ABSOLUTE_PATH_ACTION: 'https://github.com/microsoft/template-validation-action'
 inputs:
   workingDirectory:
     description: 'The path of target template to validate'
@@ -53,7 +55,14 @@ runs:
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
     
-    # TODO: check security with PSRule or msdo
+    # Analyze templates for MI compliance with PSRule for Azure
+    - name: Analyze templates for MI compliance
+      uses: microsoft/ps-rule@v2.9.0
+      id: run_psrule
+      with:
+        source: '${{ ABSOLUTE_PATH_ACTION }}/.ps-rule/'
+        modules: 'PSRule.Rules.Azure'
+        baseline: 'TemplateValidation.MI_2024_10'
 
     - name: Set environment name with timestamp
       id: set_env_name
