@@ -1,14 +1,14 @@
 import logging
 from validator.validator_base import ValidatorBase
 from constants import ItemResultFormat, Signs, line_delimiter
-from level import Level
+from severity import Severity
 
 
 class TopicValidator(ValidatorBase):
     def __init__(
-        self, catalog, name, expected_topics, actual_topics, level=Level.MODERATE
+        self, catalog, name, expected_topics, actual_topics, severity=Severity.MODERATE
     ):
-        super().__init__("TopicValidator", catalog, level)
+        super().__init__("TopicValidator", catalog, severity)
         self.name = name
         self.expected_topics = expected_topics
         self.actual_topics = actual_topics
@@ -23,7 +23,9 @@ class TopicValidator(ValidatorBase):
             result = False
             subMessages.append(
                 ItemResultFormat.SUBITEM.format(
-                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
+                    sign=Signs.BLOCK
+                    if Severity.isBlocker(self.severity)
+                    else Signs.WARNING,
                     message="topics string is NULL.",
                 )
             )
@@ -35,7 +37,7 @@ class TopicValidator(ValidatorBase):
                     subMessages.append(
                         ItemResultFormat.SUBITEM.format(
                             sign=Signs.BLOCK
-                            if Level.isBlocker(self.level)
+                            if Severity.isBlocker(self.severity)
                             else Signs.WARNING,
                             message=f"{topic} is missing in topics.",
                         )
@@ -50,7 +52,9 @@ class TopicValidator(ValidatorBase):
         else:
             messages.append(
                 ItemResultFormat.FAIL.format(
-                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
+                    sign=Signs.BLOCK
+                    if Severity.isBlocker(self.severity)
+                    else Signs.WARNING,
                     message=f"Topics on repo contains {self.expected_topics}",
                     detail_messages=line_delimiter.join(subMessages),
                 )

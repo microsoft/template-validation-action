@@ -1,5 +1,6 @@
 import unittest
 from result_aggregator import ResultAggregator
+from severity import Severity
 
 
 class TestResultAggregator(unittest.TestCase):
@@ -8,25 +9,47 @@ class TestResultAggregator(unittest.TestCase):
 
         # Add mock results
         aggregator.add_result(
-            "repository_management_readme", True, "- [x] README.md File"
+            "repository_management_readme",
+            Severity.MODERATE,
+            True,
+            "- [x] README.md File",
         )
         aggregator.add_result(
-            "repository_management_license", True, "- [x] LICENSE.md File"
+            "repository_management_license",
+            Severity.MODERATE,
+            True,
+            "- [x] LICENSE.md File",
         )
         aggregator.add_result(
-            "repository_management_security", False, "- :warning: SECURITY.md File"
+            "repository_management_security",
+            Severity.MODERATE,
+            False,
+            "- :warning: SECURITY.md File",
         )
         aggregator.add_result(
-            "source_code_structure_azure_dev", True, "- [x] azure-dev.yaml File"
+            "source_code_structure_azure_dev",
+            Severity.LOW,
+            True,
+            "- [x] azure-dev.yaml File",
         )
-        aggregator.add_result("functional_requirements_azd_up", True, "- [x] azd up")
         aggregator.add_result(
-            "security_requirements_msdo", False, "- :warning: MSDO validation failed"
+            "functional_requirements_azd_up", Severity.HIGH, True, "- [x] azd up"
+        )
+        aggregator.add_result(
+            "security_requirements_msdo",
+            Severity.MODERATE,
+            False,
+            "- :warning: MSDO validation failed",
         )
 
         summary = aggregator.generate_summary()
 
-        expected_summary = """# AI Gallery Standard Validation: FAILED
+        expected_summary = """# AI Gallery Standard Validation: NON-CONFORMING
+
+<p>Severity: Moderate</p>
+
+Please review the warnings below. If your template is already published, it may be subject to removal from a collection.
+Head to this link for more information: [template-lifecycle](https://aka.ms/ai-gallery/template-lifecycle)
 
 ## Repository Management:
 - [x] README.md File
