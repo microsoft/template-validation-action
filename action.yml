@@ -1,7 +1,6 @@
 name: 'Gallery Standard Validation'
 description: 'Validate the standard of the gallery'
 env:
-  ABSOLUTE_PATH_ACTION: 'https://github.com/microsoft/template-validation-action'
 inputs:
   workingDirectory:
     description: 'The path of target template to validate'
@@ -60,7 +59,8 @@ runs:
       uses: microsoft/ps-rule@v2.9.0
       id: run_psrule
       with:
-        source: '${{ ABSOLUTE_PATH_ACTION }}/.ps-rule/'
+        source: '${{ github.action_path }}/.ps-rule/'
+        path: ${{ inputs.workingDirectory }}
         modules: 'PSRule.Rules.Azure'
         baseline: 'TemplateValidation.MI_2024_10'
 
