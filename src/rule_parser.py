@@ -94,21 +94,25 @@ class RuleParser:
                 infra_yaml_paths = utils.find_infra_yaml_path(self.args.repo_path)
                 logging.debug(f"infra_yaml_paths: {infra_yaml_paths}")
                 if not infra_yaml_paths:
-                    validators.append(
-                        AzdValidator(catalog, ".", AzdCommand.UP, severity)
-                    )
-                    validators.append(
-                        AzdValidator(catalog, ".", AzdCommand.DOWN, severity)
-                    )
-                for infra_yaml_path in infra_yaml_paths:
-                    validators.append(
-                        AzdValidator(catalog, infra_yaml_path, AzdCommand.UP, severity)
-                    )
-                    validators.append(
-                        AzdValidator(
-                            catalog, infra_yaml_path, AzdCommand.DOWN, severity
+                    if rule_name == AzdCommand.UP.value:
+                        validators.append(
+                            AzdValidator(catalog, ".", AzdCommand.UP, severity)
                         )
-                    )
+                    if rule_name == AzdCommand.DOWN.value:
+                        validators.append(
+                            AzdValidator(catalog, ".", AzdCommand.DOWN, severity)
+                        )
+                for infra_yaml_path in infra_yaml_paths:
+                    if rule_name == AzdCommand.UP.value:
+                        validators.append(
+                            AzdValidator(catalog, infra_yaml_path, AzdCommand.UP, severity)
+                        )
+                    if rule_name == AzdCommand.DOWN.value:
+                        validators.append(
+                            AzdValidator(
+                                catalog, infra_yaml_path, AzdCommand.DOWN, severity
+                            )
+                        )
 
             # TODO
             # elif validator_type == 'MsdoValidator':
