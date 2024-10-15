@@ -87,6 +87,11 @@
     "validator": "AzdValidator",
     "severity": "high"
   },
+  "azd down": {
+    "catalog": "functional_requirements",
+    "validator": "AzdValidator",
+    "level": "moderate"
+  },
   "expected_topics": {
     "catalog": "repository_management",
     "topics": ["azd-templates", "ai-azd-templates"],
