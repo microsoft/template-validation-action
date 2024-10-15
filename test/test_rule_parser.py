@@ -86,7 +86,6 @@ class TestParseRules(unittest.TestCase):
         )
         self.assertEqual(topic_validator.severity, Severity.HIGH)
 
-
     @patch("utils.find_infra_yaml_path")
     @patch(
         "builtins.open",

@@ -105,7 +105,9 @@ class RuleParser:
                 for infra_yaml_path in infra_yaml_paths:
                     if rule_name == AzdCommand.UP.value:
                         validators.append(
-                            AzdValidator(catalog, infra_yaml_path, AzdCommand.UP, severity)
+                            AzdValidator(
+                                catalog, infra_yaml_path, AzdCommand.UP, severity
+                            )
                         )
                     if rule_name == AzdCommand.DOWN.value:
                         validators.append(
