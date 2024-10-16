@@ -36,6 +36,11 @@ class TestParseRules(unittest.TestCase):
                     "validator": "AzdValidator",
                     "severity": "high",
                 },
+                "azd down": {
+                    "catalog": "Functional Requirements",
+                    "validator": "AzdValidator",
+                    "severity": "moderate",
+                },
                 "expected_topics": {
                     "catalog": "Repository Management",
                     "topics": ["azd-templates", "ai-azd-templates"],
@@ -46,7 +51,10 @@ class TestParseRules(unittest.TestCase):
         ),
     )
     def test_rule_parser(self, mock_file, mock_find_infra_yaml_path):
-        mock_find_infra_yaml_path.return_value = ["mocked/path/to/infra.yaml"]
+        mock_find_infra_yaml_path.return_value = [
+            "mocked/path/to/infra.yaml",
+            "mocked/path/to/infra2.yaml",
+        ]
         args = argparse.Namespace(
             validate_azd=True,
             topics="azd-templates,azure",
@@ -57,7 +65,7 @@ class TestParseRules(unittest.TestCase):
         parser = RuleParser("dummy_path", args)
         validators = parser.parse()
 
-        self.assertEqual(len(validators), 3)
+        self.assertEqual(len(validators), 6)
 
         file_validator = validators[0]
         self.assertIsInstance(file_validator, FileValidator)
@@ -78,61 +86,34 @@ class TestParseRules(unittest.TestCase):
         self.assertEqual(azd_validator.command, AzdCommand.UP)
         self.assertEqual(azd_validator.severity, Severity.HIGH)
 
-        topic_validator = validators[2]
-        self.assertIsInstance(topic_validator, TopicValidator)
-        self.assertEqual(topic_validator.catalog, "Repository Management")
-        self.assertEqual(
-            topic_validator.expected_topics, ["azd-templates", "ai-azd-templates"]
-        )
-        self.assertEqual(topic_validator.severity, Severity.HIGH)
-
-    @patch("utils.find_infra_yaml_path")
-    @patch(
-        "builtins.open",
-        new_callable=mock_open,
-        read_data=json.dumps(
-            {
-                "azd up": {
-                    "catalog": "Functional Requirements",
-                    "validator": "AzdValidator",
-                    "severity": "high",
-                },
-                "azd down": {
-                    "catalog": "Functional Requirements",
-                    "validator": "AzdValidator",
-                    "severity": "moderate",
-                },
-            }
-        ),
-    )
-    def test_parse_azd_validator(self, mock_file, mock_find_infra_yaml_path):
-        mock_find_infra_yaml_path.return_value = ["mocked/path/to/infra.yaml"]
-        args = argparse.Namespace(
-            validate_azd=True,
-            topics=None,
-            repo_path=".",
-            validate_paths=None,
-            expected_topics=None,
-        )
-        parser = RuleParser("dummy_path", args)
-        validators = parser.parse()
-
-        self.assertEqual(len(validators), 2)
-
-        azd_up_validator = validators[0]
-        self.assertIsInstance(azd_up_validator, AzdValidator)
-        self.assertEqual(azd_up_validator.catalog, "Functional Requirements")
-        self.assertEqual(azd_up_validator.folderPath, "mocked/path/to/infra.yaml")
-        self.assertEqual(azd_up_validator.command, AzdCommand.UP)
-        self.assertEqual(azd_up_validator.severity, Severity.HIGH)
-
-        azd_down_validator = validators[1]
+        azd_down_validator = validators[2]
         self.assertIsInstance(azd_down_validator, AzdValidator)
         self.assertEqual(azd_down_validator.catalog, "Functional Requirements")
         self.assertEqual(azd_down_validator.folderPath, "mocked/path/to/infra.yaml")
         self.assertEqual(azd_down_validator.command, AzdCommand.DOWN)
         self.assertEqual(azd_down_validator.severity, Severity.MODERATE)
 
+        azd_up_validator = validators[3]
+        self.assertIsInstance(azd_up_validator, AzdValidator)
+        self.assertEqual(azd_up_validator.catalog, "Functional Requirements")
+        self.assertEqual(azd_up_validator.folderPath, "mocked/path/to/infra2.yaml")
+        self.assertEqual(azd_up_validator.command, AzdCommand.UP)
+        self.assertEqual(azd_up_validator.severity, Severity.HIGH)
+
+        azd_down_validator = validators[4]
+        self.assertIsInstance(azd_down_validator, AzdValidator)
+        self.assertEqual(azd_down_validator.catalog, "Functional Requirements")
+        self.assertEqual(azd_down_validator.folderPath, "mocked/path/to/infra2.yaml")
+        self.assertEqual(azd_down_validator.command, AzdCommand.DOWN)
+        self.assertEqual(azd_down_validator.severity, Severity.MODERATE)
+
+        topic_validator = validators[5]
+        self.assertIsInstance(topic_validator, TopicValidator)
+        self.assertEqual(topic_validator.catalog, "Repository Management")
+        self.assertEqual(
+            topic_validator.expected_topics, ["azd-templates", "ai-azd-templates"]
+        )
+        self.assertEqual(topic_validator.severity, Severity.HIGH)
 
     @patch("utils.find_infra_yaml_path")
     @patch(

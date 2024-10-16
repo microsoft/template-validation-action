@@ -3,8 +3,6 @@ import logging
 import os
 from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
-
-# from validator.msdo_validator import MsdoValidator
 from validator.topic_validator import TopicValidator
 from validator.folder_validator import FolderValidator
 from validator.azd_command import AzdCommand
@@ -93,15 +91,6 @@ class RuleParser:
                     continue
                 infra_yaml_paths = utils.find_infra_yaml_path(self.args.repo_path)
                 logging.debug(f"infra_yaml_paths: {infra_yaml_paths}")
-                if not infra_yaml_paths:
-                    if rule_name == AzdCommand.UP.value:
-                        validators.append(
-                            AzdValidator(catalog, ".", AzdCommand.UP, severity)
-                        )
-                    if rule_name == AzdCommand.DOWN.value:
-                        validators.append(
-                            AzdValidator(catalog, ".", AzdCommand.DOWN, severity)
-                        )
                 for infra_yaml_path in infra_yaml_paths:
                     if rule_name == AzdCommand.UP.value:
                         validators.append(
@@ -112,13 +101,25 @@ class RuleParser:
                     if rule_name == AzdCommand.DOWN.value:
                         validators.append(
                             AzdValidator(
-                                catalog, infra_yaml_path, AzdCommand.DOWN, severity
+                                catalog, infra_yaml_path, AzdCommand.UP, severity
                             )
                         )
-
-            # TODO
-            # elif validator_type == 'MsdoValidator':
-            # validator = MsdoValidator(catalog, ".", rule_name, severity)
+                    if rule_name == AzdCommand.DOWN.value:
+                        azd_down_validator = AzdValidator(
+                            catalog, infra_yaml_path, AzdCommand.DOWN, severity
+                        )
+                        inserted = False
+                        for i, validator in enumerate(validators):
+                            if (
+                                isinstance(validator, AzdValidator)
+                                and validator.command == AzdCommand.UP
+                                and validator.folderPath == infra_yaml_path
+                            ):
+                                validators.insert(i + 1, azd_down_validator)
+                                inserted = True
+                                break
+                        if not inserted:
+                            validators.append(azd_down_validator)
 
             elif validator_type == "TopicValidator":
                 if self.args.expected_topics == "None":
