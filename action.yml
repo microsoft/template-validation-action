@@ -52,8 +52,41 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-    
-    # TODO: check security with PSRule or msdo
+
+    - name: Calculate relative paths for PSRule
+      if: ${{ inputs.securityAction == 'PSRule' }}
+      id: calculate_relative_paths
+      run: |
+        working_directory="${{ inputs.workingDirectory }}"
+        relative_working_directory=$(realpath --relative-to="${{ github.workspace }}" "$working_directory")
+        echo "relative_working_directory=$relative_working_directory" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Prepare PSRule for Azure
+      if: ${{ inputs.securityAction == 'PSRule' }}
+      id: prepare_psrule
+      run: |
+        rm -rf ${{ inputs.workingDirectory }}/.ps-rule
+        mkdir -p ${{ inputs.workingDirectory }}/.ps-rule
+        cp ${{ github.action_path }}/.ps-rule/templateCustom.Rule.yaml ${{ inputs.workingDirectory }}/.ps-rule/templateCustom.Rule.yaml
+        cp ${{ github.action_path}}/ps-rule.yaml ${{ inputs.workingDirectory }}
+        cd ${{ inputs.workingDirectory }}
+        python3 ${{ github.action_path }}/scripts/generate-bicep-test.py 
+      shell: bash
+
+    # Analyze templates for MI compliance with PSRule for Azure
+    - name: Analyze templates for MI compliance
+      uses: microsoft/ps-rule@v2.9.0
+      if: ${{ inputs.securityAction == 'PSRule' }}
+      id: run_psrule
+      with:
+        inputType: inputPath
+        path: ${{ env.relative_working_directory }}
+        modules: 'PSRule.Rules.Azure'
+        baseline: 'TemplateValidation.MI_2024_10'
+        outputFormat: "json"
+        outputPath: 'ps-rule-output.json'
+      continue-on-error: true
 
     - name: Set environment name with timestamp
       id: set_env_name
@@ -191,7 +224,7 @@ runs:
       uses: Azure/setup-azd@v1.0.0
 
     - name: Log in with Azure (Federated Credentials)
-      if: ${{ env.AZURE_CLIENT_ID != '' && inputs.useDevContainer == 'false' }}
+      if: ${{ inputs.validateAzd == 'true' && inputs.useDevContainer == 'false' }}
       run: |
         azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
       shell: bash
