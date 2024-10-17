@@ -99,12 +99,6 @@ class RuleParser:
                             )
                         )
                     if rule_name == AzdCommand.DOWN.value:
-                        validators.append(
-                            AzdValidator(
-                                catalog, infra_yaml_path, AzdCommand.UP, severity
-                            )
-                        )
-                    if rule_name == AzdCommand.DOWN.value:
                         azd_down_validator = AzdValidator(
                             catalog, infra_yaml_path, AzdCommand.DOWN, severity
                         )
