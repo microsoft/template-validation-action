@@ -1,9 +1,14 @@
-import re
 import os
+import re
 import glob
 
-
 def generate_test_bicep(main_bicep_path):
+    # Check if test file already exists
+    test_bicep_path = os.path.join(os.path.dirname(main_bicep_path), "main.test.bicep")
+    if os.path.exists(test_bicep_path):
+        print("Test file already exists.")
+        return
+
     # Read the main.bicep file
     with open(main_bicep_path, "r") as file:
         main_bicep_content = file.read()
@@ -41,7 +46,7 @@ module test 'main.bicep' = {{
         for allowed_values, allowed_param_name, allowed_param_type in allowed_params:
             if param_name == allowed_param_name:
                 allowed_value = (
-                    allowed_values.split()[0].split(",")[0].strip(" ").strip("'")
+                    allowed_values.split()[-1].split(",")[0].strip(" ").strip("'")
                 )
                 break
 
