@@ -22,7 +22,7 @@ inputs:
   securityAction:
     description: 'Run security action validation'
     required: true
-    default: ''
+    default: 'PSRule'
     options:
       - 'PSRule'
 outputs:
