@@ -32,7 +32,7 @@ class PSRuleValidator(ValidatorBase):
                         sign=Signs.BLOCK
                         if Severity.isBlocker(self.severity)
                         else Signs.WARNING,
-                        message= f"{rule_name} ({error_code}){line_delimiter}"
+                        message=f"{rule_name} ({error_code}){line_delimiter}",
                     )
                 )
                 detail_messages.append(f"{recommendation}")
@@ -52,7 +52,9 @@ class PSRuleValidator(ValidatorBase):
             else:
                 self.result = True
                 messages.append(
-                    ItemResultFormat.PASS.format(sign=Signs.CHECK, message="Security Scan")
+                    ItemResultFormat.PASS.format(
+                        sign=Signs.CHECK, message="Security Scan"
+                    )
                 )
             self.resultMessage = line_delimiter.join(messages)
             return self.result, self.resultMessage

@@ -52,7 +52,7 @@ class TestParseRules(unittest.TestCase):
                     "catalog": "Security Requirements",
                     "validator": "PSRuleValidator",
                     "severity": "moderate",
-                }
+                },
             }
         ),
     )
@@ -125,7 +125,9 @@ class TestParseRules(unittest.TestCase):
         ps_rule_validator = validators[6]
         self.assertIsInstance(ps_rule_validator, PSRuleValidator)
         self.assertEqual(ps_rule_validator.catalog, "Security Requirements")
-        self.assertEqual(ps_rule_validator.rules_file_path, "mocked/path/to/psrule.output")
+        self.assertEqual(
+            ps_rule_validator.rules_file_path, "mocked/path/to/psrule.output"
+        )
         self.assertEqual(ps_rule_validator.severity, Severity.MODERATE)
 
     @patch("utils.find_infra_yaml_path")
