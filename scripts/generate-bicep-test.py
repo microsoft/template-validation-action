@@ -2,6 +2,7 @@ import os
 import re
 import glob
 
+
 def generate_test_bicep(main_bicep_path):
     # Read the main.bicep file
     with open(main_bicep_path, "r") as file:
