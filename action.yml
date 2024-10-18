@@ -86,6 +86,7 @@ runs:
         baseline: 'TemplateValidation.MI_2024_10'
         outputFormat: "json"
         outputPath: 'psrule-output.json'
+        summary: false
       continue-on-error: true
 
     - name: Copy back psrule-output
