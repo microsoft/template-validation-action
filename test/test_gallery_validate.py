@@ -20,6 +20,7 @@ class TestGalleryValidate(unittest.TestCase):
             topics="azd-templates,azure",
             expected_topics=None,
             msdoresult="dummy_msdo_result_file",
+            psrule_result="dummy_psrule_result_file",
             output=None,
             debug=True,
         )

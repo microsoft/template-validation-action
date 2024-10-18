@@ -22,7 +22,7 @@ inputs:
   securityAction:
     description: 'Run security action validation'
     required: true
-    default: ''
+    default: 'PSRule'
     options:
       - 'PSRule'
 outputs:
@@ -57,20 +57,20 @@ runs:
       if: ${{ inputs.securityAction == 'PSRule' }}
       id: calculate_relative_paths
       run: |
-        working_directory="${{ inputs.workingDirectory }}"
-        relative_working_directory=$(realpath --relative-to="${{ github.workspace }}" "$working_directory")
-        echo "relative_working_directory=$relative_working_directory" >> $GITHUB_ENV
+        mkdir -p ${{ github.run_id }}/template
+        cp -a ${{ inputs.workingDirectory }}/. ${{ github.run_id }}/template
+        echo "relative_working_directory=${{ github.run_id }}/template" >> $GITHUB_ENV
       shell: bash
 
     - name: Prepare PSRule for Azure
       if: ${{ inputs.securityAction == 'PSRule' }}
       id: prepare_psrule
       run: |
-        rm -rf ${{ inputs.workingDirectory }}/.ps-rule
-        mkdir -p ${{ inputs.workingDirectory }}/.ps-rule
-        cp ${{ github.action_path }}/.ps-rule/templateCustom.Rule.yaml ${{ inputs.workingDirectory }}/.ps-rule/templateCustom.Rule.yaml
-        cp ${{ github.action_path}}/ps-rule.yaml ${{ inputs.workingDirectory }}
-        cd ${{ inputs.workingDirectory }}
+        rm -rf ${{ env.relative_working_directory }}/.ps-rule
+        mkdir -p ${{ env.relative_working_directory }}/.ps-rule
+        cp ${{ github.action_path }}/.ps-rule/templateCustom.Rule.yaml ${{ env.relative_working_directory }}/.ps-rule/templateCustom.Rule.yaml
+        cp ${{ github.action_path}}/ps-rule.yaml ${{ env.relative_working_directory }}
+        cd ${{ env.relative_working_directory }}
         python3 ${{ github.action_path }}/scripts/generate-bicep-test.py 
       shell: bash
 
@@ -85,7 +85,16 @@ runs:
         modules: 'PSRule.Rules.Azure'
         baseline: 'TemplateValidation.MI_2024_10'
         outputFormat: "json"
-        outputPath: 'ps-rule-output.json'
+        outputPath: 'psrule-output.json'
+        summary: false
+      continue-on-error: true
+
+    - name: Copy back psrule-output
+      if: ${{ inputs.securityAction == 'PSRule' }}
+      id: copy-back-psrule-output
+      run: |
+        cp ${{ env.relative_working_directory }}/psrule-output.json ${{ inputs.workingDirectory}}
+      shell: bash
       continue-on-error: true
 
     - name: Set environment name with timestamp
@@ -106,6 +115,9 @@ runs:
         mkdir -p ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}
         cp -r ${{ github.action_path }}/src ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/src
         cp ${{ github.action_path }}/requirements.txt ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/requirements.txt
+        if [ -f "${{ inputs.workingDirectory }}/psrule-output.json" ]; then
+          cp ${{ inputs.workingDirectory }}/psrule-output.json ${{ inputs.workingDirectory }}/tva_${{ github.run_id }};
+        fi
         env > ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/env_variables.txt
       shell: bash
 
@@ -176,6 +188,25 @@ runs:
         echo "expected_topics=$inputs_topics" >> $GITHUB_ENV
       shell: bash
 
+    - name: Prepare arguments
+      id: prepare_arguments
+      run: |
+        arguments='--topics ${{ env.TOPICS }}'
+        if [ -n "${{ env.expected_topics }}" ]; then
+          arguments+=" --expected_topics ${{ env.expected_topics }}"
+        fi
+        if [ "${{ inputs.validateAzd }}" = "true" ]; then
+          arguments+=" --validate_azd" 
+        fi
+        if [ -n "${{ env.validatePaths }}" ]; then
+          arguments+=" --validate_paths ${{ env.validatePaths }}"
+        fi
+        if [ ${{ inputs.securityAction }} == "PSRule" ]; then
+          arguments+=" --psrule_result ./psrule-output.json"
+        fi
+        echo "arguments=$arguments" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Run validation
       id: validation
       if: ${{ inputs.useDevContainer == 'true' }}
@@ -191,17 +222,7 @@ runs:
               fi
             done < tva_${{ github.run_id }}/env_variables.txt
           fi
-          arguments='--topics ${{ env.TOPICS }}'
-          if [ -n "${{ env.expected_topics }}" ]; then
-            arguments+=" --expected_topics ${{ env.expected_topics }}"
-          fi
-          if [ "${{ inputs.validateAzd }}" = "true" ]; then
-            arguments+=" --validate_azd" 
-          fi
-          if [ -n "${{ env.validatePaths }}" ]; then
-            arguments+=" --validate_paths ${{ env.validatePaths }}"
-          fi
-          python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log $arguments
+          python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log ${{ steps.prepare_arguments.outputs.arguments }}
         subFolder: ${{ inputs.workingDirectory }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
@@ -238,34 +259,19 @@ runs:
       working-directory: ${{ inputs.workingDirectory }}
       run: |
         pip install -r ${{ github.action_path }}/requirements.txt
-        arguments='--topics ${{ env.TOPICS }}'
-        if [ -n "${{ env.expected_topics }}" ]; then
-          arguments+=" --expected_topics ${{ env.expected_topics }}"
-        fi
-        if [ "${{ inputs.validateAzd }}" = "true" ]; then
-          arguments+=" --validate_azd" 
-        fi
-        if [ -n "${{ env.validatePaths }}" ]; then
-          arguments+=" --validate_paths ${{ env.validatePaths }}"
-        fi
-        python3 ${{ github.action_path }}/src/gallery_validate.py . --output ${{ env.AZURE_ENV_NAME }}-output.log $arguments
+        python3 ${{ github.action_path }}/src/gallery_validate.py . --output ${{ github.run_id }}-output.log ${{ steps.prepare_arguments.outputs.arguments }}
       shell: bash
       env:
-        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
-        AZURE_LOCATION: ${{ env.AZURE_LOCATION }}
-        AZURE_SUBSCRIPTION_ID: ${{ env.AZURE_SUBSCRIPTION_ID }}
         CREATE_ROLE_FOR_USER: false
         AZURE_PRINCIPAL_TYPE: "ServicePrincipal"
 
     - id: set_output
       run: |
         if [[ ${{ inputs.useDevContainer }} == 'true' ]]; then
-          echo "${{ steps.send_output.outputs.runCmdOutput }}" >> ${{ env.AZURE_ENV_NAME }}-output.log
+          echo "${{ steps.send_output.outputs.runCmdOutput }}" >> ${{ github.run_id }}-output.log
         fi
-        output_link=$(realpath ${{ env.AZURE_ENV_NAME }}-output.log)
+        output_link=$(realpath ${{ github.run_id }}-output.log)
         echo "resultFile is $output_link"
         echo "resultFile=$output_link" >> $GITHUB_OUTPUT
       working-directory: ${{ inputs.workingDirectory }}
       shell: bash 
-      env:
-        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
