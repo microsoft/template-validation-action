@@ -18,7 +18,7 @@ jobs:
           git clone https://github.com/Azure-Samples/azd-ai-starter template
 
       - id: validation
-        uses: microsoft/template-validation-action@feat/main
+        uses: microsoft/template-validation-action@/main
         with:
           workingDirectory: ${{ runner.temp }}/template
           validateAzd: false
