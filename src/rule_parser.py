@@ -5,6 +5,7 @@ from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
 from validator.folder_validator import FolderValidator
+from validator.ps_rule_validator import PSRuleValidator
 from validator.azd_command import AzdCommand
 from severity import Severity
 import utils
@@ -127,6 +128,9 @@ class RuleParser:
                 )
                 validators.append(validator)
 
+            elif validator_type == "PSRuleValidator":
+                validator = PSRuleValidator(catalog, self.args.psrule_result, severity)
+                validators.append(validator)
             else:
                 continue
 

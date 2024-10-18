@@ -85,7 +85,7 @@ runs:
         modules: 'PSRule.Rules.Azure'
         baseline: 'TemplateValidation.MI_2024_10'
         outputFormat: "json"
-        outputPath: 'ps-rule-output.json'
+        outputPath: 'psrule-output.json'
       continue-on-error: true
 
     - name: Set environment name with timestamp
@@ -176,6 +176,25 @@ runs:
         echo "expected_topics=$inputs_topics" >> $GITHUB_ENV
       shell: bash
 
+    - name: Prepare arguments
+      id: prepare_arguments
+      run: |
+        arguments='--topics ${{ env.TOPICS }}'
+        if [ -n "${{ env.expected_topics }}" ]; then
+          arguments+=" --expected_topics ${{ env.expected_topics }}"
+        fi
+        if [ "${{ inputs.validateAzd }}" = "true" ]; then
+          arguments+=" --validate_azd" 
+        fi
+        if [ -n "${{ env.validatePaths }}" ]; then
+          arguments+=" --validate_paths ${{ env.validatePaths }}"
+        fi
+        if [ ${{ inputs.securityAction }} == "PSRule" ]; then
+          arguments+=" --psrule_result ${{ inputs.workingDirectory }}/psrule-output.json"
+        fi
+        echo "arguments=$arguments" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Run validation
       id: validation
       if: ${{ inputs.useDevContainer == 'true' }}
@@ -191,17 +210,7 @@ runs:
               fi
             done < tva_${{ github.run_id }}/env_variables.txt
           fi
-          arguments='--topics ${{ env.TOPICS }}'
-          if [ -n "${{ env.expected_topics }}" ]; then
-            arguments+=" --expected_topics ${{ env.expected_topics }}"
-          fi
-          if [ "${{ inputs.validateAzd }}" = "true" ]; then
-            arguments+=" --validate_azd" 
-          fi
-          if [ -n "${{ env.validatePaths }}" ]; then
-            arguments+=" --validate_paths ${{ env.validatePaths }}"
-          fi
-          python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log $arguments
+          python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log ${{ steps.prepare_arguments.outputs.arguments }}
         subFolder: ${{ inputs.workingDirectory }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
@@ -238,17 +247,7 @@ runs:
       working-directory: ${{ inputs.workingDirectory }}
       run: |
         pip install -r ${{ github.action_path }}/requirements.txt
-        arguments='--topics ${{ env.TOPICS }}'
-        if [ -n "${{ env.expected_topics }}" ]; then
-          arguments+=" --expected_topics ${{ env.expected_topics }}"
-        fi
-        if [ "${{ inputs.validateAzd }}" = "true" ]; then
-          arguments+=" --validate_azd" 
-        fi
-        if [ -n "${{ env.validatePaths }}" ]; then
-          arguments+=" --validate_paths ${{ env.validatePaths }}"
-        fi
-        python3 ${{ github.action_path }}/src/gallery_validate.py . --output ${{ env.AZURE_ENV_NAME }}-output.log $arguments
+        python3 ${{ github.action_path }}/src/gallery_validate.py . --output ${{ env.AZURE_ENV_NAME }}-output.log ${{ steps.prepare_arguments.outputs.arguments }}
       shell: bash
       env:
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
