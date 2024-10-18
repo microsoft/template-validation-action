@@ -97,5 +97,10 @@
     "topics": ["azd-templates", "ai-azd-templates"],
     "validator": "TopicValidator",
     "severity": "low"
+  },
+  "ps rule": {
+    "catalog": "security_requirements",
+    "validator": "PSRuleValidator",
+    "severity": "low"
   }
 }
