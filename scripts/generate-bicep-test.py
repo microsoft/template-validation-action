@@ -3,12 +3,6 @@ import re
 import glob
 
 def generate_test_bicep(main_bicep_path):
-    # Check if test file already exists
-    test_bicep_path = os.path.join(os.path.dirname(main_bicep_path), "main.test.bicep")
-    if os.path.exists(test_bicep_path):
-        print("Test file already exists.")
-        return
-
     # Read the main.bicep file
     with open(main_bicep_path, "r") as file:
         main_bicep_content = file.read()
@@ -19,13 +13,14 @@ def generate_test_bicep(main_bicep_path):
     target_scope = target_scope_match.group(1) if target_scope_match else "subscription"
 
     # Find all parameter definitions and allowed values
-    param_pattern = re.compile(r"param\s+(\w+)\s+(\w+)")
+    param_pattern = re.compile(r"param\s+(\w+)\s+(\w+)\s*(?!\s*=\s*'.*')\n")
     allowed_pattern = re.compile(
         r"@allowed\(\[\s*([^\]]+)\s*\]\)(?:\s*@\w+\([^\)]*\))*\s*param\s+(\w+)\s+(\w+)"
     )
 
     params = param_pattern.findall(main_bicep_content)
     allowed_params = allowed_pattern.findall(main_bicep_content)
+    print(f"Found {len(params)} parameters and {len(allowed_params)} allowed values.")
 
     # Generate the main.test.bicep content
     test_bicep_content = f"""// This file is for doing static analysis and contains sensible defaults

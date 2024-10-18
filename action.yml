@@ -114,7 +114,9 @@ runs:
         mkdir -p ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}
         cp -r ${{ github.action_path }}/src ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/src
         cp ${{ github.action_path }}/requirements.txt ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/requirements.txt
-        cp ${{ inputs.workingDirectory }}/psrule-output.json ${{ inputs.workingDirectory }}/tva_${{ github.run_id }} 2>/dev/null
+        if [ -f "${{ inputs.workingDirectory }}/psrule-output.json" ]; then
+          cp ${{ inputs.workingDirectory }}/psrule-output.json ${{ inputs.workingDirectory }}/tva_${{ github.run_id }};
+        fi
         env > ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/env_variables.txt
       shell: bash
 
