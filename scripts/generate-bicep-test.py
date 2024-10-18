@@ -14,14 +14,13 @@ def generate_test_bicep(main_bicep_path):
     target_scope = target_scope_match.group(1) if target_scope_match else "subscription"
 
     # Find all parameter definitions and allowed values
-    param_pattern = re.compile(r"param\s+(\w+)\s+(\w+)\s*(?!\s*=\s*'.*')\n")
+    param_pattern = re.compile(r"param\s+(\w+)\s+(\w+)\s*(?!\s*=\s*'.*')(\n|\/|$)")
     allowed_pattern = re.compile(
         r"@allowed\(\[\s*([^\]]+)\s*\]\)(?:\s*@\w+\([^\)]*\))*\s*param\s+(\w+)\s+(\w+)"
     )
 
     params = param_pattern.findall(main_bicep_content)
     allowed_params = allowed_pattern.findall(main_bicep_content)
-    print(f"Found {len(params)} parameters and {len(allowed_params)} allowed values.")
 
     # Generate the main.test.bicep content
     test_bicep_content = f"""// This file is for doing static analysis and contains sensible defaults
@@ -36,7 +35,7 @@ module test 'main.bicep' = {{
 """
 
     # Add parameters to the test file content
-    for param_name, param_type in params:
+    for param_name, param_type, _ in params:
         # Check if the parameter has allowed values
         allowed_value = None
         for allowed_values, allowed_param_name, allowed_param_type in allowed_params:
