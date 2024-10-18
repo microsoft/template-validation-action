@@ -28,3 +28,4 @@ jobs:
 
       - name: print result
         run: cat ${{ steps.validation.outputs.resultFile }}
+        
