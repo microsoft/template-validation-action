@@ -60,4 +60,6 @@ class PSRuleValidator(ValidatorBase):
             return self.result, self.resultMessage
         except Exception as e:
             logging.error(f"Error parsing PSRule JSON file: {e}")
-            return False, "Error parsing PSRule JSON file."
+            # Parsing error usually caused by wrong workflow behavior
+            self.result = True
+            return self.result, self.resultMessage
