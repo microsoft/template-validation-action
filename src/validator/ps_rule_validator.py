@@ -63,6 +63,6 @@ class PSRuleValidator(ValidatorBase):
             # Parsing error usually caused by wrong workflow behavior
             self.result = True
             self.resultMessage = ItemResultFormat.PASS.format(
-                sign=Signs.CHECK, message="Security Scan is not performed"
+                sign=Signs.CHECK, message="Security scan is not performed"
             )
             return self.result, self.resultMessage
