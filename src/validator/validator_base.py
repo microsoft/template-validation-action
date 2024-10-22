@@ -7,7 +7,7 @@ class ValidatorBase:
         self.catalog = catalog
         self.severity = severity
         self.result = False
-        self.resultMessage = "Validation not performed."
+        self.resultMessage = "Validation not performed"
 
     @abstractmethod
     def validate(self):

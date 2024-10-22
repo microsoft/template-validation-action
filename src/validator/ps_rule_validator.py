@@ -62,4 +62,7 @@ class PSRuleValidator(ValidatorBase):
             logging.error(f"Error parsing PSRule JSON file: {e}")
             # Parsing error usually caused by wrong workflow behavior
             self.result = True
+            self.resultMessage = ItemResultFormat.PASS.format(
+                sign=Signs.CHECK, message=self.resultMessage
+            )
             return self.result, self.resultMessage
