@@ -56,7 +56,7 @@ class TestPSRuleValidator(unittest.TestCase):
         validator = PSRuleValidator("ValidatorCatalog", "dummy_path", Severity.HIGH)
         result, message = validator.validate()
         self.assertTrue(result)
-        self.assertEqual(message, "- [x] <b>Validation not performed</b>.")
+        self.assertEqual(message, "- [x] <b>Security scan is not performed</b>.")
 
 
 if __name__ == "__main__":
