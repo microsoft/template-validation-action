@@ -9,6 +9,8 @@ jobs:
   template_validation_job:
     runs-on: ubuntu-latest
     name: template validation
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -18,13 +20,12 @@ jobs:
           git clone https://github.com/Azure-Samples/azd-ai-starter template
 
       - id: validation
-        uses: microsoft/template-validation-action@/main
+        uses: microsoft/template-validation-action@main
         with:
           workingDirectory: ${{ runner.temp }}/template
           validateAzd: false
           useDevContainer: false
           securityAction: 'PSRule'
-          topics: ''
 
       - name: print result
         run: cat ${{ steps.validation.outputs.resultFile }}
