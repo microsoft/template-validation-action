@@ -55,7 +55,7 @@ module test 'main.bicep' = {{
             test_bicep_content += f"    {param_name}: true\n"
         elif param_type == "object":
             test_bicep_content += (
-                f'    {param_name}: {{\n      "settings": []\n    }}\n'
+                f"    {param_name}: {{\n      'settings': []\n    }}\n"
             )
         else:
             test_bicep_content += f"    {param_name}: null\n"
