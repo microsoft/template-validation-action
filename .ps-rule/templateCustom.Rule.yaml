@@ -6,13 +6,18 @@ metadata:
 spec:
   rule:
     include:
-    - Azure.ContainerApp.ManagedIdentity
+    - Azure.AI.ManagedIdentity
+    - Azure.AI.DisableLocalAuth
+    - Azure.Cosmos.DisableLocalAuth
     - Azure.AKS.ManagedIdentity
     - Azure.APIM.ManagedIdentity
     - Azure.AppService.ManagedIdentity
-    - Azure.Search.ManagedIdentity
-    - Azure.AI.ManagedIdentity
-    - Azure.SQLMI.ManagedIdentity
-    - Azure.EventGrid.ManagedIdentity
+    - Azure.ContainerApp.ManagedIdentity
     - Azure.Deployment.SecureValue
     - Azure.Deployment.OutputSecretValue
+    - Azure.EventGrid.ManagedIdentity
+    - Azure.EventGrid.DisableLocalAuth
+    - Azure.Search.ManagedIdentity
+    - Azure.SignalR.ManagedIdentity
+    - Azure.SQLMI.ManagedIdentity
+    - Azure.SQLMI.AADOnly
