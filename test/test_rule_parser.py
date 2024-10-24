@@ -7,6 +7,7 @@ from validator.file_validator import FileValidator
 from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
 from validator.azd_command import AzdCommand
+from validator.ps_rule_validator import PSRuleValidator
 from severity import Severity
 
 
@@ -47,6 +48,11 @@ class TestParseRules(unittest.TestCase):
                     "validator": "TopicValidator",
                     "severity": "high",
                 },
+                "ps rule": {
+                    "catalog": "Security Requirements",
+                    "validator": "PSRuleValidator",
+                    "severity": "moderate",
+                },
             }
         ),
     )
@@ -59,13 +65,14 @@ class TestParseRules(unittest.TestCase):
             validate_azd=True,
             topics="azd-templates,azure",
             repo_path=".",
+            psrule_result="mocked/path/to/psrule.output",
             validate_paths=None,
             expected_topics=None,
         )
         parser = RuleParser("dummy_path", args)
         validators = parser.parse()
 
-        self.assertEqual(len(validators), 6)
+        self.assertEqual(len(validators), 7)
 
         file_validator = validators[0]
         self.assertIsInstance(file_validator, FileValidator)
@@ -115,6 +122,14 @@ class TestParseRules(unittest.TestCase):
         )
         self.assertEqual(topic_validator.severity, Severity.HIGH)
 
+        ps_rule_validator = validators[6]
+        self.assertIsInstance(ps_rule_validator, PSRuleValidator)
+        self.assertEqual(ps_rule_validator.catalog, "Security Requirements")
+        self.assertEqual(
+            ps_rule_validator.rules_file_path, "mocked/path/to/psrule.output"
+        )
+        self.assertEqual(ps_rule_validator.severity, Severity.MODERATE)
+
     @patch("utils.find_infra_yaml_path")
     @patch(
         "builtins.open",
@@ -161,6 +176,36 @@ class TestParseRules(unittest.TestCase):
         self.assertEqual(azd_down_validator.folderPath, "mocked/path/to/infra.yaml")
         self.assertEqual(azd_down_validator.command, AzdCommand.DOWN)
         self.assertEqual(azd_down_validator.severity, Severity.MODERATE)
+
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data='{"README": {"validator": "FileValidator", "catalog": "TestCatalog", "ext": [".md"], "assert_in": ["## Default H2"]}}',
+    )
+    @patch("os.getenv")
+    def test_h2tag_env_empty(self, mock_getenv, mock_file):
+        # Mock the environment variable to an empty string
+        mock_getenv.return_value = "None"
+
+        args = argparse.Namespace(
+            validate_azd=False,
+            topics=None,
+            repo_path=".",
+            validate_paths=None,
+            expected_topics=None,
+        )
+        parser = RuleParser("dummy_path", args)
+        validators = parser.parse()
+
+        self.assertEqual(len(validators), 1)
+
+        file_validator = validators[0]
+        self.assertIsInstance(file_validator, FileValidator)
+        self.assertEqual(file_validator.catalog, "TestCatalog")
+        self.assertEqual(file_validator.name, "READMEFileValidator")
+        self.assertEqual(file_validator.extensionList, [".md"])
+        self.assertEqual(file_validator.h2Tags, None)
+        self.assertEqual(file_validator.severity, Severity.MODERATE)
 
 
 if __name__ == "__main__":

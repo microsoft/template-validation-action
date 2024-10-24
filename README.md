@@ -118,10 +118,10 @@ By default, the action validates all paths, unless specific paths are configured
 | ------------------------- | -------- | ----------------------------------|
 | workingDirectory         | false    | The directory to run the validation in. Defaults to `.` (the root of the repository). Use this if your template is in a subdirectory. |
 | validatePaths             | false    | A comma-separated list of static files or folder path to check for existence. Defaults to `README.md, LICENSE, SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, ISSUE_TEMPLATE.md, azure-dev.yaml, azure.yaml, infra, .devcontainer`. Pass "None" to skip this check. |
-| topics                    | false    | A comma-separated list of topics to check for in the repository. Defaults to `azd-template, ai-azd-template`. Leave empty to skip this check. |
+| topics                    | false    | A comma-separated list of topics to check for in the repository. Defaults to `azd-template, ai-azd-template`. Pass `None` to skip this check. |
 | validateAzd               | false    | Whether to validate the deployment functionality with Azure Developer CLI (azd). Defaults to `true`. Set to `false` to skip azd validation. |
 | useDevContainer           | false    | Whether to use a development container for validation. Defaults to `true`. |
-| securityAction            | false    | Specify the security action to use. Defaults to ``. Available values: `PSRule` for microsoft/PSRule action. Pass "None" to skip this check. |
+| securityAction            | false    | Specify the security action to use. Defaults to `PSRule`. Available values: `PSRule` for microsoft/PSRule action. Pass "None" to skip this check. |
 
 ## Outputs
 
@@ -139,7 +139,7 @@ By default, the action validates all paths, unless specific paths are configured
 | AZURE_ENV_NAME              | Azure environment name. Required for azd validation.                    |
 | AZURE_LOCATION              | Azure location for resources. Required for azd validation.              |
 | GITHUB_TOKEN                | GitHub token for authentication. Required for GitHub topics validation. |
-| README_H2_TAG               | Expected H2 tag(s) in the README file for validation.                   |
+| README_H2_TAG               | Expected H2 tag(s) in the README file for validation. Pass `None` to skip this check.                   |
 | REPOSITORY_NAME             | The name of the repository for GitHub topics validation. Using the name of current repository if not set. |
 
 ## Built-in Rules

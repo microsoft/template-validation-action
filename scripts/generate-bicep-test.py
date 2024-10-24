@@ -1,5 +1,5 @@
-import re
 import os
+import re
 import glob
 
 
@@ -14,7 +14,7 @@ def generate_test_bicep(main_bicep_path):
     target_scope = target_scope_match.group(1) if target_scope_match else "subscription"
 
     # Find all parameter definitions and allowed values
-    param_pattern = re.compile(r"param\s+(\w+)\s+(\w+)")
+    param_pattern = re.compile(r"param\s+(\w+)\s+(\w+)\s*(?!\s*=\s*'.*')(\n|\/|$)")
     allowed_pattern = re.compile(
         r"@allowed\(\[\s*([^\]]+)\s*\]\)(?:\s*@\w+\([^\)]*\))*\s*param\s+(\w+)\s+(\w+)"
     )
@@ -35,13 +35,13 @@ module test 'main.bicep' = {{
 """
 
     # Add parameters to the test file content
-    for param_name, param_type in params:
+    for param_name, param_type, _ in params:
         # Check if the parameter has allowed values
         allowed_value = None
         for allowed_values, allowed_param_name, allowed_param_type in allowed_params:
             if param_name == allowed_param_name:
                 allowed_value = (
-                    allowed_values.split()[0].split(",")[0].strip(" ").strip("'")
+                    allowed_values.split()[-1].split(",")[0].strip(" ").strip("'")
                 )
                 break
 
@@ -53,6 +53,10 @@ module test 'main.bicep' = {{
             test_bicep_content += f"    {param_name}: 1\n"
         elif param_type == "bool":
             test_bicep_content += f"    {param_name}: true\n"
+        elif param_type == "object":
+            test_bicep_content += (
+                f"    {param_name}: {{\n      'settings': []\n    }}\n"
+            )
         else:
             test_bicep_content += f"    {param_name}: null\n"
 

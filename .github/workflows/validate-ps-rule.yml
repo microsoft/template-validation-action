@@ -1,0 +1,31 @@
+name: Template Validation Sample Workflow for PSRule
+on: 
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  template_validation_job:
+    runs-on: ubuntu-latest
+    name: template validation
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone repo
+        working-directory: ${{ runner.temp }}
+        run: |
+          git clone https://github.com/Azure-Samples/azd-ai-starter template
+
+      - id: validation
+        uses: microsoft/template-validation-action@main
+        with:
+          workingDirectory: ${{ runner.temp }}/template
+          validateAzd: false
+          useDevContainer: false
+          securityAction: 'PSRule'
+
+      - name: print result
+        run: cat ${{ steps.validation.outputs.resultFile }}
