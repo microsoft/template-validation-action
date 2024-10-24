@@ -42,7 +42,7 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
         steps:
           - uses: actions/checkout@v4
 
-          - uses: microsoft/template-validation-action@v0.1
+          - uses: microsoft/template-validation-action@v0.2.2
             env:
               AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
               AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
@@ -62,7 +62,7 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
 Suppose there is a folder at root-level, called `ai-template`, where the `azure.yml` configuration is found:
 
 ```yaml
-  - uses: microsoft/template-validation-action@v0.1
+  - uses: microsoft/template-validation-action@v0.2.2
     with:
       workingDirectory: ./ai-template
     env:
@@ -79,7 +79,7 @@ Suppose there is a folder at root-level, called `ai-template`, where the `azure.
 By default, the action validates all paths, unless specific paths are configured. You can find the reference input name in the [#Inputs] table below. 
 
 ```yaml
-  - uses: microsoft/template-validation-action@v0.1
+  - uses: microsoft/template-validation-action@v0.2.2
     with:
       validatePaths: "README.md, LICENSE, ISSUE_TEMPLATE"
       topics: "azure, chatgpt, javascript"
@@ -99,7 +99,7 @@ By default, the action validates all paths, unless specific paths are configured
       java-version: '17'
       cache: 'maven'
 
-  - uses: microsoft/template-validation-action@v0.1
+  - uses: microsoft/template-validation-action@v0.2.2
     with:
       validateAzd: true
       useDevContainer: false
