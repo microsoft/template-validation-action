@@ -28,7 +28,7 @@ class TestPSRuleValidator(unittest.TestCase):
     @patch(
         "builtins.open",
         new_callable=mock_open,
-        read_data='[{"outcome": "Fail", "ruleName": "Rule1", "ref": "Error1", "info": {"recommendation": "Do this", "annotations": {"online version": "http://example.com"}}}, {"outcome": "Fail", "ruleName": "Rule2", "ref": "Error2", "info": {"recommendation": "Do that", "annotations": {"online version": "http://example.com"}}}]'
+        read_data='[{"outcome": "Fail", "ruleName": "Rule1", "ref": "Error1", "info": {"recommendation": "Do this", "annotations": {"online version": "http://example.com"}}}, {"outcome": "Fail", "ruleName": "Rule2", "ref": "Error2", "info": {"recommendation": "Do that", "annotations": {"online version": "http://example.com"}}}]',
     )
     def test_validate_with_multiple_failures(self, mock_file):
         validator = PSRuleValidator("ValidatorCatalog", "dummy_path", Severity.HIGH)
