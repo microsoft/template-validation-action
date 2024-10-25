@@ -141,7 +141,7 @@ runs:
       with:
         runCmd: |
           if find . -type f -iname 'dockerfile' | grep -q .; then
-            sudo service docker start
+            sudo service docker start > /dev/null
           fi
         subFolder: ${{ inputs.workingDirectory }}
       continue-on-error: true
@@ -275,3 +275,10 @@ runs:
         echo "resultFile=$output_link" >> $GITHUB_OUTPUT
       working-directory: ${{ inputs.workingDirectory }}
       shell: bash 
+
+    - name: Write to workflow job summary
+      run: |
+        SUMMARY=$(cat ${{ steps.set_output.outputs.resultFile }})
+        echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+      shell: bash
+      continue-on-error: true
