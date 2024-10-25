@@ -278,8 +278,7 @@ runs:
 
     - name: Write to workflow job summary
       run: |
-        repository_name=${{ env.REPOSITORY_NAME || github.repository }}
         SUMMARY=$(cat ${{ steps.set_output.outputs.resultFile }})
-        echo "Validation results of $repository_name\n$SUMMARY" >> $GITHUB_STEP_SUMMARY
+        echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
       shell: bash
       continue-on-error: true
