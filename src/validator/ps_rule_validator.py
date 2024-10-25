@@ -24,22 +24,21 @@ class PSRuleValidator(ValidatorBase):
                     continue
                 rule_name = item["ruleName"]
                 error_code = item["ref"]
-                source = str(item["source"])
                 recommendation = item["info"]["recommendation"]
-                reference = item["info"]["annotations"]["online version"]
-
-                detail_messages.append(
-                    ItemResultFormat.SUBITEM.format(
-                        sign=Signs.BLOCK
-                        if Severity.isBlocker(self.severity)
-                        else Signs.WARNING,
-                        message=f"{rule_name} ({error_code}){line_delimiter}",
-                    )
+                reference = (
+                    f'reference: {item["info"]["annotations"]["online version"]}'
                 )
-                detail_messages.append(source)
-                detail_messages.append(recommendation)
-                detail_messages.append(f"reference: {reference}")
-            detail_messages = indent(line_delimiter.join(detail_messages), 4)
+
+                item = ItemResultFormat.SUBITEM.format(
+                    sign=Signs.BLOCK
+                    if Severity.isBlocker(self.severity)
+                    else Signs.WARNING,
+                    message=f"{rule_name} ({error_code}){line_delimiter}",
+                )
+                detail_messages.append(
+                    indent(line_delimiter.join([item, recommendation, reference]), 4)
+                )
+            detail_messages = line_delimiter.join(detail_messages)
             if detail_messages:
                 messages.append(
                     ItemResultFormat.FAIL.format(

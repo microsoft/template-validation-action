@@ -9,9 +9,9 @@ class TestPSRuleValidator(unittest.TestCase):
     @patch(
         "builtins.open",
         new_callable=mock_open,
-        read_data='[{"outcome": "Fail", "ruleName": "Rule1", "source": [{"file": "/mock/main.bicep", "line": 532, "position": 37, "type": "Template"}], "ref": "Error1", "info": {"recommendation": "Do this", "annotations": {"online version": "http://example.com"}}}]',
+        read_data='[{"outcome": "Fail", "ruleName": "Rule1", "ref": "Error1", "info": {"recommendation": "Do this", "annotations": {"online version": "http://example.com"}}}]',
     )
-    def test_validate_with_failures(self, mock_file):
+    def test_validate_with_failure(self, mock_file):
         validator = PSRuleValidator("ValidatorCatalog", "dummy_path", Severity.HIGH)
         result, message = validator.validate()
 
@@ -21,14 +21,33 @@ class TestPSRuleValidator(unittest.TestCase):
             ItemResultFormat.FAIL.format(
                 sign=Signs.BLOCK,
                 message="Security Scan",
-                detail_messages="  - [ ] :x: Rule1 (Error1)\n    \n    [{'file': '/mock/main.bicep', 'line': 532, 'position': 37, 'type': 'Template'}]\n    Do this\n    reference: http://example.com",
+                detail_messages="  - [ ] :x: Rule1 (Error1)\n    \n    Do this\n    reference: http://example.com",
             ),
         )
 
     @patch(
         "builtins.open",
         new_callable=mock_open,
-        read_data='[{"outcome": "Pass", "ruleName": "Rule1", "source": [{"file": "/mock/main.bicep", "line": 532, "position": 37, "type": "Template"}], "ref": "Error1", "info": {"recommendation": "Do this", "annotations": {"online version": "http://example.com"}}}]',
+        read_data='[{"outcome": "Fail", "ruleName": "Rule1", "ref": "Error1", "info": {"recommendation": "Do this", "annotations": {"online version": "http://example.com"}}}, {"outcome": "Fail", "ruleName": "Rule2", "ref": "Error2", "info": {"recommendation": "Do that", "annotations": {"online version": "http://example.com"}}}]'
+    )
+    def test_validate_with_multiple_failures(self, mock_file):
+        validator = PSRuleValidator("ValidatorCatalog", "dummy_path", Severity.HIGH)
+        result, message = validator.validate()
+
+        self.assertFalse(result)
+        self.assertEqual(
+            message,
+            ItemResultFormat.FAIL.format(
+                sign=Signs.BLOCK,
+                message="Security Scan",
+                detail_messages="  - [ ] :x: Rule1 (Error1)\n    \n    Do this\n    reference: http://example.com\n  - [ ] :x: Rule2 (Error2)\n    \n    Do that\n    reference: http://example.com",
+            ),
+        )
+
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data='[{"outcome": "Pass", "ruleName": "Rule1", "ref": "Error1", "info": {"recommendation": "Do this", "annotations": {"online version": "http://example.com"}}}]',
     )
     def test_validate_with_no_failures(self, mock_file):
         validator = PSRuleValidator("ValidatorCatalog", "dummy_path", Severity.HIGH)
