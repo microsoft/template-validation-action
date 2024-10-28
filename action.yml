@@ -57,12 +57,13 @@ runs:
       if: ${{ inputs.securityAction == 'PSRule' }}
       id: calculate_relative_paths
       run: |
-        if [[ "${{ inputs.workingDirectory }}" == "/*" ]]; then
+        relative_working_directory=$(realpath --relative-to=$GITHUB_WORKSPACE ${{ inputs.workingDirectory }})
+        if [[ "${{ relative_working_directory }}" == "..*" ]]; then
           mkdir -p ${{ github.run_id }}/template
           cp -a ${{ inputs.workingDirectory }}/. ${{ github.run_id }}/template
           echo "relative_working_directory=${{ github.run_id }}/template" >> $GITHUB_ENV
         else
-          echo "relative_working_directory=${{ inputs.workingDirectory }}" >> $GITHUB_ENV
+          echo "relative_working_directory=$relative_working_directory" >> $GITHUB_ENV
         fi
       shell: bash
 
@@ -81,11 +82,23 @@ runs:
     # Analyze templates for MI compliance with PSRule for Azure
     - name: Analyze templates for MI compliance
       uses: microsoft/ps-rule@v2.9.0
-      if: ${{ inputs.securityAction == 'PSRule' }}
+      if: ${{ inputs.securityAction == 'PSRule' && env.relative_working_directory != "." }}
       id: run_psrule
       with:
-        inputType: inputPath
         path: ${{ env.relative_working_directory }}
+        modules: 'PSRule.Rules.Azure'
+        baseline: 'TemplateValidation.MI_2024_10'
+        outputFormat: "json"
+        outputPath: 'psrule-output.json'
+        summary: false
+      continue-on-error: true
+
+    # Analyze templates for MI compliance with PSRule for Azure
+    - name: Analyze templates for MI compliance
+      uses: microsoft/ps-rule@v2.9.0
+      if: ${{ inputs.securityAction == 'PSRule' && env.relative_working_directory == "." }}
+      id: run_psrule
+      with:
         modules: 'PSRule.Rules.Azure'
         baseline: 'TemplateValidation.MI_2024_10'
         outputFormat: "json"
