@@ -57,9 +57,13 @@ runs:
       if: ${{ inputs.securityAction == 'PSRule' }}
       id: calculate_relative_paths
       run: |
-        mkdir -p ${{ github.run_id }}/template
-        cp -a ${{ inputs.workingDirectory }}/. ${{ github.run_id }}/template
-        echo "relative_working_directory=${{ github.run_id }}/template" >> $GITHUB_ENV
+        if [[ "${{ inputs.workingDirectory }}" == "/*" ]]; then
+          mkdir -p ${{ github.run_id }}/template
+          cp -a ${{ inputs.workingDirectory }}/. ${{ github.run_id }}/template
+          echo "relative_working_directory=${{ github.run_id }}/template" >> $GITHUB_ENV
+        else
+          echo "relative_working_directory=${{ inputs.workingDirectory }}" >> $GITHUB_ENV
+        fi
       shell: bash
 
     - name: Prepare PSRule for Azure
