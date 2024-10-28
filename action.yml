@@ -82,8 +82,7 @@ runs:
     # Analyze templates for MI compliance with PSRule for Azure
     - name: Analyze templates for MI compliance
       uses: microsoft/ps-rule@v2.9.0
-      if: ${{ inputs.securityAction == 'PSRule' && env.relative_working_directory != "." }}
-      id: run_psrule
+      if: ${{ inputs.securityAction == 'PSRule' && env.relative_working_directory != '.' }}
       with:
         path: ${{ env.relative_working_directory }}
         modules: 'PSRule.Rules.Azure'
@@ -96,8 +95,7 @@ runs:
     # Analyze templates for MI compliance with PSRule for Azure
     - name: Analyze templates for MI compliance
       uses: microsoft/ps-rule@v2.9.0
-      if: ${{ inputs.securityAction == 'PSRule' && env.relative_working_directory == "." }}
-      id: run_psrule
+      if: ${{ inputs.securityAction == 'PSRule' && env.relative_working_directory == '.' }}
       with:
         modules: 'PSRule.Rules.Azure'
         baseline: 'TemplateValidation.MI_2024_10'
