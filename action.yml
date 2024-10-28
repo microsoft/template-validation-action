@@ -105,7 +105,7 @@ runs:
       continue-on-error: true
 
     - name: Copy back psrule-output
-      if: ${{ inputs.securityAction == 'PSRule' }}
+      if: ${{ inputs.securityAction == 'PSRule' && inputs.workingDirectory != env.relative_working_directory }}
       id: copy-back-psrule-output
       run: |
         cp ${{ env.relative_working_directory }}/psrule-output.json ${{ inputs.workingDirectory}}
