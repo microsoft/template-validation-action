@@ -59,6 +59,7 @@ runs:
       run: |
         relative_working_directory=$(realpath --relative-to=$GITHUB_WORKSPACE ${{ inputs.workingDirectory }})
         if [[ $relative_working_directory == ..* ]]; then
+          rm -rf ${{ github.run_id }}/template
           mkdir -p ${{ github.run_id }}/template
           cp -a ${{ inputs.workingDirectory }}/. ${{ github.run_id }}/template
           echo "relative_working_directory=${{ github.run_id }}/template" >> $GITHUB_ENV
