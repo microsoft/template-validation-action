@@ -42,7 +42,8 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
         steps:
           - uses: actions/checkout@v4
 
-          - uses: microsoft/template-validation-action@v0.2.2
+          - uses: microsoft/template-validation-action@v0.3.2
+            id: validation
             env:
               AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
               AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
