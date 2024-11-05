@@ -22,7 +22,7 @@ class FileValidator(ValidatorBase):
         self.fileName = fileName
         self.extensionList = extensionList
         self.rootFolder = rootFolder
-        self.candidatePaths = candidatePaths
+        self.candidatePaths = [path.replace('/', os.path.sep) for path in candidatePaths]
         self.caseSensitive = caseSensitive
         self.h2Tags = (
             [h2Tag.strip() for h2Tag in h2Tags] if h2Tags is not None else None

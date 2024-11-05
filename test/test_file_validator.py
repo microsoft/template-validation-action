@@ -1,3 +1,4 @@
+import os
 import unittest
 from validator.file_validator import FileValidator
 from constants import ItemResultFormat, Signs
@@ -196,6 +197,20 @@ def test_file_validator_folder_allowed_but_not_exists():
         ),
     )
 
+def test_candidate_paths_conversion():
+    validator = FileValidator(
+        "TestCatalog",
+        "README",
+        [".md"],
+        "test/data",
+        ["./subdir", "another/subdir"],
+        None,
+        False,
+        Severity.HIGH,
+        False,
+    )
+    expected_paths = [os.path.join(".", "subdir"), os.path.join("another", "subdir")]
+    assert validator.candidatePaths == expected_paths
 
 if __name__ == "__main__":
     unittest.main()
