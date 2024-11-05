@@ -57,8 +57,8 @@ runs:
       id: reform_path
       run: |
         if [[ "$RUNNER_OS" == "Windows" ]]; then
-          working_directory=$(echo "${{ inputs.workingDirectory }}" | tr '\\' '/')
-          action_path=$(echo "${{ github.action_path }}" | tr '\\' '/')
+          working_directory=$(cygpath $(echo "${{ inputs.workingDirectory }}" | tr '\\' '/'))
+          action_path=$(cygpath $(echo "${{ github.action_path }}" | tr '\\' '/'))
           echo "workingDirectory=$working_directory" >> $GITHUB_OUTPUT
           echo "actionPath=$action_path" >> $GITHUB_OUTPUT
         else
