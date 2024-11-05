@@ -59,11 +59,14 @@ runs:
         if [[ "$RUNNER_OS" == "Windows" ]]; then
           working_directory=$(cygpath $(echo "${{ inputs.workingDirectory }}" | tr '\\' '/'))
           action_path=$(cygpath $(echo "${{ github.action_path }}" | tr '\\' '/'))
+          workspace=$(cygpath $(echo "$GITHUB_WORKSPACE" | tr '\\' '/'))
           echo "workingDirectory=$working_directory" >> $GITHUB_OUTPUT
           echo "actionPath=$action_path" >> $GITHUB_OUTPUT
+          echo "workspace=$workspace" >> $GITHUB_OUTPUT
         else
           echo "workingDirectory=${{ inputs.workingDirectory }}" >> $GITHUB_OUTPUT
           echo "actionPath=${{ github.action_path }}" >> $GITHUB_OUTPUT
+          echo "workspace=$GITHUB_WORKSPACE" >> $GITHUB_OUTPUT
         fi
       shell: bash
 
@@ -71,7 +74,7 @@ runs:
       if: ${{ inputs.securityAction == 'PSRule' }}
       id: calculate_relative_paths
       run: |
-        relative_working_directory=$(realpath --relative-to=$GITHUB_WORKSPACE ${{ steps.reform_path.outputs.workingDirectory }})
+        relative_working_directory=$(realpath --relative-to=${{ steps.reform_path.outputs.workspace }} ${{ steps.reform_path.outputs.workingDirectory }})
         if [[ $relative_working_directory == ..* ]]; then
           rm -rf ${{ github.run_id }}/template
           mkdir -p ${{ github.run_id }}/template
