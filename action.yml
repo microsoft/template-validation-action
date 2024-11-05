@@ -256,7 +256,7 @@ runs:
             done < tva_${{ github.run_id }}/env_variables.txt
           fi
           python3 tva_${{ github.run_id }}/src/gallery_validate.py . --output tva_${{ github.run_id }}/output.log ${{ steps.prepare_arguments.outputs.arguments }}
-        subFolder: ${{ steps.reform_path.outputs.workingDirectory }}
+        subFolder: ${{ inputs.workingDirectory }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
           ACTIONS_ID_TOKEN_REQUEST_TOKEN=${{ steps.script.outputs.TOKEN }}
@@ -289,7 +289,7 @@ runs:
     - name: Run validation
       id: run_validation
       if: ${{ inputs.useDevContainer == 'false' }}
-      working-directory: ${{ steps.reform_path.outputs.workingDirectory }}
+      working-directory: ${{ inputs.workingDirectory }}
       run: |
         pip install -r ${{ steps.reform_path.outputs.actionPath }}/requirements.txt
         python3 ${{ steps.reform_path.outputs.actionPath }}/src/gallery_validate.py . --output ${{ github.run_id }}-output.log ${{ steps.prepare_arguments.outputs.arguments }}
@@ -306,7 +306,7 @@ runs:
         output_link=$(realpath ${{ github.run_id }}-output.log)
         echo "resultFile is $output_link"
         echo "resultFile=$output_link" >> $GITHUB_OUTPUT
-      working-directory: ${{ steps.reform_path.outputs.workingDirectory }}
+      working-directory: ${{ inputs.workingDirectory }}
       shell: bash 
 
     - name: Write to workflow job summary
