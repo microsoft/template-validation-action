@@ -75,7 +75,7 @@ class FileValidator(ValidatorBase):
                                 subMessages = []
                                 if self.h2Tags is not None:
                                     with open(
-                                        os.path.join(root, file), "r"
+                                        os.path.join(root, file), "r", encoding="utf-8"
                                     ) as fileContent:
                                         content = fileContent.read()
                                         for tag in self.h2Tags:
