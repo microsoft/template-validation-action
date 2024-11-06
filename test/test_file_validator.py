@@ -197,6 +197,7 @@ def test_file_validator_folder_allowed_but_not_exists():
         ),
     )
 
+
 def test_candidate_paths_conversion():
     validator = FileValidator(
         "TestCatalog",
@@ -211,6 +212,7 @@ def test_candidate_paths_conversion():
     )
     expected_paths = [os.path.join(".", "subdir"), os.path.join("another", "subdir")]
     assert validator.candidatePaths == expected_paths
+
 
 if __name__ == "__main__":
     unittest.main()
