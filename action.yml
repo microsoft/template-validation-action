@@ -53,15 +53,32 @@ runs:
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
 
+    - name: Reform path for compatability
+      id: reform_path
+      run: |
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          working_directory=$(cygpath $(echo "${{ inputs.workingDirectory }}" | tr '\\' '/'))
+          action_path=$(cygpath $(echo "${{ github.action_path }}" | tr '\\' '/'))
+          workspace=$(cygpath $(echo "$GITHUB_WORKSPACE" | tr '\\' '/'))
+          echo "workingDirectory=$working_directory" >> $GITHUB_OUTPUT
+          echo "actionPath=$action_path" >> $GITHUB_OUTPUT
+          echo "workspace=$workspace" >> $GITHUB_OUTPUT
+        else
+          echo "workingDirectory=${{ inputs.workingDirectory }}" >> $GITHUB_OUTPUT
+          echo "actionPath=${{ github.action_path }}" >> $GITHUB_OUTPUT
+          echo "workspace=$GITHUB_WORKSPACE" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
     - name: Calculate relative paths for PSRule
       if: ${{ inputs.securityAction == 'PSRule' }}
       id: calculate_relative_paths
       run: |
-        relative_working_directory=$(realpath --relative-to=$GITHUB_WORKSPACE ${{ inputs.workingDirectory }})
+        relative_working_directory=$(realpath --relative-to=${{ steps.reform_path.outputs.workspace }} ${{ steps.reform_path.outputs.workingDirectory }})
         if [[ $relative_working_directory == ..* ]]; then
           rm -rf ${{ github.run_id }}/template
           mkdir -p ${{ github.run_id }}/template
-          cp -a ${{ inputs.workingDirectory }}/. ${{ github.run_id }}/template
+          cp -a ${{ steps.reform_path.outputs.workingDirectory }}/. ${{ github.run_id }}/template
           echo "relative_working_directory=${{ github.run_id }}/template" >> $GITHUB_ENV
         else
           echo "relative_working_directory=$relative_working_directory" >> $GITHUB_ENV
@@ -74,10 +91,10 @@ runs:
       run: |
         rm -rf ${{ env.relative_working_directory }}/.ps-rule
         mkdir -p ${{ env.relative_working_directory }}/.ps-rule
-        cp ${{ github.action_path }}/.ps-rule/templateCustom.Rule.yaml ${{ env.relative_working_directory }}/.ps-rule/templateCustom.Rule.yaml
-        cp ${{ github.action_path}}/ps-rule.yaml ${{ env.relative_working_directory }}
+        cp ${{ steps.reform_path.outputs.actionPath }}/.ps-rule/templateCustom.Rule.yaml ${{ env.relative_working_directory }}/.ps-rule/templateCustom.Rule.yaml
+        cp ${{ steps.reform_path.outputs.actionPath}}/ps-rule.yaml ${{ env.relative_working_directory }}
         cd ${{ env.relative_working_directory }}
-        python3 ${{ github.action_path }}/scripts/generate-bicep-test.py 
+        python3 ${{ steps.reform_path.outputs.actionPath }}/scripts/generate-bicep-test.py 
       shell: bash
 
     # Analyze templates for MI compliance with PSRule for Azure
@@ -106,10 +123,10 @@ runs:
       continue-on-error: true
 
     - name: Copy back psrule-output
-      if: ${{ inputs.securityAction == 'PSRule' && inputs.workingDirectory != env.relative_working_directory }}
+      if: ${{ inputs.securityAction == 'PSRule' && steps.reform_path.outputs.workingDirectory != env.relative_working_directory }}
       id: copy-back-psrule-output
       run: |
-        cp ${{ env.relative_working_directory }}/psrule-output.json ${{ inputs.workingDirectory}}
+        cp ${{ env.relative_working_directory }}/psrule-output.json ${{ steps.reform_path.outputs.workingDirectory}}
       shell: bash
       continue-on-error: true
 
@@ -128,13 +145,13 @@ runs:
     - name: Copy validator into devcontainer
       if: ${{ inputs.useDevContainer == 'true' }}
       run: |
-        mkdir -p ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}
-        cp -r ${{ github.action_path }}/src ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/src
-        cp ${{ github.action_path }}/requirements.txt ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/requirements.txt
-        if [ -f "${{ inputs.workingDirectory }}/psrule-output.json" ]; then
-          cp ${{ inputs.workingDirectory }}/psrule-output.json ${{ inputs.workingDirectory }}/tva_${{ github.run_id }};
+        mkdir -p ${{ steps.reform_path.outputs.workingDirectory }}/tva_${{ github.run_id }}
+        cp -r ${{ steps.reform_path.outputs.actionPath }}/src ${{ steps.reform_path.outputs.workingDirectory }}/tva_${{ github.run_id }}/src
+        cp ${{ steps.reform_path.outputs.actionPath }}/requirements.txt ${{ steps.reform_path.outputs.workingDirectory }}/tva_${{ github.run_id }}/requirements.txt
+        if [ -f "${{ steps.reform_path.outputs.workingDirectory }}/psrule-output.json" ]; then
+          cp ${{ steps.reform_path.outputs.workingDirectory }}/psrule-output.json ${{ inputs.workingDirectory }}/tva_${{ github.run_id }};
         fi
-        env > ${{ inputs.workingDirectory }}/tva_${{ github.run_id }}/env_variables.txt
+        env > ${{ steps.reform_path.outputs.workingDirectory }}/tva_${{ github.run_id }}/env_variables.txt
       shell: bash
 
     - uses: actions/github-script@v6
@@ -159,7 +176,7 @@ runs:
           if find . -type f -iname 'dockerfile' | grep -q .; then
             sudo service docker start > /dev/null
           fi
-        subFolder: ${{ inputs.workingDirectory }}
+        subFolder: ${{ steps.reform_path.outputs.workingDirectory }}
       continue-on-error: true
 
     - name: Login azd in devcontainer
@@ -170,7 +187,7 @@ runs:
         runCmd: |
           azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
           az login --service-principal -u "${{ env.AZURE_CLIENT_ID }}" --federated-token $AZURE_AD_TOKEN --tenant "${{ env.AZURE_TENANT_ID }}"
-        subFolder: ${{ inputs.workingDirectory }}
+        subFolder: ${{ steps.reform_path.outputs.workingDirectory }}
         env: |
           ACTIONS_ID_TOKEN_REQUEST_URL=${{ steps.script.outputs.ID_TOKEN_URL }}
           ACTIONS_ID_TOKEN_REQUEST_TOKEN=${{ steps.script.outputs.TOKEN }}
@@ -191,7 +208,7 @@ runs:
           source .venv/bin/activate
           python3 -m pip install --upgrade pip
           python3 -m pip install -r tva_${{ github.run_id }}/requirements.txt;
-        subFolder: ${{ inputs.workingDirectory }}
+        subFolder: ${{ steps.reform_path.outputs.workingDirectory }}
     
     - name: Remove spaces from inputs
       id: remove_spaces
@@ -254,7 +271,7 @@ runs:
       with:
         runCmd: |
           cat tva_${{ github.run_id }}/output.log
-        subFolder: ${{ inputs.workingDirectory }}
+        subFolder: ${{ steps.reform_path.outputs.workingDirectory }}
 
     - name: Install AZD
       if: ${{ inputs.useDevContainer == 'false' }}
@@ -274,8 +291,8 @@ runs:
       if: ${{ inputs.useDevContainer == 'false' }}
       working-directory: ${{ inputs.workingDirectory }}
       run: |
-        pip install -r ${{ github.action_path }}/requirements.txt
-        python3 ${{ github.action_path }}/src/gallery_validate.py . --output ${{ github.run_id }}-output.log ${{ steps.prepare_arguments.outputs.arguments }}
+        pip install -r ${{ steps.reform_path.outputs.actionPath }}/requirements.txt
+        python3 ${{ steps.reform_path.outputs.actionPath }}/src/gallery_validate.py . --output ${{ github.run_id }}-output.log ${{ steps.prepare_arguments.outputs.arguments }}
       shell: bash
       env:
         CREATE_ROLE_FOR_USER: false

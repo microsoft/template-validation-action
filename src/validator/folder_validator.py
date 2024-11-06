@@ -11,7 +11,9 @@ class FolderValidator(ValidatorBase):
     ):
         super().__init__(f"{folderName}FolderValidator", validatorCatalog, severity)
         self.folderName = folderName
-        self.candidatePaths = candidatePaths
+        self.candidatePaths = [
+            path.replace("/", os.path.sep) for path in candidatePaths
+        ]
 
     def validate(self):
         logging.debug(f"Checking for {self.folderName} folder in candidate folders...")
