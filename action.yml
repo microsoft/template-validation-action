@@ -207,6 +207,7 @@ runs:
           python3 -m venv .venv --system-site-packages
           source .venv/bin/activate
           python3 -m pip install --upgrade pip
+          python3 -m pip install jupyter --force-reinstall
           python3 -m pip install -r tva_${{ github.run_id }}/requirements.txt;
         subFolder: ${{ steps.reform_path.outputs.workingDirectory }}
     
