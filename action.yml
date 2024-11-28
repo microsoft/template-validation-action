@@ -130,17 +130,17 @@ runs:
       shell: bash
       continue-on-error: true
 
-    - name: Set environment name with timestamp
-      id: set_env_name
-      if: ${{ inputs.validateAzd == 'true' }}
-      run: |
-        current_time=$(date +%m%d%H%M)
-        azure_env_name="${{ env.AZURE_ENV_NAME }}-$current_time"
-        echo "AZURE_ENV_NAME=$azure_env_name" >> $GITHUB_ENV
-        echo "azure_env_name is $azure_env_name"
-      shell: bash
-      env:
-        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
+    # - name: Set environment name with timestamp
+    #  id: set_env_name
+    #  if: ${{ inputs.validateAzd == 'true' }}
+    #  run: |
+    #    current_time=$(date +%m%d%H%M)
+    #    azure_env_name="${{ env.AZURE_ENV_NAME }}-$current_time"
+    #   echo "AZURE_ENV_NAME=$azure_env_name" >> $GITHUB_ENV
+    #    echo "azure_env_name is $azure_env_name"
+    #  shell: bash
+    #  env:
+    #    AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
 
     - name: Copy validator into devcontainer
       if: ${{ inputs.useDevContainer == 'true' }}
