@@ -1,7 +1,8 @@
+import os
 import unittest
 from validator.file_validator import FileValidator
 from constants import ItemResultFormat, Signs
-from level import Level
+from severity import Severity
 
 
 def test_file_validator_file_found_exist():
@@ -165,7 +166,7 @@ def test_file_validator_folder_allowed_and_exists():
         ["."],
         None,
         False,
-        Level.MODERATE,
+        Severity.MODERATE,
         True,
     )
     result, message = validator.validate()
@@ -182,7 +183,7 @@ def test_file_validator_folder_allowed_but_not_exists():
         ["."],
         None,
         False,
-        Level.MODERATE,
+        Severity.MODERATE,
         True,
     )
     result, message = validator.validate()
@@ -195,6 +196,22 @@ def test_file_validator_folder_allowed_but_not_exists():
             message="NON_EXISTENT_FOLDER.md file or NON_EXISTENT_FOLDER folder is missing.",
         ),
     )
+
+
+def test_candidate_paths_conversion():
+    validator = FileValidator(
+        "TestCatalog",
+        "README",
+        [".md"],
+        "test/data",
+        ["./subdir", "another/subdir"],
+        None,
+        False,
+        Severity.HIGH,
+        False,
+    )
+    expected_paths = [os.path.join(".", "subdir"), os.path.join("another", "subdir")]
+    assert validator.candidatePaths == expected_paths
 
 
 if __name__ == "__main__":

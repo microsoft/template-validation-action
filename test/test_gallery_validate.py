@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch
 import argparse
 from gallery_validate import main
+from severity import Severity
 
 
 class TestGalleryValidate(unittest.TestCase):
@@ -19,6 +20,7 @@ class TestGalleryValidate(unittest.TestCase):
             topics="azd-templates,azure",
             expected_topics=None,
             msdoresult="dummy_msdo_result_file",
+            psrule_result="dummy_psrule_result_file",
             output=None,
             debug=True,
         )
@@ -27,8 +29,8 @@ class TestGalleryValidate(unittest.TestCase):
         mock_rule_parser.parse.return_value = ["validator1", "validator2"]
 
         expected_results = [
-            ("validator1", True, "Validation passed"),
-            ("validator2", False, "Validation failed"),
+            ("validator1", Severity.LOW, True, "Validation passed"),
+            ("validator2", Severity.HIGH, False, "Validation failed"),
         ]
         mock_execution_engine = MockExecutionEngine.return_value
         mock_execution_engine.execute.return_value = expected_results

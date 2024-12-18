@@ -30,9 +30,9 @@ def main():
         help="A comma-separated list of topics to check for.",
     )
     parser.add_argument(
-        "--msdoresult",
+        "--psrule_result",
         type=str,
-        help="The output file path of microsoft security devops analysis.",
+        help="The output file path of PSRule.",
     )
     parser.add_argument("--output", type=str, help="The output file path.")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging.")
@@ -43,7 +43,7 @@ def main():
     logging.basicConfig(format="%(message)s", level=log_level)
 
     logging.debug(
-        f"Repo path: {args.repo_path} validate_paths: {args.validate_paths} validate_azd: {args.validate_azd} debug: {args.debug} topics: {args.topics} expected_topics: {args.expected_topics} msdo: {args.msdoresult} output: {args.output}"
+        f"Repo path: {args.repo_path} validate_paths: {args.validate_paths} validate_azd: {args.validate_azd} debug: {args.debug} topics: {args.topics} expected_topics: {args.expected_topics} psrule: {args.psrule_result} output: {args.output}"
     )
 
     # Parse rules and generate validators
@@ -58,7 +58,7 @@ def main():
     # Aggregate results
     aggregator = ResultAggregator()
     for result in results:
-        aggregator.add_result(result[0], result[1], result[2])
+        aggregator.add_result(result[0], result[1], result[2], result[3])
 
     summary = aggregator.generate_summary()
 

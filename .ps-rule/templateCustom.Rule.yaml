@@ -1,0 +1,23 @@
+# Synopsis: Analyze Azure resources using PSRule for Azure
+apiVersion: github.com/microsoft/PSRule/v1
+kind: Baseline
+metadata:
+  name: 'TemplateValidation.MI_2024_10'
+spec:
+  rule:
+    include:
+    - Azure.AI.ManagedIdentity
+    - Azure.AI.DisableLocalAuth
+    - Azure.Cosmos.DisableLocalAuth
+    - Azure.AKS.ManagedIdentity
+    - Azure.APIM.ManagedIdentity
+    - Azure.AppService.ManagedIdentity
+    - Azure.ContainerApp.ManagedIdentity
+    - Azure.Deployment.SecureValue
+    - Azure.Deployment.OutputSecretValue
+    - Azure.EventGrid.ManagedIdentity
+    - Azure.EventGrid.DisableLocalAuth
+    - Azure.Search.ManagedIdentity
+    - Azure.SignalR.ManagedIdentity
+    - Azure.SQLMI.ManagedIdentity
+    - Azure.SQLMI.AADOnly

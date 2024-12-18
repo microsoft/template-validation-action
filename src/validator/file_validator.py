@@ -1,6 +1,6 @@
 from validator.validator_base import ValidatorBase
 from constants import line_delimiter, ItemResultFormat, Signs
-from level import Level
+from severity import Severity
 import os
 import logging
 
@@ -15,20 +15,22 @@ class FileValidator(ValidatorBase):
         candidatePaths=[""],
         h2Tags=None,
         caseSensitive=False,
-        level=Level.HIGH,
+        severity=Severity.HIGH,
         isFolderAllowed=False,
     ):
-        super().__init__(f"{fileName}FileValidator", validatorCatalog, level)
+        super().__init__(f"{fileName}FileValidator", validatorCatalog, severity)
         self.fileName = fileName
         self.extensionList = extensionList
         self.rootFolder = rootFolder
-        self.candidatePaths = candidatePaths
+        self.candidatePaths = [
+            path.replace("/", os.path.sep) for path in candidatePaths
+        ]
         self.caseSensitive = caseSensitive
         self.h2Tags = (
             [h2Tag.strip() for h2Tag in h2Tags] if h2Tags is not None else None
         )
         self.isFolderAllowed = isFolderAllowed
-        self.level = level
+        self.severity = severity
 
     def validate(self):
         logging.debug(
@@ -73,7 +75,7 @@ class FileValidator(ValidatorBase):
                                 subMessages = []
                                 if self.h2Tags is not None:
                                     with open(
-                                        os.path.join(root, file), "r"
+                                        os.path.join(root, file), "r", encoding="utf-8"
                                     ) as fileContent:
                                         content = fileContent.read()
                                         for tag in self.h2Tags:
@@ -88,7 +90,9 @@ class FileValidator(ValidatorBase):
                                                 subMessages.append(
                                                     ItemResultFormat.SUBITEM.format(
                                                         sign=Signs.BLOCK
-                                                        if Level.isBlocker(self.level)
+                                                        if Severity.isBlocker(
+                                                            self.severity
+                                                        )
                                                         else Signs.WARNING,
                                                         message=f"{tag} is missing in {file}.",
                                                     )
@@ -104,7 +108,7 @@ class FileValidator(ValidatorBase):
                                     messages.append(
                                         ItemResultFormat.FAIL.format(
                                             sign=Signs.BLOCK
-                                            if Level.isBlocker(self.level)
+                                            if Severity.isBlocker(self.severity)
                                             else Signs.WARNING,
                                             message=f"{potential_name} File",
                                             detail_messages=line_delimiter.join(
@@ -136,10 +140,14 @@ class FileValidator(ValidatorBase):
         )
         messages.append(
             ItemResultFormat.FAIL.format(
-                sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
+                sign=Signs.BLOCK
+                if Severity.isBlocker(self.severity)
+                else Signs.WARNING,
                 message=errorMessage,
                 detail_messages=ItemResultFormat.SUBITEM.format(
-                    sign=Signs.BLOCK if Level.isBlocker(self.level) else Signs.WARNING,
+                    sign=Signs.BLOCK
+                    if Severity.isBlocker(self.severity)
+                    else Signs.WARNING,
                     message=detailMessage,
                 ),
             )
