@@ -12,7 +12,9 @@ class TestPlaywrightTestValidator(unittest.TestCase):
         mock_walk.return_value = [("/testpath/path", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 0
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
+        validator = PlaywrightTestValidator(
+            "ValidatorCatalog", "/testpath/repo", Severity.LOW
+        )
         result, message = validator.validate()
 
         self.assertTrue(result)
@@ -29,7 +31,9 @@ class TestPlaywrightTestValidator(unittest.TestCase):
         mock_walk.return_value = [("/testpath/path", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 1
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
+        validator = PlaywrightTestValidator(
+            "ValidatorCatalog", "/testpath/repo", Severity.LOW
+        )
         result, message = validator.validate()
 
         self.assertFalse(result)
@@ -44,9 +48,11 @@ class TestPlaywrightTestValidator(unittest.TestCase):
 
     @patch("os.walk")
     def test_validate_with_missing_yaml(self, mock_walk):
-        mock_walk.return_value = [("/testpath/path", [], [])] 
+        mock_walk.return_value = [("/testpath/path", [], [])]
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
+        validator = PlaywrightTestValidator(
+            "ValidatorCatalog", "/testpath/repo", Severity.LOW
+        )
         result, message = validator.validate()
 
         self.assertFalse(result)
@@ -61,7 +67,9 @@ class TestPlaywrightTestValidator(unittest.TestCase):
 
     @patch("os.walk", side_effect=Exception("Unexpected Error"))
     def test_validate_with_error_during_execution(self, mock_walk):
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
+        validator = PlaywrightTestValidator(
+            "ValidatorCatalog", "/testpath/repo", Severity.LOW
+        )
         result, message = validator.validate()
 
         self.assertFalse(result)
