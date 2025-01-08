@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from validator.playwright_validator import PlaywrightTestValidator
 from constants import ItemResultFormat, Signs
-from level import Level
+from severity import Severity
 
 
 class TestPlaywrightTestValidator(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
         mock_walk.return_value = [("/testpath/path", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 0
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", level=Level.LOW)
+        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
         result, message = validator.validate()
 
         self.assertTrue(result)
@@ -29,7 +29,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
         mock_walk.return_value = [("/testpath/path", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 1
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", level=Level.HIGH)
+        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
         result, message = validator.validate()
 
         self.assertFalse(result)
@@ -46,7 +46,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
     def test_validate_with_missing_yaml(self, mock_walk):
         mock_walk.return_value = [("/testpath/path", [], [])] 
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", level=Level.HIGH)
+        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
         result, message = validator.validate()
 
         self.assertFalse(result)

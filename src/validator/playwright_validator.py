@@ -3,11 +3,11 @@ import subprocess
 import logging
 from validator.validator_base import ValidatorBase
 from constants import ItemResultFormat, Signs, line_delimiter
-from level import Level
+from severity import Severity
 from utils import find_infra_yaml_path  # Import the utility function
 
 class PlaywrightTestValidator(ValidatorBase):
-    def __init__(self, validatorCatalog, repo_path, level=Level.LOW):
+    def __init__(self, validatorCatalog, repo_path, level=Severity.LOW):
         super().__init__("PlaywrightTestValidator", validatorCatalog, level)
         self.repo_path = repo_path
 
