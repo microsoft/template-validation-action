@@ -7,8 +7,8 @@ from severity import Severity
 from utils import find_infra_yaml_path  # Import the utility function
 
 class PlaywrightTestValidator(ValidatorBase):
-    def __init__(self, validatorCatalog, repo_path, level=Severity.LOW):
-        super().__init__("PlaywrightTestValidator", validatorCatalog, level)
+    def __init__(self, validatorCatalog, repo_path, severity=Severity.LOW):
+        super().__init__("PlaywrightTestValidator", validatorCatalog, severity)
         self.repo_path = repo_path
 
     def validate(self):
