@@ -9,11 +9,11 @@ class TestPlaywrightTestValidator(unittest.TestCase):
     @patch("os.walk")
     @patch("subprocess.run")
     def test_validate_with_successful_tests(self, mock_run, mock_walk):
-        mock_walk.return_value = [("/testpath/path", [], ["playwright-test.yaml"])]
+        mock_walk.return_value = [("./.github/workflows", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 0
 
         validator = PlaywrightTestValidator(
-            "ValidatorCatalog", "/testpath/repo", Severity.LOW
+            "ValidatorCatalog", "./test", Severity.LOW
         )
         result, message = validator.validate()
 
@@ -28,11 +28,11 @@ class TestPlaywrightTestValidator(unittest.TestCase):
     @patch("os.walk")
     @patch("subprocess.run")
     def test_validate_with_failed_tests(self, mock_run, mock_walk):
-        mock_walk.return_value = [("/testpath/path", [], ["playwright-test.yaml"])]
+        mock_walk.return_value = [("./.github/workflows", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 1
 
         validator = PlaywrightTestValidator(
-            "ValidatorCatalog", "/testpath/repo", Severity.LOW
+            "ValidatorCatalog", "./test/e2e", Severity.LOW
         )
         result, message = validator.validate()
 
@@ -48,10 +48,10 @@ class TestPlaywrightTestValidator(unittest.TestCase):
 
     @patch("os.walk")
     def test_validate_with_missing_yaml(self, mock_walk):
-        mock_walk.return_value = [("/testpath/path", [], [])]
+        mock_walk.return_value = [("./.github/workflows", [], [])]
 
         validator = PlaywrightTestValidator(
-            "ValidatorCatalog", "/testpath/repo", Severity.LOW
+            "ValidatorCatalog", "./test/e2e", Severity.LOW
         )
         result, message = validator.validate()
 
@@ -68,7 +68,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
     @patch("os.walk", side_effect=Exception("Unexpected Error"))
     def test_validate_with_error_during_execution(self, mock_walk):
         validator = PlaywrightTestValidator(
-            "ValidatorCatalog", "/testpath/repo", Severity.LOW
+            "ValidatorCatalog", "./test/e2e", Severity.LOW
         )
         result, message = validator.validate()
 

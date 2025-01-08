@@ -5,3 +5,4 @@ pyyaml
 pytest
 ruff
 sarif-tools
+playwright
