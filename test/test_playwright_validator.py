@@ -61,7 +61,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
 
     @patch("os.walk", side_effect=Exception("Unexpected Error"))
     def test_validate_with_error_during_execution(self, mock_walk):
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", level=Level.HIGH)
+        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
         result, message = validator.validate()
 
         self.assertFalse(result)
