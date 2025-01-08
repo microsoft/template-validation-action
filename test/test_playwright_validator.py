@@ -1,8 +1,8 @@
 import unittest
-from unittest.mock import patch, mock_open
-from validator.playwright_test_validator import PlaywrightTestValidator
+from unittest.mock import patch
+from validator.playwright_validator import PlaywrightTestValidator
 from constants import ItemResultFormat, Signs
-from severity import Severity
+from level import Level
 
 
 class TestPlaywrightTestValidator(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
         mock_walk.return_value = [("/testpath/path", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 0
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
+        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", level=Level.LOW)
         result, message = validator.validate()
 
         self.assertTrue(result)
@@ -29,7 +29,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
         mock_walk.return_value = [("/testpath/path", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 1
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
+        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", level=Level.HIGH)
         result, message = validator.validate()
 
         self.assertFalse(result)
@@ -46,7 +46,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
     def test_validate_with_missing_yaml(self, mock_walk):
         mock_walk.return_value = [("/testpath/path", [], [])] 
 
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
+        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", level=Level.HIGH)
         result, message = validator.validate()
 
         self.assertFalse(result)
@@ -61,7 +61,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
 
     @patch("os.walk", side_effect=Exception("Unexpected Error"))
     def test_validate_with_error_during_execution(self, mock_walk):
-        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", Severity.LOW)
+        validator = PlaywrightTestValidator("ValidatorCatalog", "/testpath/repo", level=Level.HIGH)
         result, message = validator.validate()
 
         self.assertFalse(result)
