@@ -12,9 +12,7 @@ class TestPlaywrightTestValidator(unittest.TestCase):
         mock_walk.return_value = [("./.github/workflows", [], ["playwright-test.yaml"])]
         mock_run.return_value.returncode = 0
 
-        validator = PlaywrightTestValidator(
-            "ValidatorCatalog", "./test", Severity.LOW
-        )
+        validator = PlaywrightTestValidator("ValidatorCatalog", "./test", Severity.LOW)
         result, message = validator.validate()
 
         self.assertTrue(result)

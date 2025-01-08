@@ -14,13 +14,17 @@ class ResultAggregator:
         if "repository_management" in catalog:
             self.categories["Repository Management"].append((severity, result, message))
         elif "source_code_structure" in catalog:
-            self.categories["Source code structure and conventions"].append(
-                (severity, result, message)
-            )
+            self.categories["Source code structure and conventions"].append((
+                severity,
+                result,
+                message,
+            ))
         elif "functional_requirements" in catalog:
-            self.categories["Functional Requirements"].append(
-                (severity, result, message)
-            )
+            self.categories["Functional Requirements"].append((
+                severity,
+                result,
+                message,
+            ))
         elif "security_requirements" in catalog:
             self.categories["Security Requirements"].append((severity, result, message))
         else:

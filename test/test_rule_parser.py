@@ -16,45 +16,43 @@ class TestParseRules(unittest.TestCase):
     @patch(
         "builtins.open",
         new_callable=mock_open,
-        read_data=json.dumps(
-            {
-                "README": {
-                    "catalog": "Repository Management",
-                    "ext": [".md"],
-                    "candidate_path": ["."],
-                    "assert_in": [
-                        "## Features",
-                        "## Getting Started",
-                        "## Guidance",
-                        "## Resources",
-                    ],
-                    "case_sensitive": False,
-                    "validator": "FileValidator",
-                    "severity": "high",
-                },
-                "azd up": {
-                    "catalog": "Functional Requirements",
-                    "validator": "AzdValidator",
-                    "severity": "high",
-                },
-                "azd down": {
-                    "catalog": "Functional Requirements",
-                    "validator": "AzdValidator",
-                    "severity": "moderate",
-                },
-                "expected_topics": {
-                    "catalog": "Repository Management",
-                    "topics": ["azd-templates", "ai-azd-templates"],
-                    "validator": "TopicValidator",
-                    "severity": "high",
-                },
-                "ps rule": {
-                    "catalog": "Security Requirements",
-                    "validator": "PSRuleValidator",
-                    "severity": "moderate",
-                },
-            }
-        ),
+        read_data=json.dumps({
+            "README": {
+                "catalog": "Repository Management",
+                "ext": [".md"],
+                "candidate_path": ["."],
+                "assert_in": [
+                    "## Features",
+                    "## Getting Started",
+                    "## Guidance",
+                    "## Resources",
+                ],
+                "case_sensitive": False,
+                "validator": "FileValidator",
+                "severity": "high",
+            },
+            "azd up": {
+                "catalog": "Functional Requirements",
+                "validator": "AzdValidator",
+                "severity": "high",
+            },
+            "azd down": {
+                "catalog": "Functional Requirements",
+                "validator": "AzdValidator",
+                "severity": "moderate",
+            },
+            "expected_topics": {
+                "catalog": "Repository Management",
+                "topics": ["azd-templates", "ai-azd-templates"],
+                "validator": "TopicValidator",
+                "severity": "high",
+            },
+            "ps rule": {
+                "catalog": "Security Requirements",
+                "validator": "PSRuleValidator",
+                "severity": "moderate",
+            },
+        }),
     )
     def test_rule_parser(self, mock_file, mock_find_infra_yaml_path):
         mock_find_infra_yaml_path.return_value = [
@@ -134,20 +132,18 @@ class TestParseRules(unittest.TestCase):
     @patch(
         "builtins.open",
         new_callable=mock_open,
-        read_data=json.dumps(
-            {
-                "azd up": {
-                    "catalog": "Functional Requirements",
-                    "validator": "AzdValidator",
-                    "severity": "high",
-                },
-                "azd down": {
-                    "catalog": "Functional Requirements",
-                    "validator": "AzdValidator",
-                    "severity": "moderate",
-                },
-            }
-        ),
+        read_data=json.dumps({
+            "azd up": {
+                "catalog": "Functional Requirements",
+                "validator": "AzdValidator",
+                "severity": "high",
+            },
+            "azd down": {
+                "catalog": "Functional Requirements",
+                "validator": "AzdValidator",
+                "severity": "moderate",
+            },
+        }),
     )
     def test_parse_azd_validator(self, mock_file, mock_find_infra_yaml_path):
         mock_find_infra_yaml_path.return_value = ["mocked/path/to/infra.yaml"]

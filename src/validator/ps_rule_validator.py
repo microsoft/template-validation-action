@@ -26,7 +26,7 @@ class PSRuleValidator(ValidatorBase):
                 error_code = item["ref"]
                 recommendation = item["info"]["recommendation"]
                 reference = (
-                    f'reference: {item["info"]["annotations"]["online version"]}'
+                    f"reference: {item['info']['annotations']['online version']}"
                 )
 
                 item = ItemResultFormat.SUBITEM.format(
