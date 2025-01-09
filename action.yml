@@ -276,7 +276,7 @@ runs:
 
     - name: Install AZD
       if: ${{ inputs.useDevContainer == 'false' }}
-      uses: Azure/setup-azd@v1.0.0
+      uses: Azure/setup-azd@v2
 
     - name: Log in with Azure (Federated Credentials)
       if: ${{ inputs.validateAzd == 'true' && inputs.useDevContainer == 'false' }}
