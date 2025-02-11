@@ -22,7 +22,7 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
     azd pipeline config
     ```
 
-4. Add the `microsoft/template-validation-action` action to any workflow YAML file under the `.github/workflows` folder. Below is a sample YAML configuration: [Sample Workflow for Linux](.github\workflows\sample-workflow-linux.yaml) 
+4. Add the `microsoft/template-validation-action` action to any workflow YAML file under the `.github/workflows` folder. Below is a sample YAML configuration: [Sample Workflow for Linux](.github/workflows/sample-workflow-linux.yaml) 
 
 
     ```yaml
@@ -60,7 +60,7 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
 
 #### Run in Windows
 
-Need change the job `runs-on` to `windows-latest` and diable `useDevContainer` in action. The sample workflow are [Sample Workflow for Win](.github\workflows\sample-workflow-win.yaml) 
+Need change the job `runs-on` to `windows-latest` and diable `useDevContainer` in action. The sample workflow is [Sample Workflow for Win](.github/workflows/sample-workflow-win.yaml) 
 
 ```yaml
     template_validation_job:
