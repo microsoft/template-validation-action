@@ -22,7 +22,7 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
     azd pipeline config
     ```
 
-4. Add the `microsoft/template-validation-action` action to any workflow YAML file under the `.github/workflows` folder. Below is a sample YAML configuration:
+4. Add the `microsoft/template-validation-action` action to any workflow YAML file under the `.github/workflows` folder. Below is a sample YAML configuration: [Sample Workflow for Linux](.github\workflows\sample-workflow-linux.yaml) 
 
 
     ```yaml
@@ -42,7 +42,7 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
         steps:
           - uses: actions/checkout@v4
 
-          - uses: microsoft/template-validation-action@v0.3.2
+          - uses: microsoft/template-validation-action@v0.3.5
             id: validation
             env:
               AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
@@ -58,12 +58,40 @@ Refer to the [azure.yaml](https://github.com/microsoft/template-validation-actio
 
 ### Other examples
 
+#### Run in Windows
+
+Need change the job `runs-on` to `windows-latest` and diable `useDevContainer` in action. The sample workflow are [Sample Workflow for Win](.github\workflows\sample-workflow-win.yaml) 
+
+```yaml
+    template_validation_job:
+        runs-on: windows-latest
+        name: template validation
+        steps:
+          - uses: actions/checkout@v4
+
+          - uses: microsoft/template-validation-action@v0.3.5
+            id: validation
+            with: 
+              useDevContainer: false
+            env:
+              AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+              AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+              AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+              AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+              AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          - name: print result
+            run: cat ${{ steps.validation.outputs.resultFile }}
+```
+
+
 #### Run in Subfolder
 
 Suppose there is a folder at root-level, called `ai-template`, where the `azure.yml` configuration is found:
 
 ```yaml
-  - uses: microsoft/template-validation-action@v0.2.2
+  - uses: microsoft/template-validation-action@v0.3.5
     with:
       workingDirectory: ./ai-template
     env:
@@ -80,7 +108,7 @@ Suppose there is a folder at root-level, called `ai-template`, where the `azure.
 By default, the action validates all paths, unless specific paths are configured. You can find the reference input name in the [#Inputs] table below. 
 
 ```yaml
-  - uses: microsoft/template-validation-action@v0.2.2
+  - uses: microsoft/template-validation-action@v0.3.5
     with:
       validatePaths: "README.md, LICENSE, ISSUE_TEMPLATE"
       topics: "azure, chatgpt, javascript"
@@ -100,7 +128,7 @@ By default, the action validates all paths, unless specific paths are configured
       java-version: '17'
       cache: 'maven'
 
-  - uses: microsoft/template-validation-action@v0.2.2
+  - uses: microsoft/template-validation-action@v0.3.5
     with:
       validateAzd: true
       useDevContainer: false
