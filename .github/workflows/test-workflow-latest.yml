@@ -1,0 +1,74 @@
+name: Test Workflow with Latest Release
+on: 
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  template_validation_job:
+    runs-on: ubuntu-latest
+    name: template validation
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone repo
+        working-directory: ${{ runner.temp }}
+        run: |
+          git clone https://github.com/Azure-Samples/azd-ai-starter template
+
+          candidate_hooks_paths=("./template/hooks" "./template/infra/hooks" "./template/scripts" "./template/deploy/aca/scripts" "./template/deploy/aks/scripts" "./template/deploy/app-service/scripts")
+          for hooks_path in "${candidate_hooks_paths[@]}"; do
+            if [ -d "$hooks_path" ] && [ "$(ls -A $hooks_path/*.sh 2>/dev/null)" ]; then
+              chmod +x $hooks_path/*.sh
+              echo "Executable permissions set for .sh files in $hooks_path"
+            else
+              echo "No hooks directory or no .sh files found in $hooks_path"
+            fi
+          done
+
+      - id: validation1
+        uses: microsoft/template-validation-action@Latest
+        with:
+          workingDirectory: ${{ runner.temp }}/template
+        env:
+          REPOSITORY_NAME: Azure-Samples/azd-ai-starter
+
+      - name: print result
+        run: cat ${{ steps.validation1.outputs.resultFile }}
+
+      - id: validation2
+        uses: microsoft/template-validation-action@Latest
+        with:
+          workingDirectory: ${{ runner.temp }}/template
+          validateAzd: false
+          validatePaths: "README.md, .devcontainer, azure.yaml, NON_EXISTENT_FILE"
+          expectedTopics: "ai-azd-templates, azd-templates"
+        env:
+          REPOSITORY_NAME: Azure-Samples/azd-ai-starter
+          README_H2_TAGS: "## Features, ## Get Started"
+
+      - name: print result
+        run: cat ${{ steps.validation2.outputs.resultFile }}
+
+      - id: validation3
+        uses: microsoft/template-validation-action@Latest
+        with:
+          workingDirectory: ${{ runner.temp }}/template
+          validatePaths: "None"
+          expectedTopics: "None"
+          useDevContainer: false
+        env:
+          REPOSITORY_NAME: Azure-Samples/azd-ai-starter
+
+      - name: print result
+        run: cat ${{ steps.validation3.outputs.resultFile }}
