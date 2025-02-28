@@ -27,4 +27,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: print result
-        run: cat ${{ steps.validation.outputs.resultFile }}
+        run: |
+          # Change ${{ steps.validation.outputs.resultFile }} to windows path
+          resultFile_win=$(cygpath -w ${{ steps.validation.outputs.resultFile }})
+          echo $resultFile_win
+          cat $resultFile_win
+        shell: bash
