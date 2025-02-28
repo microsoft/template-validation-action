@@ -41,6 +41,23 @@ runs:
           exit 1
         fi
       shell: bash
+    
+    - name: Check for environment variables
+      id: check_env
+      run: |
+        if [ -z "${{ env.AZURE_CLIENT_ID }}" ]; then
+          echo "Error: AZURE_CLIENT_ID is not set. Please run azd pipeline config for setup."
+          exit 1
+        fi
+        if [ -z "${{ env.AZURE_TENANT_ID }}" ]; then
+          echo "Error: AZURE_TENANT_ID is not set. Please run azd pipeline config for setup."
+          exit 1
+        fi
+        if [ -z "${{ env.AZURE_SUBSCRIPTION_ID }}" ]; then
+          echo "Error: AZURE_SUBSCRIPTION_ID is not set. Please run azd pipeline config for setup."
+          exit 1
+        fi
+      shell: bash
         
     - name: Extract topics
       id: extract_repo_info
@@ -141,6 +158,33 @@ runs:
     #  shell: bash
     #  env:
     #    AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
+
+    - name: Set azure resource group name in env
+      id: set_resource_group
+      if: ${{ inputs.validateAzd == 'true' }}
+      run: |
+        azure_resource_group="rg-${{ env.AZURE_ENV_NAME }}"
+        echo "AZURE_RESOURCE_GROUP=$azure_resource_group" >> $GITHUB_ENV
+        echo "AZURE_RESOURCE_GROUP is $AZURE_RESOURCE_GROUP"
+      shell: bash
+      env:
+        AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
+
+    - name: Azure login
+      uses: azure/login@v2
+      if : ${{ inputs.validateAzd == 'true' }}
+      with:
+        client-id: ${{ env.AZURE_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      if : ${{ inputs.validateAzd == 'true' }}
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --location ${{ env.AZURE_LOCATION }}
 
     - name: Copy validator into devcontainer
       if: ${{ inputs.useDevContainer == 'true' }}
