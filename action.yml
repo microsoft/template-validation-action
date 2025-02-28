@@ -179,12 +179,11 @@ runs:
         subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
     - name: Azure CLI script
-      uses: azure/cli@v2
+      id: create_resource_group
       if : ${{ inputs.validateAzd == 'true' }}
-      with:
-        azcliversion: latest
-        inlineScript: |
-          az group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --location ${{ env.AZURE_LOCATION }}
+      run: |
+        az group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --location ${{ env.AZURE_LOCATION }}
+      shell: bash
 
     - name: Copy validator into devcontainer
       if: ${{ inputs.useDevContainer == 'true' }}
