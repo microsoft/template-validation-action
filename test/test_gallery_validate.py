@@ -17,6 +17,7 @@ class TestGalleryValidate(unittest.TestCase):
             repo_path="dummy_repo_path",
             validate_paths=None,
             validate_azd=True,
+            validate_playwright_test=True,
             topics="azd-templates,azure",
             expected_topics=None,
             msdoresult="dummy_msdo_result_file",

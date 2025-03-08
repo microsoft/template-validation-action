@@ -25,6 +25,12 @@ inputs:
     default: 'PSRule'
     options:
       - 'PSRule'
+  validateTests:
+    description: 'Run tests for validation'
+    required: false
+    default: 'Playwright'
+    options:
+      - 'Playwright'
 outputs:
   resultFile:
     description: "A file path to a results file."
@@ -273,6 +279,23 @@ runs:
           python3 -m pip install -r tva_${{ github.run_id }}/requirements.txt;
         subFolder: ${{ steps.reform_path.outputs.workingDirectory }}
     
+    - name: Setup Node in devcontainer
+      id: setup-node
+      if: ${{ inputs.useDevContainer == 'true' && inputs.validateTests == 'Playwright' }}
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          if ! command -v node &> /dev/null; then
+            echo "node not found, installing lts. node..."
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          fi
+          echo "Install playwright node..."
+          npm install @playwright/test
+          echo "Install playwright browsers..."
+          npx playwright install --with-deps
+        subFolder: ${{ steps.reform_path.outputs.workingDirectory }}
+    
     - name: Remove spaces from inputs
       id: remove_spaces
       run: |
@@ -300,6 +323,9 @@ runs:
         if [ ${{ inputs.securityAction }} == "PSRule" ]; then
           arguments+=" --psrule_result ./psrule-output.json"
         fi
+        if [ ${{ inputs.validateTests }} == "Playwright" ]; then
+          arguments+=" --validate_playwright_test"
+        fi
         echo "arguments=$arguments" >> $GITHUB_OUTPUT
       shell: bash
 
@@ -326,7 +352,7 @@ runs:
           CREATE_ROLE_FOR_USER=false
           AZURE_PRINCIPAL_TYPE=ServicePrincipal
           FORCE_TERRAFORM_REMOTE_STATE_CREATION=false
-    
+
     - name: Send output to main workflow
       id: send_output
       if: ${{ inputs.useDevContainer == 'true' }}
@@ -339,6 +365,21 @@ runs:
     - name: Install AZD
       if: ${{ inputs.useDevContainer == 'false' }}
       uses: Azure/setup-azd@v2
+
+    - uses: actions/setup-node@v4
+      if: ${{ inputs.useDevContainer == 'false' && inputs.validateTests == 'Playwright' }}
+      with:
+        node-version: lts/*
+    
+    - name: Install playwright
+      if: ${{ inputs.useDevContainer == 'false' && inputs.validateTests == 'Playwright' }}
+      working-directory: ${{ inputs.workingDirectory }}
+      run: |
+        echo "Install playwright node..."
+        npm install @playwright/test
+        echo "Install playwright browsers..."
+        npx playwright install --with-deps
+      shell: bash
 
     - name: Log in with Azure (Federated Credentials)
       if: ${{ inputs.validateAzd == 'true' && inputs.useDevContainer == 'false' }}
