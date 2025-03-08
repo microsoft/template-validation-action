@@ -102,5 +102,10 @@
     "catalog": "security_requirements",
     "validator": "PSRuleValidator",
     "severity": "low"
+  },
+  "playwright test": {
+    "catalog": "functional_requirements",
+    "validator": "PlaywrightTestValidator",
+    "severity": "low"
   }
 }

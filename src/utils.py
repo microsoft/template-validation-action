@@ -11,6 +11,15 @@ def find_infra_yaml_path(repo_path):
     return infra_yaml_paths if len(infra_yaml_paths) > 0 else [repo_path]
 
 
+def find_playwright_config_ts_path(repo_path):
+    # playwright.config.ts
+    playwright_config_ts_paths = []
+    for root, dirs, files in os.walk(repo_path):
+        if "playwright.config.ts" in files:
+            playwright_config_ts_paths.append(root)
+    return playwright_config_ts_paths if len(playwright_config_ts_paths) > 0 else []
+
+
 def indent(text, count=2):
     return (" " * count).join(text.splitlines(True))
 
