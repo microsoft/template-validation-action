@@ -159,20 +159,39 @@ runs:
     #  env:
     #    AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
 
+    - name: Check and Set targetScope in main.bicep
+      id: check_targetScope
+      if: ${{ inputs.validateAzd == 'true' }}
+      run: |
+        if [ -f "${{ steps.reform_path.outputs.workingDirectory }}/infra/main.bicep" ]; then
+          # Check if targetScope is set to 'subscription' or 'resourceGroup'. The sample sentence in bicep is: targetScope = 'subscription'
+          targetScope=$(grep -oP "targetScope\s*=\s*['\"]\K[^'\"]+" ${{ steps.reform_path.outputs.workingDirectory }}/infra/main.bicep)
+          echo "targetScope=$targetScope" >> $GITHUB_ENV
+          if [ "$targetScope" == "subscription" ]; then
+            echo "targetScope is set to 'subscription' in main.bicep"
+            # Add the targetScope to the env variables
+          elif [ "$targetScope" == "resourceGroup" ]; then
+            echo "targetScope is set to 'resourceGroup' in main.bicep"
+          else
+            echo "targetScope is not set to 'subscription' or 'resourceGroup' in main.bicep"
+          fi
+        fi
+      shell: bash
+
     - name: Set azure resource group name in env
       id: set_resource_group
-      if: ${{ inputs.validateAzd == 'true' }}
+      if: ${{ inputs.validateAzd == 'true' && env.targetScope == 'resourceGroup' }}
       run: |
         azure_resource_group="rg-${{ env.AZURE_ENV_NAME }}"
         echo "AZURE_RESOURCE_GROUP=$azure_resource_group" >> $GITHUB_ENV
-        echo "AZURE_RESOURCE_GROUP is $AZURE_RESOURCE_GROUP"
+        echo "AZURE_RESOURCE_GROUP is $azure_resource_group"
       shell: bash
       env:
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
 
     - name: Azure login
       uses: azure/login@v2
-      if : ${{ inputs.validateAzd == 'true' }}
+      if : ${{ inputs.validateAzd == 'true' && env.targetScope == 'resourceGroup' }}
       with:
         client-id: ${{ env.AZURE_CLIENT_ID }}
         tenant-id: ${{ env.AZURE_TENANT_ID }}
@@ -180,7 +199,7 @@ runs:
 
     - name: Azure CLI script
       id: create_resource_group
-      if : ${{ inputs.validateAzd == 'true' }}
+      if : ${{ inputs.validateAzd == 'true' && env.targetScope == 'resourceGroup' }}
       run: |
         az group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --location ${{ env.AZURE_LOCATION }}
       shell: bash
