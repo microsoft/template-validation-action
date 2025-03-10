@@ -53,6 +53,7 @@ jobs:
           validateAzd: false
           validatePaths: "README.md, .devcontainer, azure.yaml, NON_EXISTENT_FILE"
           expectedTopics: "ai-azd-templates, azd-templates"
+          validateTests: "Playwright"
         env:
           REPOSITORY_NAME: Azure-Samples/azd-ai-starter
           README_H2_TAGS: "## Features, ## Get Started"
@@ -67,6 +68,7 @@ jobs:
           validatePaths: "None"
           expectedTopics: "None"
           useDevContainer: false
+          validateTests: "Playwright"
         env:
           REPOSITORY_NAME: Azure-Samples/azd-ai-starter
 

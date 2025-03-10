@@ -6,6 +6,7 @@ from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
 from validator.folder_validator import FolderValidator
 from validator.ps_rule_validator import PSRuleValidator
+from validator.playwright_test_validator import PlaywrightTestValidator
 from validator.azd_command import AzdCommand
 from severity import Severity
 import utils
@@ -143,6 +144,23 @@ class RuleParser:
             elif validator_type == "PSRuleValidator":
                 validator = PSRuleValidator(catalog, self.args.psrule_result, severity)
                 validators.append(validator)
+
+            elif validator_type == "PlaywrightTestValidator":
+                if not self.args.validate_playwright_test:
+                    continue
+
+                playwright_config_ts_paths = utils.find_playwright_config_ts_path(
+                    self.args.repo_path
+                )
+                logging.debug(
+                    f"playwright_config_ts_paths: {playwright_config_ts_paths}"
+                )
+
+                for playwright_config_ts_path in playwright_config_ts_paths:
+                    validator = PlaywrightTestValidator(
+                        catalog, playwright_config_ts_path, severity
+                    )
+                    validators.append(validator)
             else:
                 continue
 

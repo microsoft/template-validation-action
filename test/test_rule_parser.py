@@ -8,6 +8,7 @@ from validator.azd_validator import AzdValidator
 from validator.topic_validator import TopicValidator
 from validator.azd_command import AzdCommand
 from validator.ps_rule_validator import PSRuleValidator
+from validator.playwright_test_validator import PlaywrightTestValidator
 from severity import Severity
 
 
@@ -176,6 +177,78 @@ class TestParseRules(unittest.TestCase):
         self.assertEqual(azd_down_validator.folderPath, "mocked/path/to/infra.yaml")
         self.assertEqual(azd_down_validator.command, AzdCommand.DOWN)
         self.assertEqual(azd_down_validator.severity, Severity.MODERATE)
+
+    @patch("utils.find_playwright_config_ts_path")
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data=json.dumps(
+            {
+                "playwright test": {
+                    "catalog": "Functional Requirements",
+                    "validator": "PlaywrightTestValidator",
+                    "severity": "low",
+                }
+            }
+        ),
+    )
+    def test_parse_playwright_validator(
+        self, mock_file, find_playwright_config_ts_path
+    ):
+        find_playwright_config_ts_path.return_value = [
+            "mocked/path/to/playwright.config.ts"
+        ]
+        args = argparse.Namespace(
+            validate_azd=False,
+            validate_playwright_test=True,
+            topics=None,
+            repo_path=".",
+            validate_paths=None,
+            expected_topics=None,
+        )
+        parser = RuleParser("dummy_path", args)
+        validators = parser.parse()
+
+        self.assertEqual(len(validators), 1)
+
+        playwright_test_validator = validators[0]
+        self.assertIsInstance(playwright_test_validator, PlaywrightTestValidator)
+        self.assertEqual(playwright_test_validator.catalog, "Functional Requirements")
+        self.assertEqual(
+            playwright_test_validator.folderPath, "mocked/path/to/playwright.config.ts"
+        )
+        self.assertEqual(playwright_test_validator.severity, Severity.LOW)
+
+    @patch("utils.find_playwright_config_ts_path")
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data=json.dumps(
+            {
+                "playwright test": {
+                    "catalog": "Functional Requirements",
+                    "validator": "PlaywrightTestValidator",
+                    "severity": "low",
+                }
+            }
+        ),
+    )
+    def test_parse_playwright_validator_empty(
+        self, mock_file, find_playwright_config_ts_path
+    ):
+        find_playwright_config_ts_path.return_value = []
+        args = argparse.Namespace(
+            validate_azd=False,
+            validate_playwright_test=True,
+            topics=None,
+            repo_path=".",
+            validate_paths=None,
+            expected_topics=None,
+        )
+        parser = RuleParser("dummy_path", args)
+        validators = parser.parse()
+
+        self.assertEqual(len(validators), 0)
 
     @patch(
         "builtins.open",
