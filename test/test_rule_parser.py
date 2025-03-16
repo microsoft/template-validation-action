@@ -179,6 +179,73 @@ class TestParseRules(unittest.TestCase):
         self.assertEqual(azd_down_validator.severity, Severity.MODERATE)
 
     @patch("utils.find_playwright_config_ts_path")
+    @patch("utils.find_infra_yaml_path")
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data=json.dumps(
+            {
+                "azd up": {
+                    "catalog": "Functional Requirements",
+                    "validator": "AzdValidator",
+                    "severity": "high",
+                },
+                "azd down": {
+                    "catalog": "Functional Requirements",
+                    "validator": "AzdValidator",
+                    "severity": "moderate",
+                },
+                "playwright test": {
+                    "catalog": "Functional Requirements",
+                    "validator": "PlaywrightTestValidator",
+                    "severity": "low",
+                },
+            }
+        ),
+    )
+    def test_parse_mixed_azd_playwright_validator(
+        self, mock_file, find_infra_yaml_path, find_playwright_config_ts_path
+    ):
+        find_infra_yaml_path.return_value = ["mocked/path/to/infra.yaml"]
+        find_playwright_config_ts_path.return_value = [
+            "mocked/path/to/playwright.config.ts"
+        ]
+        args = argparse.Namespace(
+            validate_azd=True,
+            validate_playwright_test=True,
+            topics=None,
+            repo_path=".",
+            validate_paths=None,
+            expected_topics=None,
+        )
+        parser = RuleParser("dummy_path", args)
+        validators = parser.parse()
+
+        self.assertEqual(len(validators), 3)
+
+        azd_up_validator = validators[0]
+        self.assertIsInstance(azd_up_validator, AzdValidator)
+        self.assertEqual(azd_up_validator.catalog, "Functional Requirements")
+        self.assertEqual(azd_up_validator.folderPath, "mocked/path/to/infra.yaml")
+        self.assertEqual(azd_up_validator.command, AzdCommand.UP)
+        self.assertEqual(azd_up_validator.severity, Severity.HIGH)
+
+        playwright_test_validator = validators[1]
+        self.assertIsInstance(playwright_test_validator, PlaywrightTestValidator)
+        self.assertEqual(playwright_test_validator.catalog, "Functional Requirements")
+        self.assertEqual(
+            playwright_test_validator.folderPath, "mocked/path/to/playwright.config.ts"
+        )
+        self.assertEqual(playwright_test_validator.severity, Severity.LOW)
+
+        azd_down_validator = validators[2]
+        self.assertIsInstance(azd_down_validator, AzdValidator)
+        self.assertEqual(azd_down_validator.catalog, "Functional Requirements")
+        self.assertEqual(azd_down_validator.folderPath, "mocked/path/to/infra.yaml")
+        self.assertEqual(azd_down_validator.command, AzdCommand.DOWN)
+        self.assertEqual(azd_down_validator.severity, Severity.MODERATE)
+
+    @patch("utils.find_playwright_config_ts_path")
     @patch(
         "builtins.open",
         new_callable=mock_open,
