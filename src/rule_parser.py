@@ -157,10 +157,20 @@ class RuleParser:
                 )
 
                 for playwright_config_ts_path in playwright_config_ts_paths:
-                    validator = PlaywrightTestValidator(
+                    playwright_validator = PlaywrightTestValidator(
                         catalog, playwright_config_ts_path, severity
                     )
-                    validators.append(validator)
+                    inserted = False
+                    for i, validator in enumerate(validators):
+                        if (
+                            isinstance(validator, AzdValidator)
+                            and validator.command == AzdCommand.UP
+                        ):
+                            validators.insert(i + 1, playwright_validator)
+                            inserted = True
+                            break
+                    if not inserted:
+                        validators.append(playwright_validator)
             else:
                 continue
 
