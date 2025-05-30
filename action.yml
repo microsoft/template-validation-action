@@ -165,6 +165,62 @@ runs:
     #  env:
     #    AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
 
+    - name: Check parameters in main.bicep
+      id: check_parameters
+      #if: ${{ inputs.validateAzd == 'true' }}
+      run: |
+        if [ -f "${{ steps.reform_path.outputs.workingDirectory }}/infra/main.bicep" ]; then
+          # Get parameter names that don't have a default value (no equals sign in the line)
+          parameters=$(grep -P "^param\s+\w+\s+\w+$" "${{ steps.reform_path.outputs.workingDirectory }}/infra/main.bicep" | grep -oP "^param\s+\K\w+" || echo "")
+          echo "parameters from main.bicep without default value: $parameters"
+          # remove if parameters are set default values in /infra/main.parameters.json. 
+          # The following the sample (no default value) in main.parameters.json: "location": { "value": "${AZURE_LOCATION}" }
+          # The following the sample (with default value) in main.parameters.json: "location": { "value": "${AZURE_LOCATION}=eastus2" }
+          if [ -f "${{ steps.reform_path.outputs.workingDirectory }}/infra/main.parameters.json" ]; then
+            required_env=""
+            for param in $parameters; do
+              echo "Checking parameter: $param"
+              # Check if parameter exists and has no default value
+              param_value=$(jq -r ".parameters."$param".value // empty" "${{ steps.reform_path.outputs.workingDirectory }}/infra/main.parameters.json" || echo "")
+              echo "$param value in json file: $param_value"
+              if [ ! -z "$param_value" ] && [[ "$param_value" =~ ^\$\{[A-Z_]+\}$ ]]; then
+                # parse param_value to get the value. e.g get AZURE_LOCATION from "value": "${AZURE_LOCATION}"
+                env_key=$(echo "$param_value" | grep -oP '\$\{([^}]+)\}' | sed 's/\${//;s/}//g' || echo "")
+                echo "$param env_key: $env_key"
+                if [[ $env_key == 'AZURE_LOCATION' || $env_key == 'AZURE_ENV_NAME' || $env_key == 'AZURE_PRINCIPAL_ID' || $env_key == 'AZURE_PRINCIPAL_TYPE' || ${env_key,,} == *"location"* ]]; then
+                  echo "Ignoring parameter: $param"
+                  continue
+                else
+                  # Set env_value with random value (15 characters and starts with a letter)
+                  env_value=$(echo -n $(printf "%c" $(($RANDOM % 26 + 65)))$(for i in {1..14}; do echo -n $(($RANDOM % 36 + 48)) | awk '{printf "%c", ($1 > 57 ? $1 + 39 : $1)}'; done))
+                  # If $env_key contains Capacity (ignore case), set env_value to "10"
+                  if [[ ${env_key,,} == *"capacity"* ]]; then
+                    env_value="10"
+                  elif [[ ${env_key,,} == *"enabled"* ]]; then
+                    env_value="false"
+                  fi
+                  echo "env_value: $env_value"
+                  # Check if $param in main.bicep contains allowlist as follows:
+                  # @allowed(['User', 'ServicePrincipal'])
+                  # param myPrincipalType string
+                  allowed_value=$(grep -B 1 "param $param" "${{ steps.reform_path.outputs.workingDirectory }}/infra/main.bicep" | grep -oP "@allowed\(\[\K[^\]]+" || echo "")
+                  if [ -n "$allowed_value" ]; then
+                    echo "Parameter $param has allowed value: $allowed_value"
+                    # Select first element in the allowed list
+                    env_value=$(echo "$allowed_value" | tr -d "'" | tr -d '"' | awk -F, '{print $1}' | xargs)
+                    echo "Using allowed value for $param: $env_value"
+                  fi
+                  echo "Adding to required_env: $env_key=$env_value"
+                  required_env+="$env_key=$env_value "
+                  echo "$env_key=$env_value" >> $GITHUB_ENV
+                fi
+              fi
+            done
+            echo "required_env from json: $required_env"
+          fi
+        fi
+      shell: bash
+
     - name: Check and Set targetScope in main.bicep
       id: check_targetScope
       if: ${{ inputs.validateAzd == 'true' }}
