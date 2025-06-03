@@ -1,4 +1,4 @@
-name: Bump Tag When PR Merged
+name: Bump Tag
 
 on:
   workflow_dispatch:
@@ -52,4 +52,4 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git tag ${{ steps.version.outputs.version }}
-          git push origin "${{ steps.version.outputs.version }}"
+          git push origin ${{ steps.version.outputs.version }}
