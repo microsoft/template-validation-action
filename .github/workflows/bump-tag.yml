@@ -1,0 +1,55 @@
+name: Bump Tag
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  tag-version:
+    # Only run if PR is merged (not just closed)
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Read version file
+        id: version
+        run: |
+          if [ -f "version" ]; then
+            VERSION=$(cat version)
+            echo "Version read from file: $VERSION"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "Version file not found"
+            exit 1
+          fi
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          TAG_EXISTS=$(git tag -l "${{ steps.version.outputs.version }}")
+          if [ -z "$TAG_EXISTS" ]; then
+            echo "Tag does not exist"
+            echo "exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "Tag exists"
+            echo "exists=true" >> $GITHUB_OUTPUT
+          fi
+
+
+      - name: Create and push tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}

@@ -1,0 +1,56 @@
+name: Mark Latest Tag
+# This workflow may fail in last step bacause of permission issue about Github Token. 
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag to mark as latest (optional)'
+        required: false
+        type: string
+
+jobs:
+  update-latest-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get target tag
+        id: get_tag
+        run: |
+          Target_TAG=$(git tag -l "v*" --sort=-version:refname | head -n 1)
+          echo "Newest tag now is $Target_TAG"
+          if [ -n "${{ inputs.version_tag }}" ]; then
+            # Check if input tag exists
+            TAG_EXISTS=$(git tag -l "${{ inputs.version_tag }}")
+            if [ -n "$TAG_EXISTS" ]; then
+              echo "Using specified tag: ${{ inputs.version_tag }}"
+              Target_TAG="${{ inputs.version_tag }}"
+            fi
+          fi
+          echo "Candidate Latest tag: $Target_TAG"
+          echo "target_tag=$Target_TAG" >> $GITHUB_OUTPUT
+
+      - name: Update latest tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Delete existing latest tag if it exists (both local and remote)
+          echo "Deleting existing latest tag if it exists..."
+          git tag -d Latest 2>/dev/null || true
+          git push origin :refs/tags/Latest 2>/dev/null || true
+          
+          # Create new latest tag
+          echo "Creating new latest tag..."
+          git tag Latest $(git rev-list -n 1 ${{ steps.get_tag.outputs.target_tag }})
+          git tag --list
+          echo "Pushing latest tag to remote..."
+          git push origin --tags
