@@ -40,6 +40,8 @@ jobs:
         uses: microsoft/template-validation-action@Latest
         with:
           workingDirectory: ${{ runner.temp }}/template
+          validationEnvs: |
+            AAA=BBB,CCC=DDD
         env:
           REPOSITORY_NAME: Azure-Samples/azd-ai-starter
 
