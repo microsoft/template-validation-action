@@ -115,7 +115,7 @@ class AzdValidator(ValidatorBase):
                 text=True,
                 check=True,
                 shell=True,
-                stdin=subprocess.DEVNULL,
+                input="\n" * 10,
             )
             logging.info(f"{result.stdout}")
             self.extract_resource_group(result.stdout)
