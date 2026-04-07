@@ -89,6 +89,20 @@ class AzdValidator(ValidatorBase):
         except Exception as e:
             logging.warning(f"Failed to refresh az login: {e}")
 
+    def disable_interactive_hooks(self):
+        """Remove 'interactive: true' from azure.yaml to prevent hooks from
+        trying to allocate a PTY, which blocks forever in non-interactive CI."""
+        azure_yaml = os.path.join(self.folderPath, "azure.yaml")
+        if not os.path.exists(azure_yaml):
+            return
+        with open(azure_yaml, "r") as f:
+            content = f.read()
+        modified = re.sub(r'^\s*interactive:\s*true\s*$', '', content, flags=re.MULTILINE)
+        if modified != content:
+            with open(azure_yaml, "w") as f:
+                f.write(modified)
+            logging.info(f"Removed interactive: true from {azure_yaml}")
+
     def validate_up(self):
         logging.debug(f"Running azd up in {self.folderPath}")
         try:
@@ -96,6 +110,7 @@ class AzdValidator(ValidatorBase):
         except Exception as e:
             logging.warning(f"Failed to update tf backend: {e}")
 
+        self.disable_interactive_hooks()
         self.refresh_az_login()
         return self.runCommand("azd up", "--no-prompt")
 
