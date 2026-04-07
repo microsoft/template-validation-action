@@ -45,63 +45,25 @@ class AzdValidator(ValidatorBase):
         self.resultMessage = line_delimiter.join(self.messages)
         return self.result, self.resultMessage
 
-    def refresh_az_login(self):
-        """Refresh az CLI login right before azd up to ensure az is authenticated
-        when hooks check credentials via az account get-access-token."""
-        try:
-            client_id = os.environ.get("AZURE_CLIENT_ID", "")
-            tenant_id = os.environ.get("AZURE_TENANT_ID", "")
-            if not client_id or not tenant_id:
-                return
-
-            # First check if az is already authenticated
-            check_result = subprocess.run(
-                "az account get-access-token --query expiresOn -o tsv",
-                shell=True, text=True, capture_output=True,
-                stdin=subprocess.DEVNULL,
-            )
-            if check_result.returncode == 0:
-                logging.info("az CLI already authenticated, skipping refresh")
-                return
-
-            logging.info("az CLI not authenticated, attempting refresh via azd auth token")
-            # Use azd auth token to get a fresh access token
-            token_result = subprocess.run(
-                "azd auth token",
-                shell=True, text=True, capture_output=True,
-                stdin=subprocess.DEVNULL,
-            )
-            if token_result.returncode != 0:
-                logging.warning("Failed to get azd auth token for az login refresh")
-                return
-            access_token = token_result.stdout.strip()
-            if not access_token:
-                return
-            az_result = subprocess.run(
-                f'az login --service-principal -u "{client_id}" --tenant "{tenant_id}" --allow-no-subscriptions --federated-token "{access_token}"',
-                shell=True, text=True, capture_output=True,
-                stdin=subprocess.DEVNULL,
-            )
-            if az_result.returncode == 0:
-                logging.info("Successfully refreshed az CLI login")
-            else:
-                logging.warning(f"az login refresh failed: {az_result.stderr}")
-        except Exception as e:
-            logging.warning(f"Failed to refresh az login: {e}")
-
-    def disable_interactive_hooks(self):
-        """Remove 'interactive: true' from azure.yaml to prevent hooks from
-        trying to allocate a PTY, which blocks forever in non-interactive CI."""
+    def remove_hooks(self):
+        """Remove the entire hooks section from azure.yaml to prevent interactive
+        prompts (read, Read-Host) and PTY allocation that block in CI."""
         azure_yaml = os.path.join(self.folderPath, "azure.yaml")
         if not os.path.exists(azure_yaml):
             return
         with open(azure_yaml, "r") as f:
             content = f.read()
-        modified = re.sub(r'^\s*interactive:\s*true\s*$', '', content, flags=re.MULTILINE)
+        # Remove hooks section: from top-level 'hooks:' through all indented/empty lines
+        modified = re.sub(
+            r'^hooks:\s*\n(?:[ \t]+.*\n|[ \t]*\n)*',
+            '',
+            content,
+            flags=re.MULTILINE,
+        )
         if modified != content:
             with open(azure_yaml, "w") as f:
                 f.write(modified)
-            logging.info(f"Removed interactive: true from {azure_yaml}")
+            logging.info(f"Removed hooks section from {azure_yaml}")
 
     def validate_up(self):
         logging.debug(f"Running azd up in {self.folderPath}")
@@ -110,8 +72,7 @@ class AzdValidator(ValidatorBase):
         except Exception as e:
             logging.warning(f"Failed to update tf backend: {e}")
 
-        self.disable_interactive_hooks()
-        self.refresh_az_login()
+        self.remove_hooks()
         return self.runCommand("azd up", "--no-prompt")
 
     def extract_resource_group(self, stdout):
@@ -176,6 +137,7 @@ class AzdValidator(ValidatorBase):
                 check=True,
                 shell=True,
                 stdin=subprocess.DEVNULL,
+                timeout=1800,
             )
             logging.info(f"{result.stdout}")
             self.extract_resource_group(result.stdout)
