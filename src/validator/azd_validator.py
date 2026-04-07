@@ -46,29 +46,39 @@ class AzdValidator(ValidatorBase):
         return self.result, self.resultMessage
 
     def refresh_az_login(self):
-        """Refresh az CLI login using azd's credentials to ensure az is authenticated
-        in the same process context before running azd up."""
+        """Refresh az CLI login right before azd up to ensure az is authenticated
+        when hooks check credentials via az account get-access-token."""
         try:
             client_id = os.environ.get("AZURE_CLIENT_ID", "")
             tenant_id = os.environ.get("AZURE_TENANT_ID", "")
             if not client_id or not tenant_id:
                 return
-            # Use azd auth token to get a fresh access token, then use it for az login
+
+            # First check if az is already authenticated
+            check_result = subprocess.run(
+                "az account get-access-token --query expiresOn -o tsv",
+                shell=True, text=True, capture_output=True,
+                stdin=subprocess.DEVNULL,
+            )
+            if check_result.returncode == 0:
+                logging.info("az CLI already authenticated, skipping refresh")
+                return
+
+            logging.info("az CLI not authenticated, attempting refresh via azd auth token")
+            # Use azd auth token to get a fresh access token
             token_result = subprocess.run(
-                "azd auth token --output json",
+                "azd auth token",
                 shell=True, text=True, capture_output=True,
                 stdin=subprocess.DEVNULL,
             )
             if token_result.returncode != 0:
                 logging.warning("Failed to get azd auth token for az login refresh")
                 return
-            import json
-            token_data = json.loads(token_result.stdout)
-            access_token = token_data.get("token", "")
+            access_token = token_result.stdout.strip()
             if not access_token:
                 return
             az_result = subprocess.run(
-                f'az login --service-principal -u "{client_id}" --tenant "{tenant_id}" --allow-no-subscriptions -t "{access_token}"',
+                f'az login --service-principal -u "{client_id}" --tenant "{tenant_id}" --allow-no-subscriptions --federated-token "{access_token}"',
                 shell=True, text=True, capture_output=True,
                 stdin=subprocess.DEVNULL,
             )
