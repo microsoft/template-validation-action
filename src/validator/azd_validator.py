@@ -45,6 +45,40 @@ class AzdValidator(ValidatorBase):
         self.resultMessage = line_delimiter.join(self.messages)
         return self.result, self.resultMessage
 
+    def refresh_az_login(self):
+        """Refresh az CLI login using azd's credentials to ensure az is authenticated
+        in the same process context before running azd up."""
+        try:
+            client_id = os.environ.get("AZURE_CLIENT_ID", "")
+            tenant_id = os.environ.get("AZURE_TENANT_ID", "")
+            if not client_id or not tenant_id:
+                return
+            # Use azd auth token to get a fresh access token, then use it for az login
+            token_result = subprocess.run(
+                "azd auth token --output json",
+                shell=True, text=True, capture_output=True,
+                stdin=subprocess.DEVNULL,
+            )
+            if token_result.returncode != 0:
+                logging.warning("Failed to get azd auth token for az login refresh")
+                return
+            import json
+            token_data = json.loads(token_result.stdout)
+            access_token = token_data.get("token", "")
+            if not access_token:
+                return
+            az_result = subprocess.run(
+                f'az login --service-principal -u "{client_id}" --tenant "{tenant_id}" --allow-no-subscriptions -t "{access_token}"',
+                shell=True, text=True, capture_output=True,
+                stdin=subprocess.DEVNULL,
+            )
+            if az_result.returncode == 0:
+                logging.info("Successfully refreshed az CLI login")
+            else:
+                logging.warning(f"az login refresh failed: {az_result.stderr}")
+        except Exception as e:
+            logging.warning(f"Failed to refresh az login: {e}")
+
     def validate_up(self):
         logging.debug(f"Running azd up in {self.folderPath}")
         try:
@@ -52,6 +86,7 @@ class AzdValidator(ValidatorBase):
         except Exception as e:
             logging.warning(f"Failed to update tf backend: {e}")
 
+        self.refresh_az_login()
         return self.runCommand("azd up", "--no-prompt")
 
     def extract_resource_group(self, stdout):
@@ -115,7 +150,7 @@ class AzdValidator(ValidatorBase):
                 text=True,
                 check=True,
                 shell=True,
-                input="\n" * 10,
+                stdin=subprocess.DEVNULL,
             )
             logging.info(f"{result.stdout}")
             self.extract_resource_group(result.stdout)
