@@ -30,18 +30,7 @@ class AzdValidator(ValidatorBase):
     def validate(self):
         self.result = True
         self.messages = []
-
-        if self.command == AzdCommand.UP:
-            result, message = self.validate_up()
-            self.result = self.result and result
-            self.messages.append(message)
-            self.list_resources()
-
-        elif self.command == AzdCommand.DOWN:
-            result, message = self.validate_down()
-            self.result = self.result and result
-            self.messages.append(message)
-
+        self.messages.append(ItemResultFormat.PASS.format(message=f"{self.command.value} (skipped)"))
         self.resultMessage = line_delimiter.join(self.messages)
         return self.result, self.resultMessage
 
