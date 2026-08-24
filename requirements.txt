@@ -1,5 +1,5 @@
 azure-identity
-azure.mgmt.resource
+azure.mgmt.resource==25.0.0
 azure.mgmt.cognitiveservices
 pyyaml
 pytest
