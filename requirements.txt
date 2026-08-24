@@ -3,5 +3,5 @@ azure.mgmt.resource
 azure.mgmt.cognitiveservices
 pyyaml
 pytest
-ruff
+ruff==0.15.21
 sarif-tools
