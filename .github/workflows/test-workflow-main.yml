@@ -19,7 +19,7 @@ jobs:
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Clone repo
         working-directory: ${{ runner.temp }}
@@ -37,7 +37,7 @@ jobs:
           done
 
       - id: validation1
-        uses: microsoft/template-validation-action@main
+        uses: microsoft/template-validation-action@9f56864b1ddbfb56dd27f3cbc71a00750cdb9a18 # v0.4.3
         with:
           workingDirectory: ${{ runner.temp }}/template
         env:
@@ -47,7 +47,7 @@ jobs:
         run: cat ${{ steps.validation1.outputs.resultFile }}
 
       - id: validation2
-        uses: microsoft/template-validation-action@main
+        uses: microsoft/template-validation-action@9f56864b1ddbfb56dd27f3cbc71a00750cdb9a18 # v0.4.3
         with:
           workingDirectory: ${{ runner.temp }}/template
           validateAzd: false
@@ -62,7 +62,7 @@ jobs:
         run: cat ${{ steps.validation2.outputs.resultFile }}
 
       - id: validation3
-        uses: microsoft/template-validation-action@main
+        uses: microsoft/template-validation-action@9f56864b1ddbfb56dd27f3cbc71a00750cdb9a18 # v0.4.3
         with:
           workingDirectory: ${{ runner.temp }}/template
           validatePaths: "None"

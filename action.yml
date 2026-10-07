@@ -126,7 +126,7 @@ runs:
 
     # Analyze templates for MI compliance with PSRule for Azure
     - name: Analyze templates for MI compliance
-      uses: microsoft/ps-rule@v2.9.0
+      uses: microsoft/ps-rule@46451b8f5258c41beb5ae69ed7190ccbba84112c # v2.9.0
       if: ${{ inputs.securityAction == 'PSRule' && env.relative_working_directory != '.' }}
       with:
         path: ${{ env.relative_working_directory }}
@@ -139,7 +139,7 @@ runs:
 
     # Analyze templates for MI compliance with PSRule for Azure
     - name: Analyze templates for MI compliance
-      uses: microsoft/ps-rule@v2.9.0
+      uses: microsoft/ps-rule@46451b8f5258c41beb5ae69ed7190ccbba84112c # v2.9.0
       if: ${{ inputs.securityAction == 'PSRule' && env.relative_working_directory == '.' }}
       with:
         modules: 'PSRule.Rules.Azure'
@@ -308,7 +308,7 @@ runs:
         AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
 
     - name: Azure login
-      uses: azure/login@v2
+      uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2.3.1
       if : ${{ inputs.validateAzd == 'true' && env.targetScope == 'resourceGroup' }}
       with:
         client-id: ${{ env.AZURE_CLIENT_ID }}
@@ -334,7 +334,7 @@ runs:
         env > ${{ steps.reform_path.outputs.workingDirectory }}/tva_${{ github.run_id }}/env_variables.txt
       shell: bash
 
-    - uses: actions/github-script@v6
+    - uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
       id: script
       if: ${{ inputs.useDevContainer == 'true' && inputs.validateAzd == 'true' }}
       with:
@@ -350,7 +350,7 @@ runs:
     # A workaround to those template that using Docker 
     - name: Start Docker
       if: ${{ inputs.useDevContainer == 'true' && inputs.validateAzd == 'true' }}
-      uses: devcontainers/ci@v0.3
+      uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
       with:
         runCmd: |
           if find . -type f -iname 'dockerfile' | grep -q .; then
@@ -362,7 +362,7 @@ runs:
     - name: Login azd in devcontainer
       id: azd-login
       if: ${{ inputs.useDevContainer == 'true' && inputs.validateAzd == 'true' }}
-      uses: devcontainers/ci@v0.3
+      uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
       with:
         runCmd: |
           azd auth login --client-id "${{ env.AZURE_CLIENT_ID }}" --federated-credential-provider "github" --tenant-id "${{ env.AZURE_TENANT_ID }}"
@@ -377,7 +377,7 @@ runs:
     - name: Setup Python in devcontainer
       id: setup-python
       if: ${{ inputs.useDevContainer == 'true' }}
-      uses: devcontainers/ci@v0.3
+      uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
       with:
         runCmd: |
           if ! command -v python &> /dev/null; then
@@ -394,7 +394,7 @@ runs:
     - name: Setup Node in devcontainer
       id: setup-node
       if: ${{ inputs.useDevContainer == 'true' && inputs.validateTests == 'Playwright' }}
-      uses: devcontainers/ci@v0.3
+      uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
       with:
         runCmd: |
           if ! command -v node &> /dev/null; then
@@ -469,7 +469,7 @@ runs:
     - name: Run validation
       id: validation
       if: ${{ inputs.useDevContainer == 'true' }}
-      uses: devcontainers/ci@v0.3
+      uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
       with:
         runCmd: |
           source .venv/bin/activate
@@ -493,7 +493,7 @@ runs:
     - name: Send output to main workflow
       id: send_output
       if: ${{ inputs.useDevContainer == 'true' }}
-      uses: devcontainers/ci@v0.3
+      uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
       with:
         runCmd: |
           cat tva_${{ github.run_id }}/output.log
@@ -501,9 +501,9 @@ runs:
 
     - name: Install AZD
       if: ${{ inputs.useDevContainer == 'false' }}
-      uses: Azure/setup-azd@v2
+      uses: Azure/setup-azd@0b7e3a35ab00f2eee7080c845eb39c3f0ebfa553 # v2.4.0
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       if: ${{ inputs.useDevContainer == 'false' && inputs.validateTests == 'Playwright' }}
       with:
         node-version: lts/*
